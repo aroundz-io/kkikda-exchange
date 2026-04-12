@@ -103,6 +103,7 @@ interface AppStore {
   setUser: (u: Partial<UserState>) => void;
   connectWallet: () => void;
   disconnectWallet: () => void;
+  clearUser: () => void;
 
   tokens: Token[];
   setTokens: (t: Token[]) => void;
@@ -330,17 +331,14 @@ export const useStore = create<AppStore>()(
       user: { address: null, balance: 0, kycTier: 0, isAdmin: false },
       setUser: (u) => set((s) => ({ user: { ...s.user, ...u } })),
       connectWallet: () => {
-        set({
-          user: {
-            address: "0x7a3F...9e2B",
-            balance: 4.238,
-            kycTier: 2,
-            isAdmin: true,
-          },
-        });
-        get().addToast({ type: "success", title: "Wallet Connected", message: "Connected as 0x7a3F...9e2B" });
+        // Legacy mock — real connections are handled by wagmi/RainbowKit.
+        // useWalletSync calls setUser() when wagmi detects a connected wallet.
       },
       disconnectWallet: () => {
+        // Legacy — use clearUser() instead.
+        set({ user: { address: null, balance: 0, kycTier: 0, isAdmin: false } });
+      },
+      clearUser: () => {
         set({ user: { address: null, balance: 0, kycTier: 0, isAdmin: false } });
         get().addToast({ type: "info", title: "Disconnected", message: "Wallet disconnected" });
       },

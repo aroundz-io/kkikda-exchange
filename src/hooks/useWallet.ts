@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAccount, useBalance, useChainId, useSwitchChain } from 'wagmi';
 import { formatEther } from 'viem';
 import { useStore } from '@/stores/useStore';
@@ -23,6 +23,11 @@ export function useWalletSync() {
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
 
+  // Track whether the user was connected at least once in this session.
+  // This prevents firing disconnectWallet() on initial page load when
+  // wagmi starts in the "disconnected" state.
+  const hasBeenConnected = useRef(false);
+
   const { data: balanceData } = useBalance({
     address,
     query: {
@@ -31,11 +36,13 @@ export function useWalletSync() {
   });
 
   const setUser = useStore((s) => s.setUser);
-  const disconnectWallet = useStore((s) => s.disconnectWallet);
+  const clearUser = useStore((s) => s.clearUser);
 
   // --- Sync connection state into store ---
   useEffect(() => {
     if (isConnected && address) {
+      hasBeenConnected.current = true;
+
       const formattedBalance = balanceData
         ? parseFloat(formatEther(balanceData.value))
         : 0;
@@ -47,12 +54,13 @@ export function useWalletSync() {
     }
   }, [isConnected, address, balanceData, setUser]);
 
-  // --- Clear store on disconnect ---
+  // --- Clear store on disconnect (only if previously connected) ---
   useEffect(() => {
-    if (isDisconnected) {
-      disconnectWallet();
+    if (isDisconnected && hasBeenConnected.current) {
+      hasBeenConnected.current = false;
+      clearUser();
     }
-  }, [isDisconnected, disconnectWallet]);
+  }, [isDisconnected, clearUser]);
 
   // --- Auto-switch to BSC if on wrong chain ---
   useEffect(() => {
