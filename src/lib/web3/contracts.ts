@@ -10,19 +10,19 @@ export const BSC_CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN === "mainnet" ? 56 : 9
 
 export const TESTNET_ADDRESSES = {
   /** KKD utility/governance token */
-  KKD_TOKEN: "0x0000000000000000000000000000000000000001" as const, // TODO: replace after testnet deployment
+  KKD_TOKEN: "0xdae7BE3dAe2f8E90b7B68FdF92cb13a0aa5Ee479" as const,
   /** RWA-backed Puer tea token */
-  RWA_PUER_TOKEN: "0x0000000000000000000000000000000000000002" as const, // TODO: replace after testnet deployment
+  RWA_PUER_TOKEN: "0x374609bfC6492E618fB44985f6548A218e1bF757" as const,
   /** RWA-backed Aged tea token */
-  RWA_AGED_TOKEN: "0x0000000000000000000000000000000000000003" as const, // TODO: replace after testnet deployment
+  RWA_AGED_TOKEN: "0xB73d530Af0A8A07A94465656e2B4fe6eE8CFEA8c" as const,
   /** RWA-backed Cera (ceramics) token */
-  RWA_CERA_TOKEN: "0x0000000000000000000000000000000000000004" as const, // TODO: replace after testnet deployment
+  RWA_CERA_TOKEN: "0x211E83e3cfE323791fcd57b44474d3FFD38F114C" as const,
   /** KKIKDA NFT collection */
-  KKIKDA_NFT: "0x0000000000000000000000000000000000000005" as const, // TODO: replace after testnet deployment
+  KKIKDA_NFT: "0x96f91e0757aa5769aEEc509408c7Ab86A81539bc" as const,
   /** NFT Marketplace */
-  MARKETPLACE: "0x0000000000000000000000000000000000000006" as const, // TODO: replace after testnet deployment
+  MARKETPLACE: "0x1C80967399D0146b7DcEAAE45aEdc89aFa128656" as const,
   /** KKD Staking pool */
-  STAKING: "0x0000000000000000000000000000000000000007" as const, // TODO: replace after testnet deployment
+  STAKING: "0x1A58c14DEEb7f1B555f9ea08dC486C191719F081" as const,
 } as const;
 
 export const MAINNET_ADDRESSES = {
