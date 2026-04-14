@@ -32,7 +32,7 @@ export default function RootLayout({
         <Web3Provider>
           <Navbar />
           <Sidebar />
-          <main className="ml-0 lg:ml-64 pt-20 min-h-screen">{children}</main>
+          <main className="ml-0 lg:ml-64 pt-20 min-h-screen overflow-x-hidden">{children}</main>
           <Footer />
           <Toasts />
         </Web3Provider>

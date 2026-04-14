@@ -1,7 +1,7 @@
 export function Footer() {
   return (
     <footer className="py-12 px-8 bg-surface border-t border-outline-variant/15 ml-0 lg:ml-64">
-      <div className="flex flex-col md:flex-row justify-between items-center gap-6 max-w-[1400px] mx-auto">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-6">
         <div>
           <span className="font-headline text-primary text-lg font-bold tracking-tighter">
             KKIKDAGEO

@@ -33,7 +33,7 @@ export default function HomePage() {
         : teaCakes;
 
   return (
-    <div className="px-4 md:px-8 py-8 max-w-[1400px] mx-auto">
+    <div className="p-6 lg:p-10">
       {/* ── Header ── */}
       <motion.div
         className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10"
@@ -158,7 +158,7 @@ export default function HomePage() {
       </div>
 
       {/* ── Main Content Grid ── */}
-      <div className="grid grid-cols-12 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
         {/* Asset Table (8/12) */}
         <motion.div
           className="col-span-12 lg:col-span-8"

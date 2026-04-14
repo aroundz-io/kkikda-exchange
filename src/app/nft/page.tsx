@@ -336,7 +336,7 @@ export default function NftMarketplacePage() {
     SORT_OPTIONS.find((o) => o.value === sort)?.label ?? "Sort";
 
   return (
-    <div className="px-6 py-10 max-w-7xl mx-auto">
+    <div className="p-6 lg:p-10">
       {/* ── Header ── */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}

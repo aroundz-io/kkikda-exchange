@@ -44,7 +44,7 @@ export default function NftManagePage() {
   ];
 
   return (
-    <div className="px-6 lg:px-12 py-10 max-w-7xl mx-auto space-y-10">
+    <div className="p-6 lg:p-10 space-y-10">
       {/* ── Header ── */}
       <motion.header
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"

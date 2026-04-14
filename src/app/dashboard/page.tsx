@@ -78,7 +78,7 @@ export default function DashboardPage() {
     hash.length > 12 ? `${hash.slice(0, 6)}...${hash.slice(-4)}` : hash;
 
   return (
-    <div className="px-4 md:px-8 py-8 max-w-[1400px] mx-auto">
+    <div className="p-6 lg:p-10">
       {/* ── Header ── */}
       <motion.div
         className="mb-10"

@@ -199,7 +199,7 @@ export default function DexPage() {
   const barHeights = useBarHeights(28);
 
   return (
-    <div className="px-6 py-10 max-w-7xl mx-auto">
+    <div className="p-6 lg:p-10">
       {/* ── Price Header ── */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
