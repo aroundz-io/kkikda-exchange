@@ -93,12 +93,12 @@ export default function NftManagePage() {
           {teaCakes.map((cake, i) => (
             <motion.div
               key={cake.id}
-              className="bg-surface-low border-[0.5px] border-outline-variant overflow-hidden group"
+              className="bg-surface-container-low border-[0.5px] border-outline-variant overflow-hidden group"
               {...fade}
               transition={{ duration: 0.35, delay: 0.1 + i * 0.05 }}
             >
               {/* Image Placeholder */}
-              <div className="aspect-[4/5] bg-surface-mid flex items-center justify-center relative">
+              <div className="aspect-[4/5] bg-surface-container flex items-center justify-center relative">
                 <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
                   {cake.weight}
                 </span>
@@ -127,7 +127,7 @@ export default function NftManagePage() {
                   {cake.tags.slice(0, 2).map((tag) => (
                     <span
                       key={tag}
-                      className="font-label text-[9px] uppercase tracking-[0.15em] text-on-surface-muted border-[0.5px] border-outline-ghost px-1.5 py-0.5"
+                      className="font-label text-[9px] uppercase tracking-[0.15em] text-outline border-[0.5px] border-outline-variant/30 px-1.5 py-0.5"
                     >
                       {tag}
                     </span>
@@ -143,11 +143,11 @@ export default function NftManagePage() {
           {teaCakes.map((cake, i) => (
             <motion.div
               key={cake.id}
-              className="bg-surface-low border-[0.5px] border-outline-variant p-4 flex items-center gap-4"
+              className="bg-surface-container-low border-[0.5px] border-outline-variant p-4 flex items-center gap-4"
               {...fade}
               transition={{ duration: 0.3, delay: 0.1 + i * 0.04 }}
             >
-              <div className="w-14 h-14 bg-surface-mid shrink-0 flex items-center justify-center">
+              <div className="w-14 h-14 bg-surface-container shrink-0 flex items-center justify-center">
                 <span className="font-label text-[9px] uppercase tracking-[0.15em] text-outline">
                   {cake.weight}
                 </span>
@@ -163,7 +163,7 @@ export default function NftManagePage() {
                     {cake.grade}
                   </span>
                 </div>
-                <p className="font-body text-xs text-on-surface-dim mt-0.5">
+                <p className="font-body text-xs text-on-surface-variant mt-0.5">
                   {cake.factory} &middot; {cake.vintage} &middot;{" "}
                   {cake.category}
                 </p>
@@ -190,7 +190,7 @@ export default function NftManagePage() {
         {stats.map((stat) => (
           <div
             key={stat.label}
-            className="bg-surface-low border-[0.5px] border-outline-variant p-5 text-center"
+            className="bg-surface-container-low border-[0.5px] border-outline-variant p-5 text-center"
           >
             <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline mb-2">
               {stat.label}

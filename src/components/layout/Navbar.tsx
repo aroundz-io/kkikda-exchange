@@ -22,11 +22,11 @@ export function Navbar() {
   const toggleSidebar = useStore((s) => s.toggleSidebar);
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-20 z-50 glass-panel border-b border-[0.5px] border-outline-variant flex items-center px-6">
+    <header className="fixed top-0 left-0 right-0 h-20 z-50 backdrop-blur-xl bg-surface/80 border-b border-outline-variant/15 flex items-center px-6">
       {/* Left: Brand */}
       <Link
         href="/"
-        className="font-headline text-primary font-bold text-lg tracking-wider shrink-0"
+        className="font-headline text-primary text-2xl font-bold tracking-tighter shrink-0"
       >
         KKIKDAGEO
       </Link>
@@ -39,10 +39,10 @@ export function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className={`font-label text-[10px] tracking-[0.15em] uppercase transition-colors ${
+              className={`font-label text-[10px] tracking-widest uppercase transition-colors ${
                 active
-                  ? "text-primary border-b border-primary pb-0.5"
-                  : "text-outline hover:text-on-surface"
+                  ? "text-primary border-b-[0.5px] border-primary pb-1"
+                  : "text-white/60 hover:text-white"
               }`}
             >
               {link.label}
@@ -56,7 +56,7 @@ export function Navbar() {
         {/* Language toggle */}
         <button
           onClick={() => setLang(lang === "ko" ? "en" : "ko")}
-          className="font-label text-[10px] tracking-[0.15em] uppercase text-outline hover:text-on-surface transition-colors"
+          className="font-label text-[10px] tracking-widest uppercase text-outline hover:text-on-surface transition-colors"
         >
           {lang === "ko" ? "EN" : "KO"}
         </button>
@@ -108,7 +108,7 @@ export function Navbar() {
                     return (
                       <button
                         onClick={openConnectModal}
-                        className="border border-primary text-primary font-label text-[10px] tracking-[0.15em] px-5 py-2.5 uppercase hover:bg-primary/10 transition-colors"
+                        className="bg-primary text-on-primary font-label font-bold text-[10px] uppercase tracking-widest px-5 py-2.5 hover:bg-primary/90 transition-colors"
                       >
                         Connect Wallet
                       </button>
@@ -119,7 +119,7 @@ export function Navbar() {
                     return (
                       <button
                         onClick={openChainModal}
-                        className="border border-error text-error font-label text-[10px] tracking-[0.15em] px-5 py-2.5 uppercase"
+                        className="border border-error text-error font-label text-[10px] tracking-widest px-5 py-2.5 uppercase"
                       >
                         Wrong Network
                       </button>
@@ -150,7 +150,7 @@ export function Navbar() {
 
                       <button
                         onClick={openAccountModal}
-                        className="font-label text-[10px] tracking-[0.15em] text-on-surface hover:text-primary transition-colors"
+                        className="font-label text-[10px] tracking-widest text-on-surface hover:text-primary transition-colors"
                       >
                         {account.displayBalance && (
                           <span className="text-outline mr-2">

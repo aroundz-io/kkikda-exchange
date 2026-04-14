@@ -78,7 +78,7 @@ function ExchangeWidget() {
   };
 
   return (
-    <div className="bg-surface-low border-[0.5px] border-outline-variant p-6">
+    <div className="bg-surface-container-low border-[0.5px] border-outline-variant p-6">
       {/* Tab: Buy / Sell */}
       <div className="flex gap-0 mb-6">
         {(["buy", "sell"] as const).map((t) => (
@@ -167,7 +167,7 @@ function ExchangeWidget() {
             <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
               {row.label}
             </span>
-            <span className="text-xs text-on-surface-dim">{row.value}</span>
+            <span className="text-xs text-on-surface-variant">{row.value}</span>
           </div>
         ))}
       </div>
@@ -294,7 +294,7 @@ export default function DexPage() {
             <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
               24h Volume
             </span>
-            <span className="font-label text-[10px] tracking-[0.15em] text-on-surface-dim">
+            <span className="font-label text-[10px] tracking-[0.15em] text-on-surface-variant">
               ${(kkda?.volume24h ?? 2_840_000).toLocaleString()}
             </span>
           </div>
@@ -326,7 +326,7 @@ export default function DexPage() {
           {stakingPools.map((pool) => (
             <div
               key={pool.id}
-              className="bg-surface-low border-[0.5px] border-outline-variant p-5"
+              className="bg-surface-container-low border-[0.5px] border-outline-variant p-5"
             >
               <div className="flex items-start justify-between">
                 <div>
@@ -351,7 +351,7 @@ export default function DexPage() {
                 <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
                   Total Value Locked
                 </span>
-                <span className="text-sm text-on-surface-dim">
+                <span className="text-sm text-on-surface-variant">
                   ${pool.totalStakedUsd.toLocaleString()}
                 </span>
               </div>
@@ -360,7 +360,7 @@ export default function DexPage() {
                 <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
                   Lock Period
                 </span>
-                <span className="text-sm text-on-surface-dim">
+                <span className="text-sm text-on-surface-variant">
                   {pool.lockDays} days
                 </span>
               </div>
@@ -374,12 +374,12 @@ export default function DexPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.45, duration: 0.6 }}
-        className="mt-16 mb-8 border-[0.5px] border-outline-variant p-8 bg-surface-low"
+        className="mt-16 mb-8 border-[0.5px] border-outline-variant p-8 bg-surface-container-low"
       >
         <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
           {"Master's Note"}
         </span>
-        <blockquote className="font-headline italic text-lg text-on-surface-dim mt-4 leading-relaxed">
+        <blockquote className="font-headline italic text-lg text-on-surface-variant mt-4 leading-relaxed">
           {
             "\"The patient hand that stores the leaf also stores time itself. In this exchange, we do not merely trade tea \u2014 we trade the years held within each cake, the patience of those who waited, and the trust of those who preserved.\""
           }

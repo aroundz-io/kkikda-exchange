@@ -98,14 +98,14 @@ export function Sidebar() {
   const setSidebarOpen = useStore((s) => s.setSidebarOpen);
 
   const sidebarContent = (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full py-8 px-0">
       {/* User section */}
-      <div className="p-6 flex flex-col items-center gap-3 border-b border-[0.5px] border-outline-variant">
-        <div className="w-16 h-16 border border-outline-variant flex items-center justify-center text-outline">
+      <div className="px-8 flex items-center gap-4">
+        <div className="w-10 h-10 bg-surface-container-highest rounded-full flex items-center justify-center text-outline shrink-0">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="28"
-            height="28"
+            width="18"
+            height="18"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -117,16 +117,19 @@ export function Sidebar() {
             <circle cx="12" cy="7" r="4" />
           </svg>
         </div>
-        <span className="font-headline text-sm text-on-surface">
-          Digital Sommelier
-        </span>
-        <span className="bg-primary/10 text-primary text-[9px] font-label tracking-[0.15em] px-2 py-0.5 uppercase">
-          Verified Collector
-        </span>
+        <div className="flex flex-col">
+          <span className="text-primary font-headline font-bold text-sm">
+            Digital Sommelier
+          </span>
+          <span className="text-white/40 font-label text-[10px] uppercase tracking-widest">
+            Verified Collector
+          </span>
+        </div>
       </div>
+      <div className="border-b border-outline-variant/10 mx-6 my-4" />
 
       {/* Nav items */}
-      <nav className="flex-1 py-4 px-3 flex flex-col gap-1">
+      <nav className="flex-1 flex flex-col gap-1">
         {NAV_ITEMS.map((item) => {
           const active = pathname.startsWith(item.href);
           return (
@@ -134,10 +137,10 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 font-body text-sm transition-colors ${
+              className={`flex items-center gap-4 px-8 py-4 font-label text-xs uppercase tracking-widest transition-colors ${
                 active
-                  ? "border-l-2 border-primary bg-primary/5 text-primary"
-                  : "text-on-surface-dim hover:text-on-surface hover:bg-surface-high border-l-2 border-transparent"
+                  ? "bg-surface-container-low text-primary font-bold border-l-2 border-primary"
+                  : "text-outline hover:text-primary border-l-2 border-transparent"
               }`}
             >
               <span className={active ? "text-primary" : "text-outline"}>
@@ -150,11 +153,11 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom CTA */}
-      <div className="p-4 border-t border-[0.5px] border-outline-variant">
+      <div className="mx-6">
         <Link
           href="/dex"
           onClick={() => setSidebarOpen(false)}
-          className="btn-gradient block w-full text-center"
+          className="block w-full text-center bg-gradient-to-br from-primary to-on-primary-container text-on-primary py-3 font-label font-bold text-xs uppercase tracking-widest"
         >
           Trade Now
         </Link>
@@ -165,7 +168,7 @@ export function Sidebar() {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden lg:block fixed left-0 top-20 bottom-0 w-64 z-40 bg-surface-low border-r border-[0.5px] border-outline-variant overflow-y-auto">
+      <aside className="hidden lg:block fixed left-0 top-20 bottom-0 w-64 z-40 bg-surface border-r border-outline-variant/15 overflow-y-auto">
         {sidebarContent}
       </aside>
 
@@ -189,7 +192,7 @@ export function Sidebar() {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "tween", duration: 0.25 }}
-              className="lg:hidden fixed left-0 top-20 bottom-0 w-64 z-50 bg-surface-low border-r border-[0.5px] border-outline-variant overflow-y-auto"
+              className="lg:hidden fixed left-0 top-20 bottom-0 w-64 z-50 bg-surface border-r border-outline-variant/15 overflow-y-auto"
             >
               {sidebarContent}
             </motion.aside>

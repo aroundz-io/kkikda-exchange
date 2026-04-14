@@ -113,7 +113,7 @@ export default function AdminPage() {
         {metrics.map((m, i) => (
           <motion.div
             key={m.label}
-            className="bg-surface-low border-[0.5px] border-outline-variant p-6 space-y-4"
+            className="bg-surface-container-low border-[0.5px] border-outline-variant p-6 space-y-4"
             {...fade}
             transition={{ duration: 0.4, delay: 0.15 + i * 0.08 }}
           >
@@ -126,7 +126,7 @@ export default function AdminPage() {
             <p className={`font-headline text-3xl ${m.color}`}>
               {m.value}
             </p>
-            <div className="h-1 bg-surface-high overflow-hidden">
+            <div className="h-1 bg-surface-container-high overflow-hidden">
               <motion.div
                 className={`h-full ${
                   m.color === "text-primary"
@@ -148,7 +148,7 @@ export default function AdminPage() {
       <div className="grid grid-cols-12 gap-6">
         {/* Protocol Fees */}
         <motion.div
-          className="col-span-12 lg:col-span-4 bg-surface-low border-[0.5px] border-outline-variant p-6 space-y-4"
+          className="col-span-12 lg:col-span-4 bg-surface-container-low border-[0.5px] border-outline-variant p-6 space-y-4"
           {...fade}
           transition={{ duration: 0.5, delay: 0.25 }}
         >
@@ -161,7 +161,7 @@ export default function AdminPage() {
                 <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
                   {fee.label}
                 </p>
-                <div className="bg-surface-high border-[0.5px] border-outline-variant px-3 py-2">
+                <div className="bg-surface-container-high border-[0.5px] border-outline-variant px-3 py-2">
                   <span className="font-body text-sm text-on-surface">
                     {fee.value}
                   </span>
@@ -173,7 +173,7 @@ export default function AdminPage() {
 
         {/* Recent Mint History */}
         <motion.div
-          className="col-span-12 lg:col-span-8 bg-surface-low border-[0.5px] border-outline-variant p-6 space-y-4"
+          className="col-span-12 lg:col-span-8 bg-surface-container-low border-[0.5px] border-outline-variant p-6 space-y-4"
           {...fade}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
@@ -182,7 +182,7 @@ export default function AdminPage() {
           </p>
 
           {mintRecords.length === 0 ? (
-            <p className="font-body text-xs text-on-surface-muted py-8 text-center">
+            <p className="font-body text-xs text-outline py-8 text-center">
               No mint records yet. Mint your first asset from the NFT management page.
             </p>
           ) : (
@@ -206,12 +206,12 @@ export default function AdminPage() {
                   {mintRecords.map((record) => (
                     <tr
                       key={record.id}
-                      className="border-b-[0.5px] border-outline-ghost"
+                      className="border-b-[0.5px] border-outline-variant/30"
                     >
                       <td className="font-body text-xs text-on-surface py-3 pr-4">
                         {record.assetName}
                       </td>
-                      <td className="font-body text-xs text-on-surface-dim py-3 pr-4">
+                      <td className="font-body text-xs text-on-surface-variant py-3 pr-4">
                         #{record.tokenId}
                       </td>
                       <td className="font-label text-[10px] text-outline py-3 pr-4">
@@ -230,7 +230,7 @@ export default function AdminPage() {
                           {record.status}
                         </span>
                       </td>
-                      <td className="font-body text-xs text-on-surface-dim py-3 pr-4">
+                      <td className="font-body text-xs text-on-surface-variant py-3 pr-4">
                         {new Date(record.timestamp).toLocaleDateString()}
                       </td>
                       <td className="font-headline text-xs text-on-surface py-3">
@@ -253,13 +253,13 @@ export default function AdminPage() {
       >
         <Link
           href="/admin/tokens"
-          className="bg-surface-low border-[0.5px] border-outline-variant p-6 flex items-center justify-between group hover:border-primary/50 transition-colors"
+          className="bg-surface-container-low border-[0.5px] border-outline-variant p-6 flex items-center justify-between group hover:border-primary/50 transition-colors"
         >
           <div>
             <p className="font-headline text-lg text-on-surface group-hover:text-primary transition-colors">
               Token Management
             </p>
-            <p className="font-body text-xs text-on-surface-dim mt-1">
+            <p className="font-body text-xs text-on-surface-variant mt-1">
               Create, pause, and manage token supply
             </p>
           </div>
@@ -269,13 +269,13 @@ export default function AdminPage() {
         </Link>
         <Link
           href="/admin/nft-manage"
-          className="bg-surface-low border-[0.5px] border-outline-variant p-6 flex items-center justify-between group hover:border-primary/50 transition-colors"
+          className="bg-surface-container-low border-[0.5px] border-outline-variant p-6 flex items-center justify-between group hover:border-primary/50 transition-colors"
         >
           <div>
             <p className="font-headline text-lg text-on-surface group-hover:text-primary transition-colors">
               NFT / Asset Management
             </p>
-            <p className="font-body text-xs text-on-surface-dim mt-1">
+            <p className="font-body text-xs text-on-surface-variant mt-1">
               Manage tokenized tea cake inventory
             </p>
           </div>

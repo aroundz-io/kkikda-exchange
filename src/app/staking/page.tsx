@@ -72,7 +72,7 @@ export default function StakingPage() {
         {summaryCards.map((card) => (
           <div
             key={card.label}
-            className="bg-surface-low border-[0.5px] border-outline-variant p-5"
+            className="bg-surface-container-low border-[0.5px] border-outline-variant p-5"
           >
             <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline mb-2">
               {card.label}
@@ -95,7 +95,7 @@ export default function StakingPage() {
           return (
             <motion.div
               key={pool.id}
-              className="bg-surface-low border-[0.5px] border-outline-variant p-6"
+              className="bg-surface-container-low border-[0.5px] border-outline-variant p-6"
               {...fade}
               transition={{ duration: 0.4, delay: 0.15 + i * 0.08 }}
             >
@@ -110,7 +110,7 @@ export default function StakingPage() {
                       {pool.pair}
                     </span>
                   </div>
-                  <div className="flex flex-wrap gap-6 text-xs text-on-surface-dim font-body">
+                  <div className="flex flex-wrap gap-6 text-xs text-on-surface-variant font-body">
                     <span>
                       TVL:{" "}
                       <span className="text-on-surface">
@@ -162,11 +162,11 @@ export default function StakingPage() {
                   <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
                     Pool Utilization
                   </span>
-                  <span className="font-label text-[10px] uppercase tracking-[0.15em] text-on-surface-dim">
+                  <span className="font-label text-[10px] uppercase tracking-[0.15em] text-on-surface-variant">
                     {utilization.toFixed(0)}%
                   </span>
                 </div>
-                <div className="h-1 bg-surface-high overflow-hidden">
+                <div className="h-1 bg-surface-container-high overflow-hidden">
                   <motion.div
                     className="h-full bg-primary/60"
                     initial={{ width: 0 }}
@@ -193,7 +193,7 @@ export default function StakingPage() {
           {HOW_IT_WORKS.map((item) => (
             <div
               key={item.step}
-              className="bg-surface-low border-[0.5px] border-outline-variant p-6 space-y-3"
+              className="bg-surface-container-low border-[0.5px] border-outline-variant p-6 space-y-3"
             >
               <span className="font-headline text-3xl text-outline-variant">
                 {item.step}
@@ -201,7 +201,7 @@ export default function StakingPage() {
               <h4 className="font-headline text-base text-on-surface">
                 {item.title}
               </h4>
-              <p className="font-body text-xs text-on-surface-dim leading-relaxed">
+              <p className="font-body text-xs text-on-surface-variant leading-relaxed">
                 {item.description}
               </p>
             </div>

@@ -4,36 +4,36 @@
   --color-primary: #f3bb90;
   --color-on-primary: #4a2808;
   --color-primary-container: #251000;
-  --color-on-primary-container: #ffdcc4;
+  --color-on-primary-container: #a4754f;
 
   --color-secondary: #b7ccb9;
   --color-on-secondary: #223527;
-  --color-secondary-container: #384b3d;
+  --color-secondary-container: #3b4d3f;
+  --color-on-secondary-container: #a9beab;
 
   --color-tertiary: #d0c4c0;
   --color-on-tertiary: #39302d;
-  --color-tertiary-container: #514643;
+  --color-tertiary-container: #1a1412;
 
   --color-error: #ffb4ab;
   --color-on-error: #690005;
   --color-error-container: #93000a;
 
+  --color-background: #131315;
+  --color-on-background: #e5e1e4;
   --color-surface: #131315;
-  --color-surface-low: #1c1b1e;
-  --color-surface-mid: #201f22;
-  --color-surface-high: #2a2a2c;
-  --color-surface-highest: #353437;
+  --color-surface-container-lowest: #0e0e10;
+  --color-surface-container-low: #1c1b1e;
+  --color-surface-container: #201f22;
+  --color-surface-container-high: #2a2a2c;
+  --color-surface-container-highest: #353437;
+  --color-surface-variant: #353437;
 
   --color-on-surface: #e5e1e4;
-  --color-on-surface-dim: #c9c5c8;
-  --color-on-surface-muted: #9a8e8b;
+  --color-on-surface-variant: #d1c4c0;
 
   --color-outline: #9a8e8b;
   --color-outline-variant: #4e4542;
-  --color-outline-ghost: #3a3335;
-
-  --color-positive: #b7ccb9;
-  --color-negative: #ffb4ab;
 
   --font-headline: "Noto Serif", serif;
   --font-body: "Manrope", sans-serif;
@@ -44,6 +44,9 @@
   --radius-md: 0px;
   --radius-lg: 0px;
   --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-full: 9999px;
 }
 
 * {
@@ -112,7 +115,7 @@ body {
 
 /* Text shadow */
 .text-shadow-gold {
-  text-shadow: 0 0 40px rgba(243, 187, 144, 0.15);
+  text-shadow: 0 0 20px rgba(243, 187, 144, 0.2);
 }
 
 /* Gradient CTA button */
@@ -121,7 +124,7 @@ body {
   color: var(--color-on-primary);
   font-family: var(--font-label);
   font-size: 10px;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   padding: 12px 28px;
   border: none;
@@ -153,7 +156,7 @@ body {
 .label {
   font-family: var(--font-label);
   font-size: 10px;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--color-outline);
 }

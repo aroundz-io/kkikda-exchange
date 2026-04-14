@@ -78,7 +78,7 @@ export function Toasts() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 80 }}
             transition={{ type: "tween", duration: 0.2 }}
-            className="bg-surface-high border border-[0.5px] border-outline-variant p-4 min-w-[300px] flex items-start gap-3"
+            className="bg-surface-container-high border border-[0.5px] border-outline-variant p-4 min-w-[300px] flex items-start gap-3"
           >
             <span className="mt-0.5 shrink-0">{ICON_MAP[toast.type]}</span>
 
@@ -88,7 +88,7 @@ export function Toasts() {
               >
                 {toast.title}
               </p>
-              <p className="text-sm text-on-surface-dim mt-0.5">
+              <p className="text-sm text-on-surface-variant mt-0.5">
                 {toast.message}
               </p>
             </div>

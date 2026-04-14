@@ -72,7 +72,7 @@ function ProvenancePanel({
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
         transition={{ type: "tween", duration: 0.3 }}
-        className="fixed right-0 top-20 bottom-0 w-full sm:w-96 bg-surface-low border-l border-[0.5px] border-outline-variant z-50 overflow-y-auto"
+        className="fixed right-0 top-20 bottom-0 w-full sm:w-96 bg-surface-container-low border-l border-[0.5px] border-outline-variant z-50 overflow-y-auto"
       >
         <div className="p-6">
           {/* Close */}
@@ -91,7 +91,7 @@ function ProvenancePanel({
           </button>
 
           {/* Image placeholder */}
-          <div className="h-72 bg-surface-mid border-[0.5px] border-outline-variant flex items-center justify-center mb-6">
+          <div className="h-72 bg-surface-container border-[0.5px] border-outline-variant flex items-center justify-center mb-6">
             <TeaLeafIcon className="w-24 h-24 text-primary/30" />
           </div>
 
@@ -99,7 +99,7 @@ function ProvenancePanel({
           <h2 className="font-headline text-2xl text-on-surface">
             {cake.name}
           </h2>
-          <p className="text-sm text-on-surface-dim mt-1">{cake.subtitle}</p>
+          <p className="text-sm text-on-surface-variant mt-1">{cake.subtitle}</p>
 
           {/* Tags */}
           <div className="flex flex-wrap gap-1.5 mt-4">
@@ -145,7 +145,7 @@ function ProvenancePanel({
               <span className="font-headline text-xl text-primary">
                 {cake.price} BNB
               </span>
-              <span className="text-sm text-on-surface-dim ml-2">
+              <span className="text-sm text-on-surface-variant ml-2">
                 ${cake.priceUsd.toLocaleString()}
               </span>
             </div>
@@ -174,7 +174,7 @@ function ProvenancePanel({
                     <p className="text-sm text-on-surface font-medium mt-0.5">
                       {entry.event}
                     </p>
-                    <p className="text-xs text-on-surface-dim mt-0.5">
+                    <p className="text-xs text-on-surface-variant mt-0.5">
                       {entry.detail}
                     </p>
                   </div>
@@ -208,11 +208,11 @@ function TeaCakeCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.4 }}
-      className="bg-surface-low border-[0.5px] border-outline-variant overflow-hidden cursor-pointer group"
+      className="bg-surface-container-low border-[0.5px] border-outline-variant overflow-hidden cursor-pointer group"
       onClick={() => onSelect(cake)}
     >
       {/* Image area */}
-      <div className="h-64 bg-surface-mid relative flex items-center justify-center">
+      <div className="h-64 bg-surface-container relative flex items-center justify-center">
         <TeaLeafIcon className="w-20 h-20 text-primary/20 group-hover:text-primary/30 transition-colors" />
 
         {/* Vintage badge */}
@@ -251,7 +251,7 @@ function TeaCakeCard({
 
         {/* Name */}
         <h3 className="font-headline text-lg text-on-surface">{cake.name}</h3>
-        <p className="text-sm text-on-surface-dim mt-1 line-clamp-2">
+        <p className="text-sm text-on-surface-variant mt-1 line-clamp-2">
           {cake.subtitle}
         </p>
 
@@ -273,7 +273,7 @@ function TeaCakeCard({
             <span className="font-headline text-lg text-primary">
               {cake.price} BNB
             </span>
-            <span className="text-xs text-on-surface-dim ml-2">
+            <span className="text-xs text-on-surface-variant ml-2">
               ${cake.priceUsd.toLocaleString()}
             </span>
           </div>
@@ -398,7 +398,7 @@ export default function NftMarketplacePage() {
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
-                className="absolute right-0 top-full mt-1 bg-surface-low border-[0.5px] border-outline-variant z-30 min-w-[180px]"
+                className="absolute right-0 top-full mt-1 bg-surface-container-low border-[0.5px] border-outline-variant z-30 min-w-[180px]"
               >
                 {SORT_OPTIONS.map((opt) => (
                   <button
@@ -410,7 +410,7 @@ export default function NftMarketplacePage() {
                     className={`block w-full text-left font-label text-[10px] uppercase tracking-[0.15em] px-4 py-2.5 transition-colors ${
                       sort === opt.value
                         ? "text-primary bg-primary/5"
-                        : "text-outline hover:text-on-surface hover:bg-surface-high"
+                        : "text-outline hover:text-on-surface hover:bg-surface-container-high"
                     }`}
                   >
                     {opt.label}
@@ -431,7 +431,7 @@ export default function NftMarketplacePage() {
             className="text-center py-24"
           >
             <TeaLeafIcon className="w-16 h-16 text-outline-variant mx-auto mb-4" />
-            <p className="font-headline text-lg text-on-surface-dim">
+            <p className="font-headline text-lg text-on-surface-variant">
               No tea cakes found
             </p>
             <p className="text-sm text-outline mt-1">

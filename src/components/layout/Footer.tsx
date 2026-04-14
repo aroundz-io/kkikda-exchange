@@ -1,13 +1,32 @@
 export function Footer() {
   return (
-    <footer className="ml-0 lg:ml-64 border-t border-[0.5px] border-outline-variant py-8 px-6">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 max-w-7xl mx-auto">
-        <span className="font-label text-[10px] tracking-[0.15em] uppercase text-outline">
-          KKIKDAGEO &copy; {new Date().getFullYear()}
-        </span>
-        <span className="font-label text-[10px] tracking-[0.15em] uppercase text-outline-variant">
-          Digital Kura Exchange
-        </span>
+    <footer className="py-12 px-8 bg-surface border-t border-outline-variant/15 ml-0 lg:ml-64">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-6 max-w-[1400px] mx-auto">
+        <div>
+          <span className="font-headline text-primary text-lg font-bold tracking-tighter">
+            KKIKDAGEO
+          </span>
+          <p className="text-outline font-label text-[10px] uppercase tracking-widest mt-1">
+            &copy; {new Date().getFullYear()} All rights reserved
+          </p>
+        </div>
+
+        <div className="flex gap-8">
+          {[
+            "Provenance Protocol",
+            "Whitepaper",
+            "Terms of Service",
+            "Security Audit",
+          ].map((link) => (
+            <a
+              key={link}
+              href="#"
+              className="font-label text-[10px] uppercase tracking-widest text-outline hover:text-primary transition-colors"
+            >
+              {link}
+            </a>
+          ))}
+        </div>
       </div>
     </footer>
   );

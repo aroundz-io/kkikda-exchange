@@ -43,30 +43,30 @@ export default function HomePage() {
         custom={0}
       >
         <div>
-          <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-            Heritage Ledger
-          </span>
-          <h1 className="font-headline text-4xl lg:text-5xl text-on-surface mt-1">
+          <h1 className="font-headline text-4xl text-on-surface mb-2">
             Portfolio Overview
           </h1>
+          <p className="text-outline">
+            Overview of your authenticated vintage assets
+          </p>
         </div>
 
-        <div className="bg-surface-low border-[0.5px] border-outline-variant p-5 min-w-[260px]">
+        <div className="bg-surface-container-low border-[0.5px] border-outline-variant p-5 min-w-[260px]">
           {user.address ? (
             <div>
-              <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+              <span className="font-label text-[10px] text-outline uppercase tracking-widest">
                 Wallet Balance
               </span>
-              <p className="font-headline text-2xl text-on-surface mt-1">
+              <p className="font-label text-4xl text-primary font-bold mt-1">
                 {user.balance.toFixed(4)}{" "}
                 <span className="text-base text-outline">BNB</span>
               </p>
-              <p className="text-sm text-on-surface-muted mt-0.5">
+              <p className="text-sm text-outline mt-0.5">
                 ${user.balanceUsd.toLocaleString()}
               </p>
             </div>
           ) : (
-            <p className="text-sm text-on-surface-muted font-body">
+            <p className="text-sm text-outline font-body">
               Connect wallet to view portfolio
             </p>
           )}
@@ -74,22 +74,20 @@ export default function HomePage() {
       </motion.div>
 
       {/* ── Stat Cards ── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         {/* P&L */}
         <motion.div
-          className="bg-surface-low border-[0.5px] border-outline-variant p-6"
+          className="relative bg-surface-container-low border-[0.5px] border-outline-variant p-8"
           initial="hidden"
           animate="visible"
           variants={fadeUp}
           custom={1}
         >
-          <div className="flex items-center justify-between mb-3">
-            <span className="font-label text-[10px] tracking-[0.15em] text-outline uppercase">
-              Profit / Loss
-            </span>
-            <TrendingUp size={16} className="text-outline" />
-          </div>
-          <p className="font-headline text-2xl text-on-surface">
+          <TrendingUp size={16} className="absolute top-8 right-8 text-outline/30" />
+          <span className="font-label text-[10px] tracking-widest text-outline uppercase">
+            Profit / Loss
+          </span>
+          <p className="font-label text-3xl font-bold text-secondary mt-3">
             ${user.pnl.toLocaleString()}
           </p>
           <div className="flex items-center gap-1 mt-1">
@@ -108,60 +106,62 @@ export default function HomePage() {
               {user.pnlPercent}%
             </span>
           </div>
+          <motion.div className="mt-4 h-1 bg-outline-variant/20">
+            <motion.div className="h-full bg-secondary" initial={{ width: 0 }} animate={{ width: "65%" }} />
+          </motion.div>
         </motion.div>
 
         {/* Staking */}
         <motion.div
-          className="bg-surface-low border-[0.5px] border-outline-variant p-6"
+          className="relative bg-surface-container-low border-[0.5px] border-outline-variant p-8"
           initial="hidden"
           animate="visible"
           variants={fadeUp}
           custom={2}
         >
-          <div className="flex items-center justify-between mb-3">
-            <span className="font-label text-[10px] tracking-[0.15em] text-outline uppercase">
-              Staked Value
-            </span>
-            <Lock size={16} className="text-outline" />
-          </div>
-          <p className="font-headline text-2xl text-on-surface">
+          <Lock size={16} className="absolute top-8 right-8 text-outline/30" />
+          <span className="font-label text-[10px] tracking-widest text-outline uppercase">
+            Staked Value
+          </span>
+          <p className="font-label text-3xl font-bold text-on-surface mt-3">
             ${user.stakedValue.toLocaleString()}
           </p>
+          <motion.div className="mt-4 h-1 bg-outline-variant/20">
+            <motion.div className="h-full bg-secondary" initial={{ width: 0 }} animate={{ width: "65%" }} />
+          </motion.div>
         </motion.div>
 
         {/* Security */}
         <motion.div
-          className="bg-surface-low border-[0.5px] border-outline-variant p-6"
+          className="relative bg-surface-container-low border-[0.5px] border-outline-variant p-8"
           initial="hidden"
           animate="visible"
           variants={fadeUp}
           custom={3}
         >
-          <div className="flex items-center justify-between mb-3">
-            <span className="font-label text-[10px] tracking-[0.15em] text-outline uppercase">
-              Security Score
-            </span>
-            <ShieldCheck size={16} className="text-outline" />
-          </div>
-          <p className="font-headline text-2xl text-on-surface">
+          <ShieldCheck size={16} className="absolute top-8 right-8 text-outline/30" />
+          <span className="font-label text-[10px] tracking-widest text-outline uppercase">
+            Security Score
+          </span>
+          <p className="font-label text-3xl font-bold text-on-surface mt-3">
             {user.securityScore}%
           </p>
-          <div className="mt-3 h-1.5 w-full bg-surface-high">
+          <motion.div className="mt-4 h-1 bg-outline-variant/20">
             <motion.div
               className="h-full bg-secondary"
               initial={{ width: 0 }}
               animate={{ width: `${user.securityScore}%` }}
               transition={{ duration: 0.8, delay: 0.4 }}
             />
-          </div>
+          </motion.div>
         </motion.div>
       </div>
 
       {/* ── Main Content Grid ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Asset Table (2/3) */}
+      <div className="grid grid-cols-12 gap-10">
+        {/* Asset Table (8/12) */}
         <motion.div
-          className="lg:col-span-2"
+          className="col-span-12 lg:col-span-8"
           initial="hidden"
           animate="visible"
           variants={fadeUp}
@@ -169,8 +169,7 @@ export default function HomePage() {
         >
           {/* Section Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
-            <div className="flex items-center gap-3">
-              <div className="w-1 h-6 bg-primary" />
+            <div className="border-l-4 border-primary pl-6">
               <h2 className="font-headline text-xl text-on-surface">
                 Your Assets
               </h2>
@@ -181,7 +180,7 @@ export default function HomePage() {
                 <button
                   key={tab}
                   onClick={() => setFilter(tab)}
-                  className={`font-label text-[10px] tracking-[0.15em] uppercase px-3 py-1.5 transition-colors ${
+                  className={`font-label text-[10px] tracking-widest uppercase px-3 py-1.5 transition-colors ${
                     filter === tab
                       ? "text-primary border-[0.5px] border-primary"
                       : "text-outline hover:text-on-surface"
@@ -198,23 +197,23 @@ export default function HomePage() {
           </div>
 
           {/* Table */}
-          <div className="bg-surface-low border-[0.5px] border-outline-variant overflow-x-auto">
+          <div className="bg-surface-container-low border-[0.5px] border-outline-variant overflow-x-auto">
             <table className="w-full min-w-[600px]">
               <thead>
-                <tr className="border-b border-outline-ghost">
-                  <th className="text-left font-label text-[10px] uppercase tracking-[0.15em] text-outline p-4">
+                <tr className="border-b border-outline-variant/30">
+                  <th className="text-left font-label text-[10px] uppercase tracking-widest text-outline pb-4 p-4">
                     Asset Name
                   </th>
-                  <th className="text-left font-label text-[10px] uppercase tracking-[0.15em] text-outline p-4">
+                  <th className="text-left font-label text-[10px] uppercase tracking-widest text-outline pb-4 p-4">
                     Vintage
                   </th>
-                  <th className="text-left font-label text-[10px] uppercase tracking-[0.15em] text-outline p-4">
+                  <th className="text-left font-label text-[10px] uppercase tracking-widest text-outline pb-4 p-4">
                     Grade
                   </th>
-                  <th className="text-right font-label text-[10px] uppercase tracking-[0.15em] text-outline p-4">
+                  <th className="text-right font-label text-[10px] uppercase tracking-widest text-outline pb-4 p-4">
                     Value (USD)
                   </th>
-                  <th className="text-center font-label text-[10px] uppercase tracking-[0.15em] text-outline p-4">
+                  <th className="text-center font-label text-[10px] uppercase tracking-widest text-outline pb-4 p-4">
                     Status
                   </th>
                 </tr>
@@ -223,7 +222,7 @@ export default function HomePage() {
                 {filteredAssets.map((cake, i) => (
                   <motion.tr
                     key={cake.id}
-                    className="border-b border-outline-ghost hover:bg-surface-mid transition-colors cursor-pointer"
+                    className="border-b-[0.5px] border-outline-variant hover:bg-surface-container-lowest transition-colors cursor-pointer"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: i * 0.04 }}
@@ -232,14 +231,14 @@ export default function HomePage() {
                       <p className="text-sm font-body text-on-surface">
                         {cake.name}
                       </p>
-                      <p className="text-xs text-on-surface-muted mt-0.5 max-w-[260px] truncate">
+                      <p className="text-xs text-outline mt-0.5 max-w-[260px] truncate">
                         {cake.subtitle}
                       </p>
                     </td>
-                    <td className="p-4 text-sm text-on-surface-dim font-label">
+                    <td className="p-4 text-sm text-on-surface-variant font-label">
                       {cake.vintage}
                     </td>
-                    <td className="p-4 text-sm text-on-surface-dim font-label">
+                    <td className="p-4 text-sm text-on-surface-variant font-label">
                       {cake.grade}
                     </td>
                     <td className="p-4 text-sm text-on-surface text-right font-label">
@@ -247,10 +246,10 @@ export default function HomePage() {
                     </td>
                     <td className="p-4 text-center">
                       <span
-                        className={`inline-block font-label text-[10px] uppercase tracking-[0.15em] px-2.5 py-1 ${
+                        className={`inline-block font-label text-[10px] uppercase tracking-widest px-2.5 py-1 ${
                           cake.isListed
                             ? "bg-primary/10 text-primary"
-                            : "bg-surface-high text-outline"
+                            : "bg-surface-container-high text-outline"
                         }`}
                       >
                         {cake.isListed ? "Listed" : "Unlisted"}
@@ -262,7 +261,7 @@ export default function HomePage() {
                   <tr>
                     <td
                       colSpan={5}
-                      className="p-8 text-center text-on-surface-muted text-sm"
+                      className="p-8 text-center text-outline text-sm"
                     >
                       No assets in this category.
                     </td>
@@ -275,14 +274,14 @@ export default function HomePage() {
 
         {/* Right Column: Provenance + Curator */}
         <motion.div
-          className="space-y-6"
+          className="col-span-12 lg:col-span-4 space-y-6"
           initial="hidden"
           animate="visible"
           variants={fadeUp}
           custom={5}
         >
           {/* Provenance Timeline */}
-          <div className="bg-surface-low border-[0.5px] border-outline-variant p-6">
+          <div className="bg-surface-container-low border-[0.5px] border-outline-variant p-6">
             <div className="flex items-center gap-3 mb-5">
               <div className="w-1 h-6 bg-primary" />
               <h3 className="font-headline text-lg text-on-surface">
@@ -291,9 +290,9 @@ export default function HomePage() {
             </div>
 
             {teaCakes[0] && (
-              <div className="relative pl-5">
+              <div className="relative pl-8">
                 {/* Dashed vertical line */}
-                <div className="absolute left-[3px] top-1 bottom-1 border-l border-dashed border-outline-variant" />
+                <div className="absolute left-[7px] top-1 bottom-1 border-l border-dashed border-outline-variant" />
 
                 <div className="space-y-5">
                   {teaCakes[0].provenance.map((p, i) => (
@@ -304,16 +303,22 @@ export default function HomePage() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.5 + i * 0.1 }}
                     >
-                      {/* Square marker */}
-                      <div className="absolute -left-5 top-1 w-2 h-2 bg-primary" />
+                      {/* Circle marker */}
+                      <div
+                        className={`absolute -left-8 top-1 w-4 h-4 rounded-full ${
+                          i === 0
+                            ? "bg-primary"
+                            : "border-[0.5px] border-outline-variant bg-surface"
+                        }`}
+                      />
 
-                      <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                      <span className="font-label text-[10px] uppercase tracking-widest text-outline">
                         {p.date}
                       </span>
                       <p className="text-sm text-on-surface mt-0.5 font-body">
                         {p.event}
                       </p>
-                      <p className="text-xs text-on-surface-muted mt-0.5">
+                      <p className="text-xs text-outline mt-0.5">
                         {p.detail}
                       </p>
                     </motion.div>
@@ -325,23 +330,25 @@ export default function HomePage() {
 
           {/* Curator's Insight */}
           <motion.div
-            className="bg-surface-low border-[0.5px] border-outline-variant p-6"
+            className="relative bg-primary-container p-8 overflow-hidden"
             initial="hidden"
             animate="visible"
             variants={fadeUp}
             custom={6}
           >
-            <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/10 blur-3xl rounded-full" />
+            <span className="font-headline text-xl text-primary">
               Curator&apos;s Insight
             </span>
-            <p className="font-headline italic text-on-surface-dim mt-3 leading-relaxed">
+            <p className="font-headline italic text-on-surface-variant mt-3 leading-relaxed">
               &ldquo;The 1988 Menghai Qing Bing represents the zenith of
               state-factory craftsmanship. Its dry-stored character has
               developed a camphor note that only deepens with each passing
               year &mdash; a living testament to patience as
               investment.&rdquo;
             </p>
-            <p className="text-sm text-on-surface-muted mt-4 font-body">
+            <div className="w-8 h-[0.5px] bg-primary mt-4 mb-2" />
+            <p className="font-label text-[10px] text-primary uppercase tracking-widest">
               &mdash; Master Chen, Head Curator
             </p>
           </motion.div>

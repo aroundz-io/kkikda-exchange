@@ -100,7 +100,7 @@ export default function DashboardPage() {
         {summaryCards.map((card, i) => (
           <motion.div
             key={card.label}
-            className="bg-surface-low border-[0.5px] border-outline-variant p-6"
+            className="bg-surface-container-low border-[0.5px] border-outline-variant p-6"
             initial="hidden"
             animate="visible"
             variants={fadeUp}
@@ -136,10 +136,10 @@ export default function DashboardPage() {
             </h2>
           </div>
 
-          <div className="bg-surface-low border-[0.5px] border-outline-variant overflow-x-auto">
+          <div className="bg-surface-container-low border-[0.5px] border-outline-variant overflow-x-auto">
             <table className="w-full min-w-[800px]">
               <thead>
-                <tr className="border-b border-outline-ghost">
+                <tr className="border-b border-outline-variant/30">
                   {[
                     "Time",
                     "Type",
@@ -168,7 +168,7 @@ export default function DashboardPage() {
                   <tr>
                     <td
                       colSpan={8}
-                      className="p-12 text-center text-on-surface-muted text-sm"
+                      className="p-12 text-center text-outline text-sm"
                     >
                       No transactions yet. Start trading to see your history.
                     </td>
@@ -177,12 +177,12 @@ export default function DashboardPage() {
                   sorted.map((order, i) => (
                     <motion.tr
                       key={order.id}
-                      className="border-b border-outline-ghost hover:bg-surface-mid transition-colors"
+                      className="border-b border-outline-variant/30 hover:bg-surface-container transition-colors"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.03 }}
                     >
-                      <td className="p-4 text-sm text-on-surface-dim font-body whitespace-nowrap">
+                      <td className="p-4 text-sm text-on-surface-variant font-body whitespace-nowrap">
                         {formatTime(order.timestamp)}
                       </td>
                       <td className="p-4">
@@ -226,7 +226,7 @@ export default function DashboardPage() {
                           {order.status}
                         </span>
                       </td>
-                      <td className="p-4 text-xs text-on-surface-muted font-label">
+                      <td className="p-4 text-xs text-outline font-label">
                         {truncateHash(order.txHash)}
                       </td>
                     </motion.tr>
@@ -244,7 +244,7 @@ export default function DashboardPage() {
           variants={fadeUp}
           custom={6}
         >
-          <div className="bg-surface-low border-[0.5px] border-outline-variant p-6">
+          <div className="bg-surface-container-low border-[0.5px] border-outline-variant p-6">
             <div className="flex items-center gap-3 mb-5">
               <div className="w-1 h-6 bg-primary" />
               <h3 className="font-headline text-lg text-on-surface">
@@ -253,7 +253,7 @@ export default function DashboardPage() {
             </div>
 
             {sorted.length === 0 ? (
-              <p className="text-sm text-on-surface-muted">
+              <p className="text-sm text-outline">
                 No activity to display yet.
               </p>
             ) : (
@@ -292,7 +292,7 @@ export default function DashboardPage() {
                         </span>{" "}
                         {order.amount} {order.tokenSymbol}
                       </p>
-                      <p className="text-xs text-on-surface-muted mt-0.5">
+                      <p className="text-xs text-outline mt-0.5">
                         ${order.total.toLocaleString()} &middot;{" "}
                         {truncateHash(order.txHash)}
                       </p>

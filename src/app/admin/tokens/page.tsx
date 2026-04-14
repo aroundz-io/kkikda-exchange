@@ -78,7 +78,7 @@ export default function AdminTokensPage() {
       <AnimatePresence>
         {showCreate && (
           <motion.div
-            className="bg-surface-low border-[0.5px] border-outline-variant p-6 space-y-4"
+            className="bg-surface-container-low border-[0.5px] border-outline-variant p-6 space-y-4"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
@@ -96,7 +96,7 @@ export default function AdminTokensPage() {
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   placeholder="e.g. Yunnan Gold"
-                  className="w-full bg-surface-high border-[0.5px] border-outline-variant px-3 py-2 font-body text-sm text-on-surface placeholder:text-on-surface-muted outline-none focus:border-primary transition-colors"
+                  className="w-full bg-surface-container-high border-[0.5px] border-outline-variant px-3 py-2 font-body text-sm text-on-surface placeholder:text-outline outline-none focus:border-primary transition-colors"
                 />
               </div>
               <div className="space-y-1">
@@ -107,7 +107,7 @@ export default function AdminTokensPage() {
                   value={newSymbol}
                   onChange={(e) => setNewSymbol(e.target.value)}
                   placeholder="e.g. YGLD"
-                  className="w-full bg-surface-high border-[0.5px] border-outline-variant px-3 py-2 font-body text-sm text-on-surface placeholder:text-on-surface-muted outline-none focus:border-primary transition-colors"
+                  className="w-full bg-surface-container-high border-[0.5px] border-outline-variant px-3 py-2 font-body text-sm text-on-surface placeholder:text-outline outline-none focus:border-primary transition-colors"
                 />
               </div>
               <div className="space-y-1">
@@ -119,7 +119,7 @@ export default function AdminTokensPage() {
                   onChange={(e) => setNewMaxSupply(e.target.value)}
                   placeholder="e.g. 1000000"
                   type="number"
-                  className="w-full bg-surface-high border-[0.5px] border-outline-variant px-3 py-2 font-body text-sm text-on-surface placeholder:text-on-surface-muted outline-none focus:border-primary transition-colors"
+                  className="w-full bg-surface-container-high border-[0.5px] border-outline-variant px-3 py-2 font-body text-sm text-on-surface placeholder:text-outline outline-none focus:border-primary transition-colors"
                 />
               </div>
             </div>
@@ -144,7 +144,7 @@ export default function AdminTokensPage() {
               onClick={() =>
                 setSelectedId(selectedId === token.id ? null : token.id)
               }
-              className={`w-full text-left bg-surface-low border-[0.5px] p-5 transition-colors ${
+              className={`w-full text-left bg-surface-container-low border-[0.5px] p-5 transition-colors ${
                 selectedId === token.id
                   ? "border-primary bg-primary/5"
                   : "border-outline-variant hover:border-outline"
@@ -154,7 +154,7 @@ export default function AdminTokensPage() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-surface-high border-[0.5px] border-outline-variant flex items-center justify-center">
+                  <div className="w-10 h-10 bg-surface-container-high border-[0.5px] border-outline-variant flex items-center justify-center">
                     <span className="font-label text-[10px] uppercase tracking-[0.15em] text-primary">
                       {token.symbol.slice(0, 2)}
                     </span>
@@ -163,7 +163,7 @@ export default function AdminTokensPage() {
                     <p className="font-headline text-base text-on-surface">
                       {token.symbol}
                     </p>
-                    <p className="font-body text-xs text-on-surface-dim">
+                    <p className="font-body text-xs text-on-surface-variant">
                       {token.name}
                     </p>
                   </div>
@@ -185,7 +185,7 @@ export default function AdminTokensPage() {
                   </div>
                 </div>
               </div>
-              <div className="flex gap-6 mt-3 font-body text-xs text-on-surface-dim">
+              <div className="flex gap-6 mt-3 font-body text-xs text-on-surface-variant">
                 <span>
                   Supply: {token.supply.toLocaleString()} /{" "}
                   {token.maxSupply.toLocaleString()}
@@ -204,7 +204,7 @@ export default function AdminTokensPage() {
             {selectedToken ? (
               <motion.div
                 key={selectedToken.id}
-                className="bg-surface-low border-[0.5px] border-outline-variant p-6 space-y-5 sticky top-24"
+                className="bg-surface-container-low border-[0.5px] border-outline-variant p-6 space-y-5 sticky top-24"
                 initial={{ opacity: 0, x: 16 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 16 }}
@@ -219,7 +219,7 @@ export default function AdminTokensPage() {
                     <span className="font-headline text-2xl text-on-surface">
                       {selectedToken.symbol}
                     </span>
-                    <span className="font-body text-sm text-on-surface-dim">
+                    <span className="font-body text-sm text-on-surface-variant">
                       {selectedToken.name}
                     </span>
                   </div>
@@ -247,7 +247,7 @@ export default function AdminTokensPage() {
                     <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
                       Supply
                     </p>
-                    <div className="h-1.5 bg-surface-high overflow-hidden">
+                    <div className="h-1.5 bg-surface-container-high overflow-hidden">
                       <motion.div
                         className="h-full bg-primary"
                         initial={{ width: 0 }}
@@ -257,7 +257,7 @@ export default function AdminTokensPage() {
                         transition={{ duration: 0.6 }}
                       />
                     </div>
-                    <p className="font-body text-xs text-on-surface-dim">
+                    <p className="font-body text-xs text-on-surface-variant">
                       {selectedToken.supply.toLocaleString()} /{" "}
                       {selectedToken.maxSupply.toLocaleString()}
                     </p>
@@ -268,7 +268,7 @@ export default function AdminTokensPage() {
                     <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
                       Contract
                     </p>
-                    <p className="font-label text-[10px] text-on-surface-dim">
+                    <p className="font-label text-[10px] text-on-surface-variant">
                       {selectedToken.contractAddress}
                     </p>
                   </div>
@@ -292,10 +292,10 @@ export default function AdminTokensPage() {
               </motion.div>
             ) : (
               <motion.div
-                className="bg-surface-low border-[0.5px] border-outline-variant p-6 flex items-center justify-center h-48"
+                className="bg-surface-container-low border-[0.5px] border-outline-variant p-6 flex items-center justify-center h-48"
                 {...fade}
               >
-                <p className="font-body text-xs text-on-surface-muted">
+                <p className="font-body text-xs text-outline">
                   Select a token to view details
                 </p>
               </motion.div>

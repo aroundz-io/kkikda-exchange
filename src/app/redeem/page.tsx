@@ -9,7 +9,7 @@ export default function RedeemPage() {
       <h1 className="font-headline text-4xl font-bold text-on-surface mb-4">
         Redeem Your Asset
       </h1>
-      <p className="text-on-surface-dim mb-8">
+      <p className="text-on-surface-variant mb-8">
         To redeem a tokenized tea cake for its physical counterpart, visit the{" "}
         <Link href="/rwa" className="text-primary underline">
           Vault page

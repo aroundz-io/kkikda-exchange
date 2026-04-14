@@ -35,7 +35,7 @@ export default function RwaPage() {
   const stepColor = (i: number) => {
     if (i < activeStep) return "bg-secondary text-on-secondary";
     if (i === activeStep) return "bg-primary text-on-primary";
-    return "bg-surface-high text-outline";
+    return "bg-surface-container-high text-outline";
   };
 
   return (
@@ -83,11 +83,11 @@ export default function RwaPage() {
         <div className="col-span-12 lg:col-span-8 space-y-6">
           {/* Tea Cake Display */}
           <motion.div
-            className="relative bg-surface-low border-[0.5px] border-outline-variant overflow-hidden"
+            className="relative bg-surface-container-low border-[0.5px] border-outline-variant overflow-hidden"
             {...fade}
             transition={{ duration: 0.5, delay: 0.15 }}
           >
-            <div className="h-96 bg-surface-mid flex items-center justify-center">
+            <div className="h-96 bg-surface-container flex items-center justify-center">
               <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
                 {selectedCake ? selectedCake.name : "No asset selected"}
               </span>
@@ -133,7 +133,7 @@ export default function RwaPage() {
                     className={`p-4 border-[0.5px] text-left transition-colors ${
                       selectedCake?.id === cake.id
                         ? "border-primary bg-primary/5"
-                        : "border-outline-variant bg-surface-low hover:bg-surface-high"
+                        : "border-outline-variant bg-surface-container-low hover:bg-surface-container-high"
                     }`}
                   >
                     <p className="font-headline text-sm text-on-surface truncate">
@@ -150,7 +150,7 @@ export default function RwaPage() {
 
           {/* Vault Specifications */}
           <motion.div
-            className="bg-surface-low border-[0.5px] border-outline-variant p-6"
+            className="bg-surface-container-low border-[0.5px] border-outline-variant p-6"
             {...fade}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
@@ -176,14 +176,14 @@ export default function RwaPage() {
         <div className="col-span-12 lg:col-span-4 space-y-6">
           {/* Burn to Redeem */}
           <motion.div
-            className="bg-surface-low border-[0.5px] border-outline-variant p-6 space-y-4"
+            className="bg-surface-container-low border-[0.5px] border-outline-variant p-6 space-y-4"
             {...fade}
             transition={{ duration: 0.5, delay: 0.25 }}
           >
             <p className="font-label text-[10px] uppercase tracking-[0.15em] text-error">
               Burn to Redeem
             </p>
-            <p className="font-body text-xs text-on-surface-dim leading-relaxed">
+            <p className="font-body text-xs text-on-surface-variant leading-relaxed">
               Burning your NFT is irreversible. The on-chain token will be
               permanently destroyed and the physical tea cake will be released
               from the vault for delivery to your registered address.
@@ -196,7 +196,7 @@ export default function RwaPage() {
                 onChange={(e) => setBurnConfirmed(e.target.checked)}
                 className="mt-0.5 accent-error"
               />
-              <span className="font-body text-xs text-on-surface-muted group-hover:text-on-surface transition-colors">
+              <span className="font-body text-xs text-outline group-hover:text-on-surface transition-colors">
                 I understand that this action is permanent and cannot be undone.
               </span>
             </label>
@@ -212,7 +212,7 @@ export default function RwaPage() {
 
           {/* Vault Status */}
           <motion.div
-            className="bg-surface-low border-[0.5px] border-outline-variant p-6 space-y-4"
+            className="bg-surface-container-low border-[0.5px] border-outline-variant p-6 space-y-4"
             {...fade}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
@@ -221,14 +221,14 @@ export default function RwaPage() {
             </p>
             <div>
               <div className="flex justify-between mb-1">
-                <span className="font-body text-xs text-on-surface-dim">
+                <span className="font-body text-xs text-on-surface-variant">
                   Collateralization Ratio
                 </span>
                 <span className="font-label text-[10px] uppercase tracking-[0.15em] text-primary">
                   92%
                 </span>
               </div>
-              <div className="h-1.5 bg-surface-high overflow-hidden">
+              <div className="h-1.5 bg-surface-container-high overflow-hidden">
                 <motion.div
                   className="h-full bg-primary"
                   initial={{ width: 0 }}
@@ -238,7 +238,7 @@ export default function RwaPage() {
               </div>
             </div>
             <div className="flex justify-between">
-              <span className="font-body text-xs text-on-surface-dim">
+              <span className="font-body text-xs text-on-surface-variant">
                 Total Vault Value
               </span>
               <span className="font-headline text-sm text-on-surface">
@@ -249,7 +249,7 @@ export default function RwaPage() {
 
           {/* Active Deliveries */}
           <motion.div
-            className="bg-surface-low border-[0.5px] border-outline-variant p-6 space-y-4"
+            className="bg-surface-container-low border-[0.5px] border-outline-variant p-6 space-y-4"
             {...fade}
             transition={{ duration: 0.5, delay: 0.35 }}
           >
