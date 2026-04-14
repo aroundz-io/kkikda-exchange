@@ -1,193 +1,288 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { useStore } from "@/stores/useStore";
-import { t } from "@/lib/i18n";
 
-export default function AdminSitePage() {
-  const { lang, siteConfig, updateSiteConfig } = useStore();
-  const [saved, setSaved] = useState(false);
+const fade = {
+  initial: { opacity: 0, y: 16 },
+  animate: { opacity: 1, y: 0 },
+};
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  };
+function formatUsd(n: number) {
+  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`;
+  if (n >= 1_000) return `$${(n / 1_000).toFixed(1)}K`;
+  return `$${n.toFixed(0)}`;
+}
+
+/* SVG Icons */
+function SparklesIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3z" />
+      <path d="M18 14l.7 2.3L21 17l-2.3.7L18 20l-.7-2.3L15 17l2.3-.7L18 14z" />
+    </svg>
+  );
+}
+
+function FlameIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22c4-4 8-7.5 8-12a8 8 0 10-16 0c0 4.5 4 8 8 12z" />
+      <path d="M12 22c-2-2-4-3.5-4-6a4 4 0 018 0c0 2.5-2 4-4 6z" />
+    </svg>
+  );
+}
+
+function BoxIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16V8z" />
+      <path d="M3.27 6.96L12 12.01l8.73-5.05" />
+      <path d="M12 22.08V12" />
+    </svg>
+  );
+}
+
+export default function AdminPage() {
+  const teaCakes = useStore((s) => s.teaCakes);
+  const mintRecords = useStore((s) => s.mintRecords);
+  const tokens = useStore((s) => s.tokens);
+
+  const totalMinted = teaCakes.length + mintRecords.length;
+  const totalBurned = 2; // placeholder
+  const totalAssetsValue = teaCakes.reduce((s, t) => s + t.priceUsd, 0);
+
+  const metrics = [
+    {
+      icon: <SparklesIcon />,
+      label: "Total Minted",
+      value: totalMinted,
+      color: "text-primary",
+      progress: 68,
+    },
+    {
+      icon: <FlameIcon />,
+      label: "Total Burned",
+      value: totalBurned,
+      color: "text-error",
+      progress: 12,
+    },
+    {
+      icon: <BoxIcon />,
+      label: "Total Assets",
+      value: formatUsd(totalAssetsValue),
+      color: "text-secondary",
+      progress: 85,
+    },
+  ];
+
+  const fees = [
+    { label: "Platform Fee", value: "2.5%" },
+    { label: "Royalty", value: "5.0%" },
+    { label: "Min Trade", value: "0.01 BNB" },
+  ];
 
   return (
-    <div className="max-w-3xl">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
+    <div className="px-6 lg:px-12 py-10 max-w-7xl mx-auto space-y-10">
+      {/* ── Header ── */}
+      <motion.header
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+        {...fade}
+        transition={{ duration: 0.5 }}
       >
-        <h1 className="text-serif text-2xl font-bold mb-1">
-          {t("admin.site", lang)}
-        </h1>
-        <p className="text-xs text-on-surface-dim mb-8">
-          Manage site appearance, announcements, and feature toggles.
-        </p>
+        <div>
+          <h1 className="font-headline text-4xl text-on-surface">
+            Executive Dashboard
+          </h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 bg-secondary animate-pulse" />
+          <span className="font-label text-[10px] uppercase tracking-[0.15em] text-secondary">
+            Network Status: Synchronized
+          </span>
+        </div>
+      </motion.header>
 
-        {/* General */}
-        <section className="bg-surface-low p-6 mb-6">
-          <h2 className="text-sm font-mono font-semibold text-primary mb-4">
-            General
-          </h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-[10px] font-mono text-on-surface-dim tracking-widest uppercase mb-1">
-                Site Name
-              </label>
-              <input
-                value={siteConfig.siteName}
-                onChange={(e) => updateSiteConfig({ siteName: e.target.value })}
-                className="input-scholar text-sm"
-              />
-            </div>
-            <div>
-              <label className="block text-[10px] font-mono text-on-surface-dim tracking-widest uppercase mb-1">
-                Hero Title
-              </label>
-              <input
-                value={siteConfig.heroTitle}
-                onChange={(e) => updateSiteConfig({ heroTitle: e.target.value })}
-                className="input-scholar text-sm"
-              />
-            </div>
-            <div>
-              <label className="block text-[10px] font-mono text-on-surface-dim tracking-widest uppercase mb-1">
-                Hero Subtitle
-              </label>
-              <input
-                value={siteConfig.heroSubtitle}
-                onChange={(e) =>
-                  updateSiteConfig({ heroSubtitle: e.target.value })
-                }
-                className="input-scholar text-sm"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Announcement */}
-        <section className="bg-surface-low p-6 mb-6">
-          <h2 className="text-sm font-mono font-semibold text-primary mb-4">
-            Announcement Bar
-          </h2>
-          <div className="space-y-4">
+      {/* ── Metric Cards ── */}
+      <motion.div
+        className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+        {...fade}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
+        {metrics.map((m, i) => (
+          <motion.div
+            key={m.label}
+            className="bg-surface-low border-[0.5px] border-outline-variant p-6 space-y-4"
+            {...fade}
+            transition={{ duration: 0.4, delay: 0.15 + i * 0.08 }}
+          >
             <div className="flex items-center justify-between">
-              <span className="text-xs text-on-surface-mid">Enable Announcement</span>
-              <button
-                onClick={() =>
-                  updateSiteConfig({
-                    announcementEnabled: !siteConfig.announcementEnabled,
-                  })
-                }
-                className={`w-10 h-5 rounded-full transition-colors relative ${
-                  siteConfig.announcementEnabled ? "bg-primary" : "bg-surface-high"
-                }`}
-              >
-                <div
-                  className={`w-4 h-4 rounded-full bg-surface absolute top-0.5 transition-transform ${
-                    siteConfig.announcementEnabled
-                      ? "translate-x-5"
-                      : "translate-x-0.5"
-                  }`}
-                />
-              </button>
+              <span className={`${m.color}`}>{m.icon}</span>
+              <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                {m.label}
+              </p>
             </div>
-            <div>
-              <label className="block text-[10px] font-mono text-on-surface-dim tracking-widest uppercase mb-1">
-                Announcement Text
-              </label>
-              <input
-                value={siteConfig.announcement}
-                onChange={(e) =>
-                  updateSiteConfig({ announcement: e.target.value })
-                }
-                className="input-scholar text-sm"
+            <p className={`font-headline text-3xl ${m.color}`}>
+              {m.value}
+            </p>
+            <div className="h-1 bg-surface-high overflow-hidden">
+              <motion.div
+                className={`h-full ${
+                  m.color === "text-primary"
+                    ? "bg-primary"
+                    : m.color === "text-error"
+                      ? "bg-error"
+                      : "bg-secondary"
+                }`}
+                initial={{ width: 0 }}
+                animate={{ width: `${m.progress}%` }}
+                transition={{ duration: 0.8, delay: 0.4 + i * 0.1 }}
               />
             </div>
-          </div>
-        </section>
+          </motion.div>
+        ))}
+      </motion.div>
 
-        {/* Feature Toggles */}
-        <section className="bg-surface-low p-6 mb-6">
-          <h2 className="text-sm font-mono font-semibold text-primary mb-4">
-            Feature Toggles
-          </h2>
+      {/* ── Protocol Fees + Mint History ── */}
+      <div className="grid grid-cols-12 gap-6">
+        {/* Protocol Fees */}
+        <motion.div
+          className="col-span-12 lg:col-span-4 bg-surface-low border-[0.5px] border-outline-variant p-6 space-y-4"
+          {...fade}
+          transition={{ duration: 0.5, delay: 0.25 }}
+        >
+          <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+            Protocol Fees
+          </p>
           <div className="space-y-3">
-            {[
-              { key: "tradingEnabled", label: "DEX Trading" },
-              { key: "stakingEnabled", label: "Staking" },
-              { key: "nftEnabled", label: "NFT Marketplace" },
-              { key: "maintenanceMode", label: "Maintenance Mode" },
-            ].map((feature) => (
-              <div
-                key={feature.key}
-                className="flex items-center justify-between py-2"
-              >
-                <span className="text-xs text-on-surface-mid">
-                  {feature.label}
-                </span>
-                <button
-                  onClick={() =>
-                    updateSiteConfig({
-                      [feature.key]:
-                        !siteConfig[feature.key as keyof typeof siteConfig],
-                    })
-                  }
-                  className={`w-10 h-5 rounded-full transition-colors relative ${
-                    feature.key === "maintenanceMode"
-                      ? siteConfig.maintenanceMode
-                        ? "bg-error"
-                        : "bg-surface-high"
-                      : siteConfig[feature.key as keyof typeof siteConfig]
-                      ? "bg-secondary"
-                      : "bg-surface-high"
-                  }`}
-                >
-                  <div
-                    className={`w-4 h-4 rounded-full bg-surface absolute top-0.5 transition-transform ${
-                      siteConfig[feature.key as keyof typeof siteConfig]
-                        ? "translate-x-5"
-                        : "translate-x-0.5"
-                    }`}
-                  />
-                </button>
+            {fees.map((fee) => (
+              <div key={fee.label} className="space-y-1">
+                <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                  {fee.label}
+                </p>
+                <div className="bg-surface-high border-[0.5px] border-outline-variant px-3 py-2">
+                  <span className="font-body text-sm text-on-surface">
+                    {fee.value}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
-        </section>
+        </motion.div>
 
-        {/* Security Overview */}
-        <section className="bg-surface-low p-6 mb-6">
-          <h2 className="text-sm font-mono font-semibold text-primary mb-4">
-            Security Status
-          </h2>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { label: "Rate Limiting", status: "Active", color: "text-secondary" },
-              { label: "DDoS Protection", status: "Active", color: "text-secondary" },
-              { label: "CSP Headers", status: "Strict", color: "text-secondary" },
-              { label: "CSRF Protection", status: "Enabled", color: "text-secondary" },
-              { label: "Timelock", status: "48h", color: "text-accent" },
-              { label: "Multisig", status: "3/5", color: "text-accent" },
-            ].map((s) => (
-              <div
-                key={s.label}
-                className="flex items-center justify-between p-3 bg-surface-mid text-xs"
-              >
-                <span className="text-on-surface-dim">{s.label}</span>
-                <span className={`font-mono ${s.color}`}>{s.status}</span>
-              </div>
-            ))}
+        {/* Recent Mint History */}
+        <motion.div
+          className="col-span-12 lg:col-span-8 bg-surface-low border-[0.5px] border-outline-variant p-6 space-y-4"
+          {...fade}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+            Recent Mint History
+          </p>
+
+          {mintRecords.length === 0 ? (
+            <p className="font-body text-xs text-on-surface-muted py-8 text-center">
+              No mint records yet. Mint your first asset from the NFT management page.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="border-b-[0.5px] border-outline-variant">
+                    {["Asset", "Token ID", "Tx Hash", "Status", "Time", "Value"].map(
+                      (col) => (
+                        <th
+                          key={col}
+                          className="font-label text-[10px] uppercase tracking-[0.15em] text-outline pb-3 pr-4"
+                        >
+                          {col}
+                        </th>
+                      )
+                    )}
+                  </tr>
+                </thead>
+                <tbody>
+                  {mintRecords.map((record) => (
+                    <tr
+                      key={record.id}
+                      className="border-b-[0.5px] border-outline-ghost"
+                    >
+                      <td className="font-body text-xs text-on-surface py-3 pr-4">
+                        {record.assetName}
+                      </td>
+                      <td className="font-body text-xs text-on-surface-dim py-3 pr-4">
+                        #{record.tokenId}
+                      </td>
+                      <td className="font-label text-[10px] text-outline py-3 pr-4">
+                        {record.txHash.slice(0, 10)}...
+                      </td>
+                      <td className="py-3 pr-4">
+                        <span
+                          className={`font-label text-[10px] uppercase tracking-[0.15em] px-2 py-0.5 border-[0.5px] ${
+                            record.status === "confirmed"
+                              ? "text-secondary border-secondary/40"
+                              : record.status === "processing"
+                                ? "text-primary border-primary/40"
+                                : "text-error border-error/40"
+                          }`}
+                        >
+                          {record.status}
+                        </span>
+                      </td>
+                      <td className="font-body text-xs text-on-surface-dim py-3 pr-4">
+                        {new Date(record.timestamp).toLocaleDateString()}
+                      </td>
+                      <td className="font-headline text-xs text-on-surface py-3">
+                        {formatUsd(record.value)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </motion.div>
+      </div>
+
+      {/* ── Navigation Links ── */}
+      <motion.div
+        className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+        {...fade}
+        transition={{ duration: 0.5, delay: 0.35 }}
+      >
+        <Link
+          href="/admin/tokens"
+          className="bg-surface-low border-[0.5px] border-outline-variant p-6 flex items-center justify-between group hover:border-primary/50 transition-colors"
+        >
+          <div>
+            <p className="font-headline text-lg text-on-surface group-hover:text-primary transition-colors">
+              Token Management
+            </p>
+            <p className="font-body text-xs text-on-surface-dim mt-1">
+              Create, pause, and manage token supply
+            </p>
           </div>
-        </section>
-
-        {/* Save */}
-        <button onClick={handleSave} className="btn-gold px-8 py-3 text-sm">
-          {saved ? "SAVED ✓" : "SAVE CHANGES"}
-        </button>
+          <span className="text-outline group-hover:text-primary transition-colors">
+            &rarr;
+          </span>
+        </Link>
+        <Link
+          href="/admin/nft-manage"
+          className="bg-surface-low border-[0.5px] border-outline-variant p-6 flex items-center justify-between group hover:border-primary/50 transition-colors"
+        >
+          <div>
+            <p className="font-headline text-lg text-on-surface group-hover:text-primary transition-colors">
+              NFT / Asset Management
+            </p>
+            <p className="font-body text-xs text-on-surface-dim mt-1">
+              Manage tokenized tea cake inventory
+            </p>
+          </div>
+          <span className="text-outline group-hover:text-primary transition-colors">
+            &rarr;
+          </span>
+        </Link>
       </motion.div>
     </div>
   );

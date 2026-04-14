@@ -1,29 +1,38 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-import Toasts from "@/components/ui/Toasts";
 import { Web3Provider } from "@/lib/web3/provider";
+import { Navbar } from "@/components/layout/Navbar";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { Footer } from "@/components/layout/Footer";
+import { Toasts } from "@/components/ui/Toasts";
 
 export const metadata: Metadata = {
-  title: "KKIKDA — RWA Tea Exchange",
+  title: "KKIKDAGEO | Digital Kura Exchange",
   description:
-    "The world's first RWA exchange for authenticated vintage Pu'er tea. Trade, stake, and redeem real-world assets on-chain.",
-  keywords: ["RWA", "blockchain", "tea", "NFT", "DeFi", "exchange", "BSC"],
+    "A vintage Pu'er tea RWA crypto exchange. Trade authenticated, tokenized tea cakes on-chain with full provenance tracking.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col noise-overlay">
+    <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@300;400;600;800&family=Space+Grotesk:wght@300;500;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="noise-overlay">
         <Web3Provider>
           <Navbar />
-          <main className="flex-1">{children}</main>
+          <Sidebar />
+          <main className="ml-0 lg:ml-64 pt-20 min-h-screen">{children}</main>
           <Footer />
           <Toasts />
         </Web3Provider>
