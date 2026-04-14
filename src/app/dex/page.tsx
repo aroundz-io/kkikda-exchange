@@ -3,185 +3,145 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useStore } from "@/stores/useStore";
+import {
+  ArrowUpDown,
+  ChevronDown,
+  Settings,
+  Droplets,
+  Waves,
+  ArrowRight,
+  CreditCard,
+} from "lucide-react";
 
 const TIME_PERIODS = ["1D", "1W", "1M", "1Y", "ALL"] as const;
 type Period = (typeof TIME_PERIODS)[number];
 
-/* ---------- Simulated bar heights ---------- */
 function useBarHeights(count: number) {
   return useMemo(() => {
     const heights: number[] = [];
     let base = 40;
     for (let i = 0; i < count; i++) {
-      base += (Math.sin(i * 0.4) * 15 + (Math.random() - 0.5) * 20);
+      base += Math.sin(i * 0.4) * 15 + (Math.random() - 0.5) * 20;
       heights.push(Math.max(15, Math.min(95, base)));
     }
     return heights;
   }, [count]);
 }
 
-/* ---------- Swap Arrow Icon ---------- */
-function SwapArrow() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <path
-        d="M10 4v12M6 12l4 4 4-4"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-    </svg>
-  );
-}
-
-/* ---------- Verified Icon ---------- */
-function VerifiedIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 14 14"
-      fill="none"
-      className={className}
-    >
-      <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1" />
-      <path d="M4.5 7l2 2 3-4" stroke="currentColor" strokeWidth="1" />
-    </svg>
-  );
-}
-
 /* ---------- Exchange Widget ---------- */
 function ExchangeWidget() {
-  const [tab, setTab] = useState<"buy" | "sell">("buy");
-  const [payAmount, setPayAmount] = useState("");
-  const [receiveAmount, setReceiveAmount] = useState("");
-
-  const rate = 0.00234; // BNB per KKDA (mock)
-
-  const handlePayChange = (val: string) => {
-    setPayAmount(val);
-    const num = parseFloat(val);
-    if (!isNaN(num) && num > 0) {
-      setReceiveAmount((num / rate).toFixed(2));
-    } else {
-      setReceiveAmount("");
-    }
-  };
-
-  const handleReceiveChange = (val: string) => {
-    setReceiveAmount(val);
-    const num = parseFloat(val);
-    if (!isNaN(num) && num > 0) {
-      setPayAmount((num * rate).toFixed(6));
-    } else {
-      setPayAmount("");
-    }
-  };
+  const [payAmount, setPayAmount] = useState("1.0");
+  const [receiveAmount, setReceiveAmount] = useState("0.45");
 
   return (
-    <div className="bg-surface-container-low border-[0.5px] border-outline-variant p-6">
-      {/* Tab: Buy / Sell */}
-      <div className="flex gap-0 mb-6">
-        {(["buy", "sell"] as const).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`flex-1 font-label text-[10px] uppercase tracking-[0.15em] py-2.5 transition-colors border-b border-[0.5px] ${
-              tab === t
-                ? "text-primary border-primary"
-                : "text-outline border-outline-variant hover:text-on-surface"
-            }`}
-          >
-            {t}
-          </button>
-        ))}
+    <div className="bg-surface-container p-8 shadow-2xl relative border border-outline-variant/10">
+      <div className="flex justify-between items-center mb-8">
+        <h3 className="font-headline text-lg text-primary">Instant Exchange</h3>
+        <Settings className="text-white/40 cursor-pointer hover:text-primary" size={18} />
       </div>
 
-      {/* You Pay */}
-      <div className="mb-1">
-        <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+      {/* Pay Input */}
+      <div className="mb-4">
+        <label className="font-label text-[10px] text-secondary uppercase tracking-widest mb-2 block">
           You Pay
-        </span>
-        <div className="flex items-center gap-3 mt-2 border-b border-[0.5px] border-outline-variant pb-3">
+        </label>
+        <div className="flex justify-between items-end border-b border-outline-variant/30 pb-4 focus-within:border-primary transition-colors">
           <input
+            className="bg-transparent border-none p-0 font-label text-2xl focus:ring-0 w-1/2 outline-none"
             type="text"
-            inputMode="decimal"
-            placeholder="0.00"
             value={payAmount}
-            onChange={(e) => handlePayChange(e.target.value)}
-            className="flex-1 bg-transparent font-headline text-2xl text-on-surface outline-none placeholder:text-outline-variant"
+            onChange={(e) => setPayAmount(e.target.value)}
           />
-          <div className="flex items-center gap-2 shrink-0 bg-surface px-3 py-1.5 border-[0.5px] border-outline-variant">
-            <div className="w-5 h-5 bg-[#F0B90B] flex items-center justify-center">
-              <span className="text-[8px] font-bold text-black">B</span>
-            </div>
-            <span className="font-label text-[10px] tracking-[0.15em]">
-              {tab === "buy" ? "BNB" : "KKDA"}
-            </span>
+          <div className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
+            <span className="font-body font-bold">BNB</span>
+            <ChevronDown size={16} />
           </div>
         </div>
+        <p className="font-label text-[10px] text-white/20 mt-2">
+          Balance: 4.821 BNB
+        </p>
       </div>
 
-      {/* Swap arrow */}
-      <div className="flex justify-center my-3">
-        <button className="text-outline hover:text-primary transition-colors p-1">
-          <SwapArrow />
+      {/* Swap Icon */}
+      <div className="flex justify-center -my-3 relative z-10">
+        <button className="w-10 h-10 bg-surface-container border border-outline-variant/30 flex items-center justify-center hover:border-primary transition-colors cursor-pointer active:scale-90">
+          <ArrowUpDown className="text-primary" size={18} />
         </button>
       </div>
 
-      {/* You Receive */}
-      <div className="mb-6">
-        <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+      {/* Receive Input */}
+      <div className="mb-10">
+        <label className="font-label text-[10px] text-secondary uppercase tracking-widest mb-2 block">
           You Receive
-        </span>
-        <div className="flex items-center gap-3 mt-2 border-b border-[0.5px] border-outline-variant pb-3">
+        </label>
+        <div className="flex justify-between items-end border-b border-outline-variant/30 pb-4 focus-within:border-primary transition-colors">
           <input
+            className="bg-transparent border-none p-0 font-label text-2xl focus:ring-0 w-1/2 outline-none"
+            readOnly
             type="text"
-            inputMode="decimal"
-            placeholder="0.00"
             value={receiveAmount}
-            onChange={(e) => handleReceiveChange(e.target.value)}
-            className="flex-1 bg-transparent font-headline text-2xl text-on-surface outline-none placeholder:text-outline-variant"
           />
-          <div className="flex items-center gap-2 shrink-0 bg-surface px-3 py-1.5 border-[0.5px] border-outline-variant">
-            <div className="w-5 h-5 bg-primary/20 flex items-center justify-center">
-              <span className="text-[8px] font-bold text-primary">K</span>
-            </div>
-            <span className="font-label text-[10px] tracking-[0.15em]">
-              {tab === "buy" ? "KKDA" : "BNB"}
-            </span>
+          <div className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
+            <span className="font-body font-bold text-primary">$KKDA</span>
+            <ChevronDown size={16} className="text-primary" />
           </div>
         </div>
+        <p className="font-label text-[10px] text-white/20 mt-2">
+          1 $KKDA = 2.22 BNB
+        </p>
       </div>
 
-      {/* Info rows */}
-      <div className="space-y-2.5 mb-6">
+      {/* Summary */}
+      <div className="space-y-2 mb-8">
         {[
-          { label: "Exchange Rate", value: `1 KKDA = ${rate} BNB` },
-          { label: "Slippage", value: "0.5%" },
-          { label: "Network Fee", value: "~0.0003 BNB" },
+          { label: "Minimum Received", value: "0.448 $KKDA" },
+          { label: "Network Fee (Gas)", value: "~ $1.42" },
+          { label: "Slippage Tolerance", value: "0.5%" },
         ].map((row) => (
           <div
             key={row.label}
-            className="flex justify-between items-center"
+            className="flex justify-between text-[11px] font-label uppercase tracking-tighter text-white/40"
           >
-            <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-              {row.label}
-            </span>
-            <span className="text-xs text-on-surface-variant">{row.value}</span>
+            <span>{row.label}</span>
+            <span>{row.value}</span>
           </div>
         ))}
       </div>
 
-      {/* CTA */}
-      <button className="btn-gradient w-full mt-2">Execute Trade</button>
+      <button className="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary py-4 font-label font-bold uppercase tracking-[0.2em] shadow-lg active:scale-[0.98] transition-all hover:opacity-90">
+        Execute Trade
+      </button>
+    </div>
+  );
+}
 
-      {/* Settlement note */}
-      <div className="flex items-center justify-center gap-1.5 mt-4">
-        <VerifiedIcon className="text-secondary" />
-        <span className="font-label text-[9px] tracking-[0.12em] text-outline">
-          Settled on BNB Smart Chain
-        </span>
+/* ---------- Liquidity Pool Card ---------- */
+function LiquidityPoolCard({
+  title,
+  apy,
+  icon,
+}: {
+  title: string;
+  apy: string;
+  icon: React.ReactNode;
+}) {
+  return (
+    <div className="bg-surface-container-highest p-6 flex justify-between items-center group cursor-pointer hover:bg-outline-variant/20 transition-all">
+      <div className="flex items-center gap-4">
+        <div className="w-12 h-12 bg-tertiary-container flex items-center justify-center">
+          {icon}
+        </div>
+        <div>
+          <h4 className="font-body font-bold text-white">{title}</h4>
+          <p className="font-label text-[10px] text-white/40 uppercase tracking-widest">
+            APY: {apy}
+          </p>
+        </div>
       </div>
+      <ArrowRight
+        className="text-primary group-hover:translate-x-1 transition-transform"
+        size={20}
+      />
     </div>
   );
 }
@@ -189,205 +149,150 @@ function ExchangeWidget() {
 /* ---------- Main Page ---------- */
 export default function DexPage() {
   const tokens = useStore((s) => s.tokens);
-  const stakingPools = useStore((s) => s.stakingPools);
-  const [period, setPeriod] = useState<Period>("1M");
+  const [period, setPeriod] = useState<Period>("1D");
+  const barHeights = useBarHeights(10);
 
   const kkda = tokens.find((t) => t.symbol === "KKDA");
-  const price = kkda?.price ?? 1248.5;
+  const price = kkda?.price ?? 4281.9;
   const change = kkda?.change24h ?? 5.24;
-  const isPositive = change >= 0;
-  const barHeights = useBarHeights(28);
 
   return (
     <div className="p-6 lg:p-10">
-      {/* ── Price Header ── */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="flex flex-col sm:flex-row sm:items-end justify-between gap-4"
-      >
-        <div>
-          <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-            Vintage $KKDA / BNB
-          </span>
-          <div className="flex items-baseline gap-3 mt-1">
-            <h1 className="font-headline text-4xl text-shadow-gold">
-              ${price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-            </h1>
-            <span
-              className={`font-label text-[11px] tracking-[0.1em] px-2 py-0.5 ${
-                isPositive
-                  ? "text-secondary bg-secondary/10"
-                  : "text-error bg-error/10"
-              }`}
-            >
-              {isPositive ? "+" : ""}
-              {change.toFixed(2)}%
-            </span>
-          </div>
-        </div>
-
-        {/* Provenance verified badge */}
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 bg-secondary inline-block" />
-          <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-            Provenance Verified
-          </span>
-          <span className="text-[10px] text-outline-variant font-label">
-            {kkda?.contractAddress ?? "0x1234...5678"}
-          </span>
-        </div>
-      </motion.div>
-
-      {/* ── Main Content: Chart + Widget ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-8">
-        {/* Chart Area */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.5 }}
-          className="lg:col-span-8"
-        >
-          {/* Time period selectors */}
-          <div className="flex gap-1 mb-4">
-            {TIME_PERIODS.map((p) => (
-              <button
-                key={p}
-                onClick={() => setPeriod(p)}
-                className={`font-label text-[10px] tracking-[0.15em] px-3 py-1.5 transition-colors ${
-                  period === p
-                    ? "text-primary border-b border-primary"
-                    : "text-outline hover:text-on-surface"
-                }`}
+      <div className="grid grid-cols-12 gap-8">
+        {/* Left Column: Chart & Market Data */}
+        <div className="col-span-12 xl:col-span-8 space-y-8">
+          {/* Header Info */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+            <div>
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="font-headline text-4xl text-primary mb-2"
               >
-                {p}
-              </button>
-            ))}
+                Vintage $KKDA / BNB
+              </motion.h1>
+              <p className="font-label text-secondary text-sm flex items-center gap-2">
+                <span className="w-2 h-2 bg-secondary rounded-full" />
+                PROVENANCE VERIFIED &bull; 0x4f2...3a92
+              </p>
+            </div>
+            <div className="text-left md:text-right">
+              <span className="font-label text-3xl font-bold text-white tracking-tighter">
+                ${price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              </span>
+              <p className="font-label text-secondary text-sm">
+                +{change.toFixed(2)}% (24H)
+              </p>
+            </div>
           </div>
 
-          {/* Chart placeholder */}
-          <div className="chart-gradient h-80 border-[0.5px] border-outline-variant relative flex items-end px-3 pb-3 gap-[3px]">
-            {barHeights.map((h, i) => (
-              <motion.div
-                key={i}
-                initial={{ height: 0 }}
-                animate={{ height: `${h}%` }}
-                transition={{ delay: i * 0.03, duration: 0.5, ease: "easeOut" }}
-                className={`flex-1 ${
-                  i === barHeights.length - 1
-                    ? "bg-primary/60"
-                    : "bg-primary/20 hover:bg-primary/35"
-                } transition-colors`}
-              />
-            ))}
-
-            {/* Current price line */}
-            <div
-              className="absolute left-0 right-0 border-t border-dashed border-primary/30"
-              style={{ bottom: `${barHeights[barHeights.length - 1]}%` }}
-            />
-          </div>
-
-          {/* Volume info */}
-          <div className="flex items-center justify-between mt-3">
-            <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-              24h Volume
-            </span>
-            <span className="font-label text-[10px] tracking-[0.15em] text-on-surface-variant">
-              ${(kkda?.volume24h ?? 2_840_000).toLocaleString()}
-            </span>
-          </div>
-        </motion.div>
-
-        {/* Exchange Widget */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="lg:col-span-4"
-        >
-          <ExchangeWidget />
-        </motion.div>
-      </div>
-
-      {/* ── Liquidity Reservoirs ── */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, duration: 0.5 }}
-        className="mt-12"
-      >
-        <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-          Liquidity Reservoirs
-        </span>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          {stakingPools.map((pool) => (
-            <div
-              key={pool.id}
-              className="bg-surface-container-low border-[0.5px] border-outline-variant p-5"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-headline text-base text-on-surface">
-                    {pool.name}
-                  </h3>
-                  <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline mt-1 inline-block">
-                    {pool.pair}
-                  </span>
-                </div>
-                <div className="text-right">
-                  <span className="font-headline text-xl text-primary">
-                    {pool.apy}%
-                  </span>
-                  <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline block mt-0.5">
-                    APY
-                  </span>
+          {/* Price Chart */}
+          <div className="bg-surface-container-low p-8 border-l border-primary/20 aspect-[16/8] relative overflow-hidden">
+            <div className="absolute inset-0 chart-gradient" />
+            <div className="relative h-full w-full flex flex-col">
+              <div className="flex justify-between text-[10px] font-label text-white/20 uppercase tracking-widest mb-4">
+                <span>Performance Index</span>
+                <div className="flex gap-4">
+                  {TIME_PERIODS.map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => setPeriod(p)}
+                      className={`cursor-pointer ${
+                        period === p
+                          ? "text-primary underline underline-offset-4"
+                          : "hover:text-white/40"
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  ))}
                 </div>
               </div>
-
-              <div className="flex items-center justify-between mt-4 pt-3 border-t border-[0.5px] border-outline-variant">
-                <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  Total Value Locked
-                </span>
-                <span className="text-sm text-on-surface-variant">
-                  ${pool.totalStakedUsd.toLocaleString()}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between mt-2">
-                <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  Lock Period
-                </span>
-                <span className="text-sm text-on-surface-variant">
-                  {pool.lockDays} days
-                </span>
+              <div className="flex-1 flex items-end gap-1">
+                {barHeights.map((height, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ height: 0 }}
+                    animate={{ height: `${height}%` }}
+                    transition={{ duration: 0.5, delay: i * 0.05 }}
+                    className={`w-full ${
+                      i === barHeights.length - 1
+                        ? "bg-primary border-t-2 border-primary"
+                        : "bg-primary/20"
+                    }`}
+                  />
+                ))}
               </div>
             </div>
-          ))}
-        </div>
-      </motion.section>
+          </div>
 
-      {/* ── Master's Note ── */}
-      <motion.section
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.45, duration: 0.6 }}
-        className="mt-16 mb-8 border-[0.5px] border-outline-variant p-8 bg-surface-container-low"
-      >
-        <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-          {"Master's Note"}
-        </span>
-        <blockquote className="font-headline italic text-lg text-on-surface-variant mt-4 leading-relaxed">
-          {
-            "\"The patient hand that stores the leaf also stores time itself. In this exchange, we do not merely trade tea \u2014 we trade the years held within each cake, the patience of those who waited, and the trust of those who preserved.\""
-          }
-        </blockquote>
-        <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline mt-4">
-          {"— Master Liang Weichen, Fifth-Generation Pu'er Curator"}
-        </p>
-      </motion.section>
+          {/* Liquidity Pools */}
+          <section>
+            <h2 className="font-headline text-xl text-primary mb-6">
+              Liquidity Reservoirs
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <LiquidityPoolCard
+                title="KKDA-BNB"
+                apy="18.4%"
+                icon={<Droplets className="text-primary" />}
+              />
+              <LiquidityPoolCard
+                title="KKDA-USDT"
+                apy="12.1%"
+                icon={<Waves className="text-primary" />}
+              />
+            </div>
+          </section>
+        </div>
+
+        {/* Right Column: Exchange Interface */}
+        <div className="col-span-12 xl:col-span-4 space-y-6">
+          <ExchangeWidget />
+
+          {/* Fiat Ramp */}
+          <div className="bg-tertiary-container p-6 flex flex-col gap-4 border border-outline-variant/10">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 bg-surface flex items-center justify-center">
+                <CreditCard className="text-secondary" size={20} />
+              </div>
+              <div>
+                <h4 className="font-body font-bold text-sm text-white">
+                  Buy with Fiat
+                </h4>
+                <p className="font-body text-xs text-white/40">
+                  Direct bank transfer or Credit Card via MoonPay.
+                </p>
+              </div>
+            </div>
+            <a
+              className="text-primary font-label text-[10px] uppercase tracking-widest gold-underline self-start"
+              href="#"
+            >
+              Launch Fiat Ramp
+            </a>
+          </div>
+
+          {/* Provenance Info */}
+          <div className="bg-surface-container-low p-8 opacity-60">
+            <h5 className="font-headline text-sm text-primary mb-4 italic">
+              The Master&apos;s Note
+            </h5>
+            <p className="font-body text-xs leading-relaxed text-white/60">
+              &ldquo;Like a fine 1990s Menghai cake, $KKDA liquidity matures
+              through patient holding. Each transaction is recorded on the
+              perpetual scroll of the blockchain, ensuring your vintage remains
+              untarnished.&rdquo;
+            </p>
+            <div className="mt-4 flex items-center gap-2">
+              <div className="w-4 h-[1px] bg-primary" />
+              <span className="font-label text-[10px] uppercase tracking-widest text-primary">
+                Chief Curator
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

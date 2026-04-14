@@ -1,54 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStore, type TeaCake } from "@/stores/useStore";
+import { ArrowRight, X } from "lucide-react";
 
-const CATEGORIES = ["all", "raw", "ripe", "aged"] as const;
-type Category = (typeof CATEGORIES)[number];
-
-const SORT_OPTIONS = [
-  { label: "Vintage: Oldest", value: "vintage-asc" },
-  { label: "Vintage: Newest", value: "vintage-desc" },
-  { label: "Price: High", value: "price-desc" },
-  { label: "Price: Low", value: "price-asc" },
-] as const;
-
-type SortValue = (typeof SORT_OPTIONS)[number]["value"];
-
-/* ---------- Tea Leaf SVG Icon ---------- */
-function TeaLeafIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 64 64"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-    >
-      <path
-        d="M32 8C20 8 12 20 12 32c0 14 10 24 20 24s20-10 20-24C52 20 44 8 32 8z"
-        stroke="currentColor"
-        strokeWidth="1"
-        opacity="0.3"
-      />
-      <path
-        d="M32 12c0 20-8 32-8 32M32 12c0 20 8 32 8 32"
-        stroke="currentColor"
-        strokeWidth="0.75"
-        opacity="0.2"
-      />
-      <path
-        d="M22 24c4 2 8 2 10 0M32 24c2 2 6 2 10 0"
-        stroke="currentColor"
-        strokeWidth="0.5"
-        opacity="0.15"
-      />
-    </svg>
-  );
-}
-
-/* ---------- Provenance Detail Panel ---------- */
-function ProvenancePanel({
+/* ---------- Provenance Sidebar Panel ---------- */
+function ProvenanceSidebar({
   cake,
   onClose,
 }: {
@@ -57,7 +15,6 @@ function ProvenancePanel({
 }) {
   return (
     <>
-      {/* Backdrop for mobile */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -65,397 +22,254 @@ function ProvenancePanel({
         className="fixed inset-0 bg-surface/60 backdrop-blur-sm z-40 xl:hidden"
         onClick={onClose}
       />
-
-      {/* Panel */}
-      <motion.aside
+      <motion.div
         initial={{ x: "100%" }}
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
         transition={{ type: "tween", duration: 0.3 }}
-        className="fixed right-0 top-20 bottom-0 w-full sm:w-96 bg-surface-container-low border-l border-[0.5px] border-outline-variant z-50 overflow-y-auto"
+        className="fixed right-0 top-0 h-full w-96 bg-surface-container-low border-l border-outline-variant/15 p-10 z-50 overflow-y-auto no-scrollbar"
       >
-        <div className="p-6">
-          {/* Close */}
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 text-outline hover:text-on-surface transition-colors"
-            aria-label="Close panel"
-          >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path
-                d="M5 5l10 10M15 5L5 15"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              />
-            </svg>
-          </button>
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-outline hover:text-on-surface"
+        >
+          <X size={20} />
+        </button>
 
-          {/* Image placeholder */}
-          <div className="h-72 bg-surface-container border-[0.5px] border-outline-variant flex items-center justify-center mb-6">
-            <TeaLeafIcon className="w-24 h-24 text-primary/30" />
+        <h4 className="text-[10px] font-label uppercase tracking-[0.4em] text-primary mb-8">
+          Selected Provenance
+        </h4>
+
+        <div className="mb-12">
+          <div className="h-48 w-full bg-surface-container mb-6 border border-outline-variant/10 overflow-hidden flex items-center justify-center">
+            <span className="text-outline text-xs font-label uppercase">
+              {cake.name}
+            </span>
           </div>
+          <h2 className="text-2xl font-headline mb-2">{cake.name}</h2>
+          <p className="text-xs font-body text-on-surface-variant leading-relaxed opacity-70">
+            {cake.subtitle}
+          </p>
+        </div>
 
-          {/* Name */}
-          <h2 className="font-headline text-2xl text-on-surface">
-            {cake.name}
-          </h2>
-          <p className="text-sm text-on-surface-variant mt-1">{cake.subtitle}</p>
-
-          {/* Tags */}
-          <div className="flex flex-wrap gap-1.5 mt-4">
-            {cake.tags.map((tag) => (
-              <span
-                key={tag}
-                className="bg-primary/10 text-primary text-[9px] font-label tracking-[0.15em] uppercase px-2 py-0.5"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-
-          {/* Metadata */}
-          <div className="mt-6 space-y-3">
-            {[
-              { label: "Vintage", value: String(cake.vintage) },
-              { label: "Weight", value: cake.weight },
-              { label: "Factory", value: cake.factory },
-              { label: "Grade", value: cake.grade },
-              { label: "Category", value: cake.category.toUpperCase() },
-              { label: "Token ID", value: `#${cake.tokenId}` },
-              { label: "Contract", value: cake.contractAddress },
-            ].map((row) => (
+        <div className="space-y-8 relative">
+          <div className="absolute left-[3.5px] top-2 w-[1px] h-full border-l border-outline-variant/30 border-dashed" />
+          {cake.provenance.map((entry, idx) => (
+            <div key={idx} className="relative pl-8 mb-10">
               <div
-                key={row.label}
-                className="flex justify-between items-center border-b border-[0.5px] border-outline-variant pb-2"
+                className={`absolute -left-[8px] top-1.5 w-4 h-4 border-2 border-surface-container-low rounded-full ${
+                  idx === 0 ? "bg-secondary" : idx === 1 ? "bg-primary" : "bg-white/20"
+                }`}
+              />
+              <div
+                className={`text-[10px] font-label uppercase mb-1 ${
+                  idx === 1 ? "text-primary" : "text-white/40"
+                }`}
               >
-                <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  {row.label}
-                </span>
-                <span className="text-sm text-on-surface">{row.value}</span>
+                {entry.date} | {entry.event}
               </div>
-            ))}
-          </div>
-
-          {/* Price */}
-          <div className="mt-6 p-4 bg-surface border-[0.5px] border-outline-variant">
-            <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-              Current Price
-            </span>
-            <div className="mt-1">
-              <span className="font-headline text-xl text-primary">
-                {cake.price} BNB
-              </span>
-              <span className="text-sm text-on-surface-variant ml-2">
-                ${cake.priceUsd.toLocaleString()}
-              </span>
+              <p className="text-xs font-body opacity-60 italic leading-relaxed">
+                {entry.detail}
+              </p>
             </div>
-          </div>
+          ))}
+        </div>
 
-          {/* Provenance Timeline */}
-          <div className="mt-8">
-            <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-              Provenance Timeline
-            </span>
-            <div className="mt-4 space-y-0">
-              {cake.provenance.map((entry, i) => (
-                <div key={i} className="flex gap-4">
-                  {/* Timeline line */}
-                  <div className="flex flex-col items-center">
-                    <div className="w-2 h-2 bg-primary shrink-0 mt-1.5" />
-                    {i < cake.provenance.length - 1 && (
-                      <div className="w-[0.5px] flex-1 bg-outline-variant" />
-                    )}
-                  </div>
-                  {/* Content */}
-                  <div className="pb-6">
-                    <span className="font-label text-[10px] text-primary tracking-[0.15em]">
-                      {entry.date}
-                    </span>
-                    <p className="text-sm text-on-surface font-medium mt-0.5">
-                      {entry.event}
-                    </p>
-                    <p className="text-xs text-on-surface-variant mt-0.5">
-                      {entry.detail}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* CTA */}
-          <button className="btn-gradient w-full mt-6">
+        <div className="mt-12">
+          <button className="w-full bg-primary text-on-primary py-4 font-label font-bold uppercase text-xs tracking-widest hover:bg-primary/90 transition-all">
             Inquire for Private Sale
           </button>
         </div>
-      </motion.aside>
+      </motion.div>
     </>
   );
 }
 
-/* ---------- Tea Cake Card ---------- */
-function TeaCakeCard({
+/* ---------- Tea Card ---------- */
+function TeaCard({
   cake,
   onSelect,
-  index,
+  isLarge = false,
 }: {
   cake: TeaCake;
   onSelect: (cake: TeaCake) => void;
-  index: number;
+  isLarge?: boolean;
 }) {
-  return (
-    <motion.article
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05, duration: 0.4 }}
-      className="bg-surface-container-low border-[0.5px] border-outline-variant overflow-hidden cursor-pointer group"
-      onClick={() => onSelect(cake)}
-    >
-      {/* Image area */}
-      <div className="h-64 bg-surface-container relative flex items-center justify-center">
-        <TeaLeafIcon className="w-20 h-20 text-primary/20 group-hover:text-primary/30 transition-colors" />
-
-        {/* Vintage badge */}
-        <div className="absolute top-3 left-3 bg-surface/80 backdrop-blur px-2.5 py-1">
-          <span className="font-label text-[10px] text-primary tracking-[0.15em]">
+  if (isLarge) {
+    return (
+      <div
+        className="group relative xl:row-span-2 bg-surface-container-low border border-outline-variant/5 hover:border-primary/20 transition-all duration-500 overflow-hidden flex flex-col cursor-pointer"
+        onClick={() => onSelect(cake)}
+      >
+        <div className="relative flex-1 overflow-hidden min-h-[300px] bg-surface-container flex items-center justify-center">
+          <span className="text-outline/30 font-headline text-4xl">
             {cake.vintage}
           </span>
-        </div>
-
-        {/* Grade badge */}
-        {cake.grade === "AAA" && (
-          <div className="absolute top-3 right-3 bg-primary/15 backdrop-blur px-2 py-0.5">
-            <span className="font-label text-[9px] text-primary tracking-[0.15em]">
-              {cake.grade}
-            </span>
+          <div className="absolute inset-0 bg-gradient-to-b from-surface-container-low/20 via-transparent to-surface-container-low" />
+          <div className="absolute top-8 left-8">
+            <div className="text-[10px] font-label uppercase text-primary mb-2 tracking-[0.3em]">
+              Masterpiece Collection
+            </div>
+            <h3 className="text-4xl font-headline text-white max-w-xs leading-tight">
+              {cake.name}
+            </h3>
           </div>
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="p-5">
-        {/* Meta row */}
-        <div className="flex items-center gap-2 mb-2">
-          <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-            {cake.grade}
-          </span>
-          <span className="text-outline-variant">|</span>
-          <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-            {cake.weight}
-          </span>
-          <span className="text-outline-variant">|</span>
-          <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-            {cake.factory}
-          </span>
         </div>
+        <div className="p-8 bg-surface-container-low relative z-10">
+          <div className="mb-8 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-secondary" />
+              <span className="text-[10px] font-label uppercase tracking-widest text-secondary">
+                Appraised by Master ({cake.vintage})
+              </span>
+            </div>
+            <p className="text-sm font-body text-on-surface-variant opacity-80 leading-relaxed">
+              {cake.subtitle}
+            </p>
+          </div>
+          <div className="flex justify-between items-end">
+            <div>
+              <div className="text-[10px] font-label uppercase text-white/40 mb-1">
+                Current Appraisal
+              </div>
+              <div className="text-2xl font-label text-primary font-bold">
+                {cake.price} BNB
+              </div>
+            </div>
+            <button className="bg-primary text-on-primary px-8 py-3 font-label font-bold uppercase text-xs hover:bg-primary/90 transition-all">
+              Acquire Now
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-        {/* Name */}
-        <h3 className="font-headline text-lg text-on-surface">{cake.name}</h3>
-        <p className="text-sm text-on-surface-variant mt-1 line-clamp-2">
-          {cake.subtitle}
-        </p>
-
-        {/* Tags */}
-        <div className="flex flex-wrap gap-1.5 mt-3">
+  return (
+    <div
+      className="group relative bg-surface-container-low border border-outline-variant/5 hover:border-primary/20 transition-all duration-500 overflow-hidden cursor-pointer"
+      onClick={() => onSelect(cake)}
+    >
+      <div className="relative h-80 overflow-hidden bg-surface-container flex items-center justify-center">
+        <span className="text-outline/20 font-headline text-6xl">
+          {cake.vintage}
+        </span>
+        <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent opacity-60" />
+        <div className="absolute top-4 left-4 flex gap-2">
           {cake.tags.map((tag) => (
             <span
               key={tag}
-              className="bg-primary/10 text-primary text-[9px] font-label tracking-[0.15em] uppercase px-2 py-0.5"
+              className="bg-surface-container-highest/80 text-on-surface px-3 py-1 text-[10px] font-label uppercase tracking-widest backdrop-blur-md border border-outline-variant/20"
             >
               {tag}
             </span>
           ))}
         </div>
-
-        {/* Bottom row */}
-        <div className="flex items-end justify-between mt-4 pt-4 border-t border-[0.5px] border-outline-variant">
+      </div>
+      <div className="p-8">
+        <div className="flex justify-between items-start mb-6">
           <div>
-            <span className="font-headline text-lg text-primary">
-              {cake.price} BNB
-            </span>
-            <span className="text-xs text-on-surface-variant ml-2">
-              ${cake.priceUsd.toLocaleString()}
-            </span>
+            <h3 className="text-2xl font-headline mb-1">{cake.name}</h3>
+            <p className="text-[10px] font-label uppercase tracking-widest text-white/40">
+              {cake.subtitle}
+            </p>
           </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onSelect(cake);
-              }}
-              className="text-primary text-xs font-label tracking-[0.1em] hover:underline"
-            >
-              View Provenance
-            </button>
-            <button
-              onClick={(e) => e.stopPropagation()}
-              className="btn-gradient text-[9px] px-4 py-2"
-            >
-              Place Bid
-            </button>
+          <div className="text-right">
+            <div className="text-lg font-label text-primary font-bold">
+              {cake.price} BNB
+            </div>
+            <div className="text-[10px] font-label text-white/20">
+              ${cake.priceUsd.toLocaleString()} USD
+            </div>
           </div>
         </div>
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className="border-l border-outline-variant/30 pl-4">
+            <div className="text-[10px] font-label uppercase text-white/40">
+              Vintage
+            </div>
+            <div className="text-sm font-label">{cake.vintage}</div>
+          </div>
+          <div className="border-l border-outline-variant/30 pl-4">
+            <div className="text-[10px] font-label uppercase text-white/40">
+              Weight
+            </div>
+            <div className="text-sm font-label">{cake.weight}</div>
+          </div>
+        </div>
+        <div className="flex items-center justify-between border-t border-outline-variant/15 pt-6">
+          <button className="text-[10px] font-label uppercase tracking-widest text-primary flex items-center gap-2 group/btn">
+            View Provenance
+            <ArrowRight className="w-3 h-3 transition-transform group-hover/btn:translate-x-1" />
+          </button>
+          <button className="bg-primary-container text-primary border border-primary/20 px-4 py-2 text-[10px] font-label uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-all">
+            Place Bid
+          </button>
+        </div>
       </div>
-    </motion.article>
+    </div>
   );
 }
 
 /* ---------- Main Page ---------- */
 export default function NftMarketplacePage() {
   const teaCakes = useStore((s) => s.teaCakes);
-  const [category, setCategory] = useState<Category>("all");
-  const [sort, setSort] = useState<SortValue>("vintage-asc");
   const [selectedCake, setSelectedCake] = useState<TeaCake | null>(null);
-  const [sortOpen, setSortOpen] = useState(false);
 
-  const filtered = useMemo(() => {
-    let result =
-      category === "all"
-        ? teaCakes.filter((c) => c.isListed)
-        : teaCakes.filter((c) => c.isListed && c.category === category);
-
-    switch (sort) {
-      case "vintage-asc":
-        result = [...result].sort((a, b) => a.vintage - b.vintage);
-        break;
-      case "vintage-desc":
-        result = [...result].sort((a, b) => b.vintage - a.vintage);
-        break;
-      case "price-desc":
-        result = [...result].sort((a, b) => b.price - a.price);
-        break;
-      case "price-asc":
-        result = [...result].sort((a, b) => a.price - b.price);
-        break;
-    }
-
-    return result;
-  }, [teaCakes, category, sort]);
-
-  const currentSortLabel =
-    SORT_OPTIONS.find((o) => o.value === sort)?.label ?? "Sort";
+  const listedCakes = teaCakes.filter((c) => c.isListed);
 
   return (
     <div className="p-6 lg:p-10">
-      {/* ── Header ── */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-          Curated Collection
-        </span>
-        <h1 className="font-headline text-4xl mt-2 text-shadow-gold">
-          The Marketplace of{" "}
-          <em className="text-primary not-italic italic">Provenance</em>
-        </h1>
-      </motion.div>
-
-      {/* ── Controls ── */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.15, duration: 0.4 }}
-        className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-8 gap-4"
-      >
-        {/* Category tabs */}
-        <div className="flex gap-1">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setCategory(cat)}
-              className={`font-label text-[10px] uppercase tracking-[0.15em] px-4 py-2 transition-colors border-[0.5px] ${
-                category === cat
-                  ? "bg-primary/10 text-primary border-primary/30"
-                  : "text-outline border-transparent hover:text-on-surface hover:border-outline-variant"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+      <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
+        <div className="max-w-2xl">
+          <h1 className="text-5xl font-headline text-on-surface mb-4 tracking-tight leading-tight">
+            The Marketplace of{" "}
+            <span className="text-primary italic">Provenance</span>
+          </h1>
+          <p className="text-on-surface-variant font-body leading-relaxed opacity-80">
+            Explore the world&apos;s most rare and authenticated vintage
+            Pu&apos;er tea cakes. Every token represents a physical cake held
+            in our climate-controlled Kura, verified by the blockchain.
+          </p>
         </div>
 
-        {/* Sort dropdown */}
-        <div className="relative">
-          <button
-            onClick={() => setSortOpen((v) => !v)}
-            className="font-label text-[10px] uppercase tracking-[0.15em] text-outline hover:text-on-surface px-4 py-2 border-[0.5px] border-outline-variant flex items-center gap-2 transition-colors"
-          >
-            {currentSortLabel}
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-              <path
-                d="M2 4l3 3 3-3"
-                stroke="currentColor"
-                strokeWidth="1"
-              />
-            </svg>
-          </button>
-
-          <AnimatePresence>
-            {sortOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                className="absolute right-0 top-full mt-1 bg-surface-container-low border-[0.5px] border-outline-variant z-30 min-w-[180px]"
-              >
-                {SORT_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.value}
-                    onClick={() => {
-                      setSort(opt.value);
-                      setSortOpen(false);
-                    }}
-                    className={`block w-full text-left font-label text-[10px] uppercase tracking-[0.15em] px-4 py-2.5 transition-colors ${
-                      sort === opt.value
-                        ? "text-primary bg-primary/5"
-                        : "text-outline hover:text-on-surface hover:bg-surface-container-high"
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </motion.div>
-
-      {/* ── Grid ── */}
-      <div className="mt-8">
-        {filtered.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-24"
-          >
-            <TeaLeafIcon className="w-16 h-16 text-outline-variant mx-auto mb-4" />
-            <p className="font-headline text-lg text-on-surface-variant">
-              No tea cakes found
-            </p>
-            <p className="text-sm text-outline mt-1">
-              Try adjusting your filters
-            </p>
-          </motion.div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {filtered.map((cake, i) => (
-              <TeaCakeCard
-                key={cake.id}
-                cake={cake}
-                onSelect={setSelectedCake}
-                index={i}
-              />
-            ))}
+        <div className="flex gap-4 border-b border-outline-variant/15 pb-2">
+          <div className="flex flex-col">
+            <label className="text-[10px] font-label uppercase text-white/40 mb-1 tracking-tighter">
+              Sort by Vintage
+            </label>
+            <select className="bg-transparent border-none text-primary font-label text-xs focus:ring-0 p-0 pr-8 cursor-pointer uppercase tracking-widest outline-none">
+              <option>Oldest First</option>
+              <option>Newest First</option>
+            </select>
           </div>
-        )}
+          <div className="w-px h-8 bg-outline-variant/15 self-end mb-1" />
+          <div className="flex flex-col">
+            <label className="text-[10px] font-label uppercase text-white/40 mb-1 tracking-tighter">
+              Sort by Price
+            </label>
+            <select className="bg-transparent border-none text-primary font-label text-xs focus:ring-0 p-0 pr-8 cursor-pointer uppercase tracking-widest outline-none">
+              <option>Highest to Lowest</option>
+              <option>Lowest to Highest</option>
+            </select>
+          </div>
+        </div>
+      </header>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-8">
+        {listedCakes.map((cake, idx) => (
+          <TeaCard
+            key={cake.id}
+            cake={cake}
+            onSelect={setSelectedCake}
+            isLarge={idx === 1}
+          />
+        ))}
       </div>
 
-      {/* ── Provenance Panel ── */}
       <AnimatePresence>
         {selectedCake && (
-          <ProvenancePanel
+          <ProvenanceSidebar
             cake={selectedCake}
             onClose={() => setSelectedCake(null)}
           />

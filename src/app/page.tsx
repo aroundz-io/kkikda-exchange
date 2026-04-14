@@ -3,356 +3,357 @@
 import { useStore } from "@/stores/useStore";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import {
-  TrendingUp,
-  Lock,
-  ShieldCheck,
-  ArrowUpRight,
-} from "lucide-react";
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.08, duration: 0.5, ease: "easeOut" as const },
-  }),
-};
+import { TrendingUp, MoreVertical, Waves } from "lucide-react";
 
 type FilterTab = "all" | "tea" | "liquidity";
 
 export default function HomePage() {
-  const { user, teaCakes, tokens } = useStore();
+  const { user, teaCakes } = useStore();
   const [filter, setFilter] = useState<FilterTab>("all");
-
-  const filteredAssets =
-    filter === "tea"
-      ? teaCakes
-      : filter === "liquidity"
-        ? []
-        : teaCakes;
 
   return (
     <div className="p-6 lg:p-10">
-      {/* ── Header ── */}
-      <motion.div
-        className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10"
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        custom={0}
-      >
+      {/* Header Section */}
+      <header className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div>
           <h1 className="font-headline text-4xl text-on-surface mb-2">
             Portfolio Overview
           </h1>
-          <p className="text-outline">
-            Overview of your authenticated vintage assets
+          <p className="font-body text-outline max-w-lg">
+            Managing your curated collection of vintage Pu&apos;er tea cakes and
+            digital liquidity positions.
           </p>
         </div>
-
-        <div className="bg-surface-container-low border-[0.5px] border-outline-variant p-5 min-w-[260px]">
+        <div className="text-left md:text-right">
+          <p className="font-label text-[10px] text-outline uppercase tracking-[0.2em] mb-1">
+            Global Wallet Balance
+          </p>
           {user.address ? (
-            <div>
-              <span className="font-label text-[10px] text-outline uppercase tracking-widest">
-                Wallet Balance
+            <p className="font-label text-4xl text-primary font-bold">
+              {user.balance.toFixed(4)}{" "}
+              <span className="text-xl font-light text-on-primary-container">
+                BNB
               </span>
-              <p className="font-label text-4xl text-primary font-bold mt-1">
-                {user.balance.toFixed(4)}{" "}
-                <span className="text-base text-outline">BNB</span>
-              </p>
-              <p className="text-sm text-outline mt-0.5">
-                ${user.balanceUsd.toLocaleString()}
-              </p>
-            </div>
+            </p>
           ) : (
-            <p className="text-sm text-outline font-body">
-              Connect wallet to view portfolio
+            <p className="font-label text-4xl text-primary font-bold">
+              142,850.42{" "}
+              <span className="text-xl font-light text-on-primary-container">
+                USD
+              </span>
             </p>
           )}
         </div>
-      </motion.div>
+      </header>
 
-      {/* ── Stat Cards ── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        {/* P&L */}
-        <motion.div
-          className="relative bg-surface-container-low border-[0.5px] border-outline-variant p-8"
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          custom={1}
-        >
-          <TrendingUp size={16} className="absolute top-8 right-8 text-outline/30" />
-          <span className="font-label text-[10px] tracking-widest text-outline uppercase">
-            Profit / Loss
-          </span>
-          <p className="font-label text-3xl font-bold text-secondary mt-3">
-            ${user.pnl.toLocaleString()}
-          </p>
-          <div className="flex items-center gap-1 mt-1">
-            <ArrowUpRight
-              size={14}
-              className={
-                user.pnlPercent >= 0 ? "text-secondary" : "text-error"
-              }
-            />
-            <span
-              className={`text-sm font-label ${
-                user.pnlPercent >= 0 ? "text-secondary" : "text-error"
-              }`}
-            >
-              {user.pnlPercent >= 0 ? "+" : ""}
-              {user.pnlPercent}%
-            </span>
+      {/* Bento Grid Stats */}
+      <div className="grid grid-cols-12 gap-6 mb-12">
+        {/* P&L Card */}
+        <div className="col-span-12 lg:col-span-4 bg-surface-container-low p-8 flex flex-col justify-between group overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <TrendingUp className="w-24 h-24" />
           </div>
-          <motion.div className="mt-4 h-1 bg-outline-variant/20">
-            <motion.div className="h-full bg-secondary" initial={{ width: 0 }} animate={{ width: "65%" }} />
-          </motion.div>
-        </motion.div>
+          <div>
+            <p className="font-label text-[10px] text-outline uppercase tracking-widest mb-4">
+              Total Profit &amp; Loss
+            </p>
+            <div className="flex items-baseline gap-2">
+              <h2 className="text-3xl font-label text-secondary font-bold">
+                +{user.pnl.toLocaleString()}
+              </h2>
+              <span className="text-secondary text-sm font-label">
+                (+{user.pnlPercent}%)
+              </span>
+            </div>
+          </div>
+          <div className="mt-8">
+            <div className="h-1 bg-surface-container-highest w-full overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: "75%" }}
+                transition={{ duration: 1, ease: "easeOut" }}
+                className="h-full bg-secondary"
+              />
+            </div>
+            <p className="text-[10px] font-label text-outline mt-2 uppercase tracking-widest">
+              Monthly Growth Target
+            </p>
+          </div>
+        </div>
 
-        {/* Staking */}
-        <motion.div
-          className="relative bg-surface-container-low border-[0.5px] border-outline-variant p-8"
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          custom={2}
-        >
-          <Lock size={16} className="absolute top-8 right-8 text-outline/30" />
-          <span className="font-label text-[10px] tracking-widest text-outline uppercase">
-            Staked Value
-          </span>
-          <p className="font-label text-3xl font-bold text-on-surface mt-3">
-            ${user.stakedValue.toLocaleString()}
+        {/* Staking Accrual */}
+        <div className="col-span-12 lg:col-span-4 bg-surface-container-highest p-8">
+          <p className="font-label text-[10px] text-outline uppercase tracking-widest mb-4">
+            Staking Accrual
           </p>
-          <motion.div className="mt-4 h-1 bg-outline-variant/20">
-            <motion.div className="h-full bg-secondary" initial={{ width: 0 }} animate={{ width: "65%" }} />
-          </motion.div>
-        </motion.div>
+          <div className="flex flex-col gap-1">
+            <h2 className="text-3xl font-label text-primary font-bold">
+              4.20 <span className="text-lg font-light">$KKDA</span>
+            </h2>
+            <p className="text-outline text-xs font-body">
+              Est. Annual Yield: 8.42%
+            </p>
+          </div>
+          <div className="mt-8 flex gap-4">
+            <button className="text-[10px] font-label uppercase tracking-widest text-primary border-b-[0.5px] border-primary pb-1 hover:opacity-70 transition-opacity">
+              Claim Rewards
+            </button>
+            <button className="text-[10px] font-label uppercase tracking-widest text-on-surface border-b-[0.5px] border-outline-variant pb-1 hover:opacity-70 transition-opacity">
+              Compound
+            </button>
+          </div>
+        </div>
 
-        {/* Security */}
-        <motion.div
-          className="relative bg-surface-container-low border-[0.5px] border-outline-variant p-8"
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          custom={3}
-        >
-          <ShieldCheck size={16} className="absolute top-8 right-8 text-outline/30" />
-          <span className="font-label text-[10px] tracking-widest text-outline uppercase">
-            Security Score
-          </span>
-          <p className="font-label text-3xl font-bold text-on-surface mt-3">
-            {user.securityScore}%
-          </p>
-          <motion.div className="mt-4 h-1 bg-outline-variant/20">
-            <motion.div
-              className="h-full bg-secondary"
-              initial={{ width: 0 }}
-              animate={{ width: `${user.securityScore}%` }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            />
-          </motion.div>
-        </motion.div>
+        {/* Security Status */}
+        <div className="col-span-12 lg:col-span-4 relative overflow-hidden bg-surface-container-low p-8 flex flex-col justify-between">
+          <div className="relative z-10">
+            <p className="font-label text-[10px] text-outline uppercase tracking-widest mb-4">
+              Security Status
+            </p>
+            <h2 className="text-xl font-headline text-on-surface mb-2">
+              Tier 2 Verification
+            </h2>
+            <p className="text-xs text-outline font-body mb-6">
+              Upgrade to Tier 3 for institutional limits and priority auction
+              access.
+            </p>
+          </div>
+          <button className="relative z-10 w-fit font-label text-[10px] font-bold uppercase tracking-widest px-6 py-2 border-[0.5px] border-outline-variant text-on-surface hover:bg-primary hover:text-on-primary hover:border-primary transition-all">
+            Start Upgrade
+          </button>
+        </div>
       </div>
 
-      {/* ── Main Content Grid ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
-        {/* Asset Table (8/12) */}
-        <motion.div
-          className="col-span-12 lg:col-span-8"
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          custom={4}
-        >
-          {/* Section Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
-            <div className="border-l-4 border-primary pl-6">
-              <h2 className="font-headline text-xl text-on-surface">
-                Your Assets
-              </h2>
-            </div>
+      {/* Asset Categories Section */}
+      <section className="mb-12">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+          <h3 className="font-headline text-2xl text-on-surface">
+            Digital Assets Portfolio
+          </h3>
+          <div className="flex gap-4">
+            {(["all", "tea", "liquidity"] as FilterTab[]).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setFilter(tab)}
+                className={`px-4 py-1 text-[10px] font-label uppercase tracking-widest transition-colors ${
+                  filter === tab
+                    ? "bg-primary text-on-primary"
+                    : "border-[0.5px] border-outline-variant text-outline hover:text-on-surface"
+                }`}
+              >
+                {tab === "all"
+                  ? "All Assets"
+                  : tab === "tea"
+                    ? "Tea Cakes"
+                    : "Liquidity"}
+              </button>
+            ))}
+          </div>
+        </div>
 
-            <div className="flex gap-1">
-              {(["all", "tea", "liquidity"] as FilterTab[]).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setFilter(tab)}
-                  className={`font-label text-[10px] tracking-widest uppercase px-3 py-1.5 transition-colors ${
-                    filter === tab
-                      ? "text-primary border-[0.5px] border-primary"
-                      : "text-outline hover:text-on-surface"
+        {/* Asset Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b-[0.5px] border-outline-variant">
+                <th className="pb-4 font-label text-[10px] uppercase tracking-widest text-outline">
+                  Asset Class
+                </th>
+                <th className="pb-4 font-label text-[10px] uppercase tracking-widest text-outline">
+                  Allocation
+                </th>
+                <th className="pb-4 font-label text-[10px] uppercase tracking-widest text-outline">
+                  Market Value
+                </th>
+                <th className="pb-4 font-label text-[10px] uppercase tracking-widest text-outline">
+                  P&amp;L (24h)
+                </th>
+                <th className="pb-4 font-label text-[10px] uppercase tracking-widest text-outline text-right">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y-[0.5px] divide-outline-variant/10">
+              {/* KKDA Heritage Token */}
+              <tr className="hover:bg-surface-container-lowest transition-colors group">
+                <td className="py-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-primary-container flex items-center justify-center">
+                      <span className="text-primary font-bold font-label">
+                        K
+                      </span>
+                    </div>
+                    <div>
+                      <p className="font-headline text-sm font-bold">
+                        $KKDA Heritage Token
+                      </p>
+                      <p className="text-[10px] font-label text-outline">
+                        Native Utility Token
+                      </p>
+                    </div>
+                  </div>
+                </td>
+                <td className="py-6 font-label text-sm">45,000.00</td>
+                <td className="py-6 font-label text-sm">$82,350.00</td>
+                <td className="py-6 font-label text-sm text-secondary">
+                  +2.4%
+                </td>
+                <td className="py-6 text-right">
+                  <button className="text-outline group-hover:text-primary transition-colors">
+                    <MoreVertical className="w-5 h-5" />
+                  </button>
+                </td>
+              </tr>
+
+              {/* Tea Cake NFT */}
+              {teaCakes.slice(0, 1).map((cake) => (
+                <tr
+                  key={cake.id}
+                  className="hover:bg-surface-container-lowest transition-colors group"
+                >
+                  <td className="py-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-surface-container overflow-hidden">
+                        <div className="w-full h-full bg-primary/10 flex items-center justify-center">
+                          <span className="text-[10px] text-primary font-label">
+                            TEA
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="font-headline text-sm font-bold">
+                          {cake.name}
+                        </p>
+                        <p className="text-[10px] font-label text-outline">
+                          Vintage NFT Cake #{cake.tokenId}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-6 font-label text-sm">1 Cake</td>
+                  <td className="py-6 font-label text-sm">
+                    ${cake.priceUsd.toLocaleString()}
+                  </td>
+                  <td className="py-6 font-label text-sm text-on-surface-variant">
+                    --
+                  </td>
+                  <td className="py-6 text-right">
+                    <button className="text-outline group-hover:text-primary transition-colors">
+                      <MoreVertical className="w-5 h-5" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+
+              {/* LP Position */}
+              <tr className="hover:bg-surface-container-lowest transition-colors group">
+                <td className="py-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-secondary-container flex items-center justify-center">
+                      <Waves className="w-5 h-5 text-secondary" />
+                    </div>
+                    <div>
+                      <p className="font-headline text-sm font-bold">
+                        LP-KKDA/USDT
+                      </p>
+                      <p className="text-[10px] font-label text-outline">
+                        Liquidity Provision
+                      </p>
+                    </div>
+                  </div>
+                </td>
+                <td className="py-6 font-label text-sm">1,240.40 LP</td>
+                <td className="py-6 font-label text-sm">$15,500.42</td>
+                <td className="py-6 font-label text-sm text-error">-1.2%</td>
+                <td className="py-6 text-right">
+                  <button className="text-outline group-hover:text-primary transition-colors">
+                    <MoreVertical className="w-5 h-5" />
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* Provenance and Activity */}
+      <div className="grid grid-cols-12 gap-10">
+        {/* Provenance Timeline */}
+        <div className="col-span-12 lg:col-span-8">
+          <h3 className="font-headline text-2xl text-on-surface mb-8">
+            Provenance Timeline
+          </h3>
+          <div className="space-y-0 border-l-[0.5px] border-outline-variant border-dashed ml-2 pl-8">
+            {[
+              {
+                date: "Dec 14, 2023",
+                title: "Acquisition: 1980s Menghai Raw",
+                desc: "Verified blockchain transfer from Master Curator #004. Storage moved to HK-Vault 02.",
+                active: true,
+              },
+              {
+                date: "Nov 22, 2023",
+                title: "KYC Tier 2 Verification Completed",
+                desc: "Identity verified for global transactions up to $250,000 USD equivalent.",
+                active: false,
+              },
+              {
+                date: "Oct 05, 2023",
+                title: "Ledger Account Initialized",
+                desc: "Welcome to Heritage Ledger. Genesis wallet binding successful.",
+                active: false,
+              },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className={`relative pb-10 ${!item.active ? "opacity-60" : ""}`}
+              >
+                <div
+                  className={`absolute -left-[37px] top-0 w-4 h-4 ${
+                    item.active
+                      ? "bg-primary"
+                      : "border-[0.5px] border-outline-variant bg-surface"
+                  }`}
+                />
+                <p
+                  className={`font-label text-[10px] uppercase tracking-[0.2em] mb-1 ${
+                    item.active ? "text-primary" : "text-outline"
                   }`}
                 >
-                  {tab === "all"
-                    ? "All"
-                    : tab === "tea"
-                      ? "Tea Cakes"
-                      : "Liquidity"}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Table */}
-          <div className="bg-surface-container-low border-[0.5px] border-outline-variant overflow-x-auto">
-            <table className="w-full min-w-[600px]">
-              <thead>
-                <tr className="border-b border-outline-variant/30">
-                  <th className="text-left font-label text-[10px] uppercase tracking-widest text-outline pb-4 p-4">
-                    Asset Name
-                  </th>
-                  <th className="text-left font-label text-[10px] uppercase tracking-widest text-outline pb-4 p-4">
-                    Vintage
-                  </th>
-                  <th className="text-left font-label text-[10px] uppercase tracking-widest text-outline pb-4 p-4">
-                    Grade
-                  </th>
-                  <th className="text-right font-label text-[10px] uppercase tracking-widest text-outline pb-4 p-4">
-                    Value (USD)
-                  </th>
-                  <th className="text-center font-label text-[10px] uppercase tracking-widest text-outline pb-4 p-4">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredAssets.map((cake, i) => (
-                  <motion.tr
-                    key={cake.id}
-                    className="border-b-[0.5px] border-outline-variant hover:bg-surface-container-lowest transition-colors cursor-pointer"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: i * 0.04 }}
-                  >
-                    <td className="p-4">
-                      <p className="text-sm font-body text-on-surface">
-                        {cake.name}
-                      </p>
-                      <p className="text-xs text-outline mt-0.5 max-w-[260px] truncate">
-                        {cake.subtitle}
-                      </p>
-                    </td>
-                    <td className="p-4 text-sm text-on-surface-variant font-label">
-                      {cake.vintage}
-                    </td>
-                    <td className="p-4 text-sm text-on-surface-variant font-label">
-                      {cake.grade}
-                    </td>
-                    <td className="p-4 text-sm text-on-surface text-right font-label">
-                      ${cake.priceUsd.toLocaleString()}
-                    </td>
-                    <td className="p-4 text-center">
-                      <span
-                        className={`inline-block font-label text-[10px] uppercase tracking-widest px-2.5 py-1 ${
-                          cake.isListed
-                            ? "bg-primary/10 text-primary"
-                            : "bg-surface-container-high text-outline"
-                        }`}
-                      >
-                        {cake.isListed ? "Listed" : "Unlisted"}
-                      </span>
-                    </td>
-                  </motion.tr>
-                ))}
-                {filteredAssets.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={5}
-                      className="p-8 text-center text-outline text-sm"
-                    >
-                      No assets in this category.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </motion.div>
-
-        {/* Right Column: Provenance + Curator */}
-        <motion.div
-          className="col-span-12 lg:col-span-4 space-y-6"
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          custom={5}
-        >
-          {/* Provenance Timeline */}
-          <div className="bg-surface-container-low border-[0.5px] border-outline-variant p-6">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-1 h-6 bg-primary" />
-              <h3 className="font-headline text-lg text-on-surface">
-                Recent Provenance
-              </h3>
-            </div>
-
-            {teaCakes[0] && (
-              <div className="relative pl-8">
-                {/* Dashed vertical line */}
-                <div className="absolute left-[7px] top-1 bottom-1 border-l border-dashed border-outline-variant" />
-
-                <div className="space-y-5">
-                  {teaCakes[0].provenance.map((p, i) => (
-                    <motion.div
-                      key={i}
-                      className="relative"
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.5 + i * 0.1 }}
-                    >
-                      {/* Circle marker */}
-                      <div
-                        className={`absolute -left-8 top-1 w-4 h-4 rounded-full ${
-                          i === 0
-                            ? "bg-primary"
-                            : "border-[0.5px] border-outline-variant bg-surface"
-                        }`}
-                      />
-
-                      <span className="font-label text-[10px] uppercase tracking-widest text-outline">
-                        {p.date}
-                      </span>
-                      <p className="text-sm text-on-surface mt-0.5 font-body">
-                        {p.event}
-                      </p>
-                      <p className="text-xs text-outline mt-0.5">
-                        {p.detail}
-                      </p>
-                    </motion.div>
-                  ))}
-                </div>
+                  {item.date}
+                </p>
+                <h4 className="font-headline text-lg text-on-surface">
+                  {item.title}
+                </h4>
+                <p className="text-sm text-outline font-body mt-2">
+                  {item.desc}
+                </p>
               </div>
-            )}
+            ))}
           </div>
+        </div>
 
-          {/* Curator's Insight */}
-          <motion.div
-            className="relative bg-primary-container p-8 overflow-hidden"
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            custom={6}
-          >
+        {/* Curator's Insight */}
+        <div className="col-span-12 lg:col-span-4">
+          <div className="bg-primary-container p-8 relative overflow-hidden">
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/10 blur-3xl rounded-full" />
-            <span className="font-headline text-xl text-primary">
+            <h4 className="font-headline text-xl text-primary mb-4">
               Curator&apos;s Insight
-            </span>
-            <p className="font-headline italic text-on-surface-variant mt-3 leading-relaxed">
-              &ldquo;The 1988 Menghai Qing Bing represents the zenith of
-              state-factory craftsmanship. Its dry-stored character has
-              developed a camphor note that only deepens with each passing
-              year &mdash; a living testament to patience as
-              investment.&rdquo;
+            </h4>
+            <p className="text-sm text-on-primary-container font-body leading-relaxed mb-6">
+              &ldquo;Your portfolio&apos;s concentration in 80s vintage cakes
+              shows strong preservation of value. Market trends suggest a 12%
+              uptick in liquidity for aged Menghai varieties next
+              quarter.&rdquo;
             </p>
-            <div className="w-8 h-[0.5px] bg-primary mt-4 mb-2" />
-            <p className="font-label text-[10px] text-primary uppercase tracking-widest">
-              &mdash; Master Chen, Head Curator
-            </p>
-          </motion.div>
-        </motion.div>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-[0.5px] bg-primary" />
+              <span className="font-label text-[10px] text-primary uppercase tracking-widest">
+                Heritage Advisory
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

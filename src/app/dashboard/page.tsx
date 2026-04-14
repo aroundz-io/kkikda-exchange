@@ -11,15 +11,6 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.08, duration: 0.5, ease: "easeOut" as const },
-  }),
-};
-
 export default function DashboardPage() {
   const { orders } = useStore();
 
@@ -42,11 +33,7 @@ export default function DashboardPage() {
       : 0;
 
   const summaryCards = [
-    {
-      label: "Total Trades",
-      value: totalTrades.toString(),
-      icon: BarChart3,
-    },
+    { label: "Total Trades", value: totalTrades.toString(), icon: BarChart3 },
     {
       label: "Total Volume",
       value: `$${totalVolume.toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
@@ -57,11 +44,7 @@ export default function DashboardPage() {
       value: `$${avgTradeSize.toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
       icon: Target,
     },
-    {
-      label: "Win Rate",
-      value: `${winRate}%`,
-      icon: TrendingUp,
-    },
+    { label: "Win Rate", value: `${winRate}%`, icon: TrendingUp },
   ];
 
   const formatTime = (ts: number) => {
@@ -79,56 +62,50 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6 lg:p-10">
-      {/* ── Header ── */}
-      <motion.div
-        className="mb-10"
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        custom={0}
-      >
-        <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-          Ledger
-        </span>
-        <h1 className="font-headline text-4xl lg:text-5xl text-on-surface mt-1">
-          Transaction History
-        </h1>
-      </motion.div>
+      {/* Header */}
+      <header className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+        <div>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="font-headline text-4xl text-on-surface mb-2"
+          >
+            Transaction History
+          </motion.h1>
+          <p className="font-body text-outline max-w-lg">
+            A complete ledger of your trading activity across the Heritage
+            Exchange.
+          </p>
+        </div>
+      </header>
 
-      {/* ── Summary Cards ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         {summaryCards.map((card, i) => (
           <motion.div
             key={card.label}
-            className="bg-surface-container-low border-[0.5px] border-outline-variant p-6"
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            custom={i + 1}
+            className="bg-surface-container-low p-8 relative overflow-hidden group border border-outline-variant/5"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.08 }}
           >
-            <div className="flex items-center justify-between mb-3">
-              <span className="font-label text-[10px] tracking-[0.15em] text-outline uppercase">
-                {card.label}
-              </span>
-              <card.icon size={16} className="text-outline" />
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <card.icon size={48} />
             </div>
-            <p className="font-headline text-2xl text-on-surface">
+            <p className="font-label text-[10px] text-outline uppercase tracking-widest mb-2">
+              {card.label}
+            </p>
+            <p className="font-headline text-3xl text-on-surface font-bold">
               {card.value}
             </p>
           </motion.div>
         ))}
       </div>
 
-      {/* ── Main Content Grid ── */}
+      {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Orders Table (2/3) */}
-        <motion.div
-          className="lg:col-span-2"
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          custom={5}
-        >
+        <div className="lg:col-span-2">
           <div className="flex items-center gap-3 mb-5">
             <div className="w-1 h-6 bg-primary" />
             <h2 className="font-headline text-xl text-on-surface">
@@ -235,15 +212,10 @@ export default function DashboardPage() {
               </tbody>
             </table>
           </div>
-        </motion.div>
+        </div>
 
         {/* Recent Activity Timeline (1/3) */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          custom={6}
-        >
+        <div>
           <div className="bg-surface-container-low border-[0.5px] border-outline-variant p-6">
             <div className="flex items-center gap-3 mb-5">
               <div className="w-1 h-6 bg-primary" />
@@ -258,9 +230,7 @@ export default function DashboardPage() {
               </p>
             ) : (
               <div className="relative pl-5">
-                {/* Dashed vertical line */}
                 <div className="absolute left-[3px] top-1 bottom-1 border-l border-dashed border-outline-variant" />
-
                 <div className="space-y-5">
                   {sorted.slice(0, 8).map((order, i) => (
                     <motion.div
@@ -270,13 +240,11 @@ export default function DashboardPage() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.5 + i * 0.1 }}
                     >
-                      {/* Square marker */}
                       <div
                         className={`absolute -left-5 top-1 w-2 h-2 ${
                           order.type === "buy" ? "bg-secondary" : "bg-primary"
                         }`}
                       />
-
                       <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
                         {formatTime(order.timestamp)}
                       </span>
@@ -302,7 +270,7 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

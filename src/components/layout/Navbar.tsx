@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useStore } from "@/stores/useStore";
 import { useWalletSync } from "@/hooks/useWallet";
+import { Menu, X } from "lucide-react";
 
 const NAV_LINKS = [
   { label: "Market", href: "/nft" },
@@ -19,67 +20,43 @@ export function Navbar() {
   const pathname = usePathname();
   const lang = useStore((s) => s.lang);
   const setLang = useStore((s) => s.setLang);
+  const sidebarOpen = useStore((s) => s.sidebarOpen);
   const toggleSidebar = useStore((s) => s.toggleSidebar);
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-20 z-50 backdrop-blur-xl bg-surface/80 border-b border-outline-variant/15 flex items-center px-6">
-      {/* Left: Brand */}
-      <Link
-        href="/"
-        className="font-headline text-primary text-2xl font-bold tracking-tighter shrink-0"
-      >
-        KKIKDAGEO
-      </Link>
+    <nav className="fixed top-0 w-full z-50 flex justify-between items-center px-8 py-4 backdrop-blur-xl bg-surface/80 border-b border-outline-variant/10">
+      <div className="flex items-center gap-12">
+        <Link href="/" className="text-2xl font-headline tracking-tighter text-primary">
+          KKIKDAGEO
+        </Link>
+        <div className="hidden md:flex gap-8 items-center">
+          {NAV_LINKS.map((link) => {
+            const active = pathname === link.href || pathname.startsWith(link.href + "/");
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`font-headline tracking-widest uppercase text-[10px] transition-colors ${
+                  active
+                    ? "text-primary border-b-[0.5px] border-primary pb-1"
+                    : "text-white/60 hover:text-white"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+        </div>
+      </div>
 
-      {/* Center: Desktop nav links */}
-      <nav className="hidden lg:flex items-center gap-8 mx-auto">
-        {NAV_LINKS.map((link) => {
-          const active = pathname.startsWith(link.href);
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`font-label text-[10px] tracking-widest uppercase transition-colors ${
-                active
-                  ? "text-primary border-b-[0.5px] border-primary pb-1"
-                  : "text-white/60 hover:text-white"
-              }`}
-            >
-              {link.label}
-            </Link>
-          );
-        })}
-      </nav>
-
-      {/* Right: Controls */}
-      <div className="flex items-center gap-4 ml-auto lg:ml-0 shrink-0">
-        {/* Language toggle */}
+      <div className="flex items-center gap-4">
         <button
           onClick={() => setLang(lang === "ko" ? "en" : "ko")}
-          className="font-label text-[10px] tracking-widest uppercase text-outline hover:text-on-surface transition-colors"
+          className="hidden sm:block font-label text-[10px] uppercase tracking-wider text-white/60 hover:text-white transition-colors"
         >
-          {lang === "ko" ? "EN" : "KO"}
+          {lang === "ko" ? "KO/EN" : "EN/KO"}
         </button>
 
-        {/* Bell icon */}
-        <button className="text-outline hover:text-on-surface transition-colors">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-          </svg>
-        </button>
-
-        {/* Wallet connect */}
         <ConnectButton.Custom>
           {({
             account,
@@ -108,7 +85,7 @@ export function Navbar() {
                     return (
                       <button
                         onClick={openConnectModal}
-                        className="bg-primary text-on-primary font-label font-bold text-[10px] uppercase tracking-widest px-5 py-2.5 hover:bg-primary/90 transition-colors"
+                        className="bg-primary text-on-primary px-6 py-2 font-label font-bold uppercase text-[10px] active:scale-95 hover:opacity-90 transition-all"
                       >
                         Connect Wallet
                       </button>
@@ -119,7 +96,7 @@ export function Navbar() {
                     return (
                       <button
                         onClick={openChainModal}
-                        className="border border-error text-error font-label text-[10px] tracking-widest px-5 py-2.5 uppercase"
+                        className="border border-error text-error font-label text-[10px] tracking-widest px-5 py-2 uppercase"
                       >
                         Wrong Network
                       </button>
@@ -167,29 +144,14 @@ export function Navbar() {
           }}
         </ConnectButton.Custom>
 
-        {/* Mobile hamburger */}
         <button
           onClick={toggleSidebar}
-          className="lg:hidden text-outline hover:text-on-surface transition-colors"
-          aria-label="Toggle sidebar"
+          className="md:hidden text-white/60 hover:text-white transition-colors"
+          aria-label="Toggle menu"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="18" x2="21" y2="18" />
-          </svg>
+          {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
-    </header>
+    </nav>
   );
 }
