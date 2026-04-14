@@ -54,7 +54,7 @@ export default function StakingPage() {
   ];
 
   return (
-    <div className="p-6 lg:p-10 space-y-10">
+    <div className="page-padding space-y-10">
       {/* ── Header ── */}
       <motion.header {...fade} transition={{ duration: 0.5 }}>
         <p className="label mb-3">YIELD PROTOCOL</p>

@@ -61,7 +61,7 @@ export default function DashboardPage() {
     hash.length > 12 ? `${hash.slice(0, 6)}...${hash.slice(-4)}` : hash;
 
   return (
-    <div className="p-6 lg:p-10">
+    <div className="page-padding">
       {/* Header */}
       <header className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div>

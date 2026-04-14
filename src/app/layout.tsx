@@ -32,13 +32,7 @@ export default function RootLayout({
         <Web3Provider>
           <Navbar />
           <Sidebar />
-          <main
-            className="min-h-screen overflow-x-hidden"
-            style={{ paddingTop: "5rem", marginLeft: 0 }}
-          >
-            <style>{`@media (min-width:1024px){main{margin-left:16rem!important}}`}</style>
-            {children}
-          </main>
+          <main className="app-main">{children}</main>
           <Footer />
           <Toasts />
         </Web3Provider>

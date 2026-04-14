@@ -157,7 +157,7 @@ export default function DexPage() {
   const change = kkda?.change24h ?? 5.24;
 
   return (
-    <div className="p-6 lg:p-10">
+    <div className="page-padding">
       <div className="grid grid-cols-12 gap-8">
         {/* Left Column: Chart & Market Data */}
         <div className="col-span-12 xl:col-span-8 space-y-8">

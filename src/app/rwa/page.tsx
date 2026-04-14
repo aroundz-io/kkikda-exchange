@@ -111,7 +111,7 @@ export default function RwaPage() {
   const selectedCake = teaCakes[0];
 
   return (
-    <div className="p-6 lg:p-10 space-y-10">
+    <div className="page-padding space-y-10">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

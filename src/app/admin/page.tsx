@@ -274,7 +274,7 @@ function InventoryGrid() {
 /* ---------- Main Admin Page ---------- */
 export default function AdminPage() {
   return (
-    <div className="p-6 lg:p-10 space-y-12">
+    <div className="page-padding space-y-12">
       {/* Header Section */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b-[0.5px] border-outline-variant pb-8">
         <motion.div

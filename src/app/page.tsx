@@ -12,7 +12,7 @@ export default function HomePage() {
   const [filter, setFilter] = useState<FilterTab>("all");
 
   return (
-    <div className="p-6 lg:p-10">
+    <div className="page-padding">
       {/* Header Section */}
       <header className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div>

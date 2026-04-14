@@ -219,7 +219,7 @@ export default function NftMarketplacePage() {
   const listedCakes = teaCakes.filter((c) => c.isListed);
 
   return (
-    <div className="p-6 lg:p-10">
+    <div className="page-padding">
       <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div className="max-w-2xl">
           <h1 className="text-5xl font-headline text-on-surface mb-4 tracking-tight leading-tight">

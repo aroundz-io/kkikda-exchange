@@ -1,6 +1,6 @@
 export function Footer() {
   return (
-    <footer className="w-full py-12 px-8 flex flex-col md:flex-row justify-between items-center gap-6 bg-surface border-t border-outline-variant/15 ml-0 lg:ml-64">
+    <footer className="app-footer w-full py-12 px-8 flex flex-col md:flex-row justify-between items-center gap-6 bg-surface border-t border-outline-variant/15">
       <div className="flex flex-col items-center md:items-start">
         <span className="text-primary font-headline text-lg uppercase tracking-tighter">
           KKIKDAGEO

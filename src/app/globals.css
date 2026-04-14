@@ -49,8 +49,30 @@
   --radius-full: 9999px;
 }
 
+/* ===== Critical layout overrides (outside @layer to beat Tailwind resets) ===== */
 html {
   scroll-behavior: smooth;
+}
+
+main.app-main {
+  padding-top: 5rem;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+@media (min-width: 1024px) {
+  main.app-main { margin-left: 16rem; }
+}
+footer.app-footer {
+  margin-left: 0;
+}
+@media (min-width: 1024px) {
+  footer.app-footer { margin-left: 16rem; }
+}
+.page-padding {
+  padding: 1.5rem;
+}
+@media (min-width: 1024px) {
+  .page-padding { padding: 2.5rem; }
 }
 
 body {
