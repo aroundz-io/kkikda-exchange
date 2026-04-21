@@ -63,10 +63,7 @@ main.app-main {
   main.app-main { margin-left: 16rem; }
 }
 footer.app-footer {
-  margin-left: 0;
-}
-@media (min-width: 1024px) {
-  footer.app-footer { margin-left: 16rem; }
+  padding: 3rem 2rem;
 }
 .page-padding {
   padding: 1.5rem;

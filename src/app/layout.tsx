@@ -32,8 +32,10 @@ export default function RootLayout({
         <Web3Provider>
           <Navbar />
           <Sidebar />
-          <main className="app-main">{children}</main>
-          <Footer />
+          <main className="app-main">
+            {children}
+            <Footer />
+          </main>
           <Toasts />
         </Web3Provider>
       </body>
