@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
-import Link from "next/link";
-import { useStore } from "@/stores/useStore";
+import { motion, AnimatePresence } from "framer-motion";
+import { useStore, type TeaCake } from "@/stores/useStore";
 
 const fade = {
   initial: { opacity: 0, y: 16 },
@@ -24,9 +23,27 @@ function formatUsd(n: number) {
   return `$${n.toFixed(0)}`;
 }
 
+const INITIAL_FORM = {
+  name: "",
+  subtitle: "",
+  vintage: "",
+  weight: "",
+  factory: "",
+  grade: "AAA",
+  category: "raw" as TeaCake["category"],
+  priceBnb: "",
+  priceUsd: "",
+  tags: "",
+};
+
 export default function NftManagePage() {
   const teaCakes = useStore((s) => s.teaCakes);
+  const addTeaCake = useStore((s) => s.addTeaCake);
+  const removeTeaCake = useStore((s) => s.removeTeaCake);
+
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [showMintForm, setShowMintForm] = useState(false);
+  const [form, setForm] = useState(INITIAL_FORM);
 
   const totalAssets = teaCakes.length;
   const totalValue = teaCakes.reduce((s, t) => s + t.priceUsd, 0);
@@ -43,6 +60,59 @@ export default function NftManagePage() {
     { label: "Avg Vintage", value: avgVintage.toString() },
   ];
 
+  function handleChange(
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    const maxTokenId =
+      teaCakes.length > 0
+        ? Math.max(...teaCakes.map((t) => t.tokenId))
+        : 0;
+
+    const today = new Date().toISOString().slice(0, 10);
+
+    const newCake: TeaCake = {
+      id: `tc-${Date.now()}`,
+      name: form.name,
+      subtitle: form.subtitle,
+      vintage: Number(form.vintage) || new Date().getFullYear(),
+      weight: form.weight || "357g",
+      factory: form.factory,
+      grade: form.grade,
+      image: "",
+      price: Number(form.priceBnb) || 0,
+      priceUsd: Number(form.priceUsd) || 0,
+      appraisal: Number(form.priceUsd) || 0,
+      tags: form.tags
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean),
+      category: form.category,
+      tokenId: maxTokenId + 1,
+      contractAddress: "0x1111...2222",
+      owner: "0xMINTER",
+      isListed: true,
+      provenance: [
+        { date: today, event: "Minted", detail: "Minted via Admin Panel" },
+      ],
+    };
+
+    addTeaCake(newCake);
+    setForm(INITIAL_FORM);
+    setShowMintForm(false);
+  }
+
+  const inputClass =
+    "w-full bg-surface-container-high border-[0.5px] border-outline-variant px-3 py-2 font-body text-sm text-on-surface placeholder:text-outline outline-none focus:border-primary transition-colors";
+
+  const selectClass =
+    "w-full bg-surface-container-high border-[0.5px] border-outline-variant px-3 py-2 font-body text-sm text-on-surface outline-none focus:border-primary transition-colors";
+
   return (
     <div className="page-padding space-y-10">
       {/* ── Header ── */}
@@ -54,16 +124,219 @@ export default function NftManagePage() {
         <h1 className="font-headline text-4xl text-on-surface">
           Tokenized Inventory
         </h1>
-        <Link href="/nft" className="btn-gradient inline-block text-center">
-          Mint New Asset
-        </Link>
+        <button
+          onClick={() => setShowMintForm((v) => !v)}
+          className="btn-gradient inline-block text-center"
+        >
+          {showMintForm ? "Cancel" : "Mint New Asset"}
+        </button>
       </motion.header>
+
+      {/* ── Mint Form ── */}
+      <AnimatePresence>
+        {showMintForm && (
+          <motion.form
+            key="mint-form"
+            onSubmit={handleSubmit}
+            className="bg-surface-container-low border-[0.5px] border-outline-variant p-6 space-y-6"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.35 }}
+          >
+            <h2 className="font-headline text-xl text-on-surface">
+              Mint New NFT
+            </h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {/* Name */}
+              <div className="space-y-1.5">
+                <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                  Name
+                </label>
+                <input
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g. Menghai '88 Qing Bing"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Subtitle / Description */}
+              <div className="space-y-1.5">
+                <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                  Subtitle / Description
+                </label>
+                <input
+                  name="subtitle"
+                  value={form.subtitle}
+                  onChange={handleChange}
+                  placeholder="Short description"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Vintage Year */}
+              <div className="space-y-1.5">
+                <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                  Vintage Year
+                </label>
+                <input
+                  name="vintage"
+                  type="number"
+                  value={form.vintage}
+                  onChange={handleChange}
+                  placeholder="e.g. 1988"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Weight */}
+              <div className="space-y-1.5">
+                <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                  Weight
+                </label>
+                <input
+                  name="weight"
+                  value={form.weight}
+                  onChange={handleChange}
+                  placeholder="e.g. 357g"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Factory */}
+              <div className="space-y-1.5">
+                <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                  Factory
+                </label>
+                <input
+                  name="factory"
+                  value={form.factory}
+                  onChange={handleChange}
+                  placeholder="e.g. Menghai Tea Factory"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Grade */}
+              <div className="space-y-1.5">
+                <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                  Grade
+                </label>
+                <select
+                  name="grade"
+                  value={form.grade}
+                  onChange={handleChange}
+                  className={selectClass}
+                >
+                  <option value="AAA">AAA</option>
+                  <option value="AA+">AA+</option>
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                </select>
+              </div>
+
+              {/* Category */}
+              <div className="space-y-1.5">
+                <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                  Category
+                </label>
+                <select
+                  name="category"
+                  value={form.category}
+                  onChange={handleChange}
+                  className={selectClass}
+                >
+                  <option value="raw">Raw</option>
+                  <option value="ripe">Ripe</option>
+                  <option value="aged">Aged</option>
+                  <option value="white">White</option>
+                </select>
+              </div>
+
+              {/* Price in BNB */}
+              <div className="space-y-1.5">
+                <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                  Price in BNB
+                </label>
+                <input
+                  name="priceBnb"
+                  type="number"
+                  step="any"
+                  value={form.priceBnb}
+                  onChange={handleChange}
+                  placeholder="e.g. 4.8"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Price in USD */}
+              <div className="space-y-1.5">
+                <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                  Price in USD
+                </label>
+                <input
+                  name="priceUsd"
+                  type="number"
+                  step="any"
+                  value={form.priceUsd}
+                  onChange={handleChange}
+                  placeholder="e.g. 12450"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Tags */}
+              <div className="space-y-1.5">
+                <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                  Tags
+                </label>
+                <input
+                  name="tags"
+                  value={form.tags}
+                  onChange={handleChange}
+                  placeholder="Audited, Rare, Certified"
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            <button type="submit" className="btn-gradient">
+              Mint NFT
+            </button>
+          </motion.form>
+        )}
+      </AnimatePresence>
+
+      {/* ── Stats Row ── */}
+      <motion.div
+        className="grid grid-cols-3 gap-4"
+        {...fade}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
+        {stats.map((stat) => (
+          <div
+            key={stat.label}
+            className="bg-surface-container-low border-[0.5px] border-outline-variant p-5 text-center"
+          >
+            <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline mb-2">
+              {stat.label}
+            </p>
+            <p className="font-headline text-2xl text-on-surface">
+              {stat.value}
+            </p>
+          </div>
+        ))}
+      </motion.div>
 
       {/* ── View Toggle ── */}
       <motion.div
         className="flex items-center gap-2"
         {...fade}
-        transition={{ duration: 0.5, delay: 0.05 }}
+        transition={{ duration: 0.5, delay: 0.15 }}
       >
         <button
           onClick={() => setViewMode("grid")}
@@ -93,10 +366,19 @@ export default function NftManagePage() {
           {teaCakes.map((cake, i) => (
             <motion.div
               key={cake.id}
-              className="bg-surface-container-low border-[0.5px] border-outline-variant overflow-hidden group"
+              className="bg-surface-container-low border-[0.5px] border-outline-variant overflow-hidden group relative"
               {...fade}
               transition={{ duration: 0.35, delay: 0.1 + i * 0.05 }}
             >
+              {/* Delete Button */}
+              <button
+                onClick={() => removeTeaCake(cake.id)}
+                className="absolute top-2 left-2 z-10 w-6 h-6 flex items-center justify-center bg-surface-container border-[0.5px] border-outline-variant text-outline hover:text-error hover:border-error/40 transition-colors font-label text-xs"
+                title="Remove"
+              >
+                X
+              </button>
+
               {/* Image Placeholder */}
               <div className="aspect-[4/5] bg-surface-container flex items-center justify-center relative">
                 <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
@@ -168,39 +450,27 @@ export default function NftManagePage() {
                   {cake.category}
                 </p>
               </div>
-              <div className="text-right shrink-0">
-                <p className="font-headline text-sm text-primary">
-                  ${cake.priceUsd.toLocaleString()}
-                </p>
-                <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  {cake.price} BNB
-                </p>
+              <div className="text-right shrink-0 flex items-center gap-3">
+                <div>
+                  <p className="font-headline text-sm text-primary">
+                    ${cake.priceUsd.toLocaleString()}
+                  </p>
+                  <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                    {cake.price} BNB
+                  </p>
+                </div>
+                <button
+                  onClick={() => removeTeaCake(cake.id)}
+                  className="w-6 h-6 flex items-center justify-center border-[0.5px] border-outline-variant text-outline hover:text-error hover:border-error/40 transition-colors font-label text-xs"
+                  title="Remove"
+                >
+                  X
+                </button>
               </div>
             </motion.div>
           ))}
         </div>
       )}
-
-      {/* ── Stats Row ── */}
-      <motion.div
-        className="grid grid-cols-3 gap-4"
-        {...fade}
-        transition={{ duration: 0.5, delay: 0.4 }}
-      >
-        {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className="bg-surface-container-low border-[0.5px] border-outline-variant p-5 text-center"
-          >
-            <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline mb-2">
-              {stat.label}
-            </p>
-            <p className="font-headline text-2xl text-on-surface">
-              {stat.value}
-            </p>
-          </div>
-        ))}
-      </motion.div>
     </div>
   );
 }

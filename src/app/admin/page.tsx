@@ -155,16 +155,33 @@ function MintHistory() {
             <tr className="bg-surface-container-low font-label text-[10px] text-outline uppercase tracking-widest">
               <th className="px-6 py-4 font-medium">Tx Hash</th>
               <th className="px-6 py-4 font-medium">Asset Name</th>
-              <th className="px-6 py-4 font-medium">Vintage</th>
-              <th className="px-6 py-4 font-medium">Quantity</th>
+              <th className="px-6 py-4 font-medium">Token ID</th>
+              <th className="px-6 py-4 font-medium">Value</th>
               <th className="px-6 py-4 font-medium">Timestamp</th>
               <th className="px-6 py-4 font-medium">Status</th>
             </tr>
           </thead>
           <tbody className="text-sm font-body divide-y divide-outline-variant/10">
-            {history.map((item, i) => (
+            {(mintRecords.length > 0
+              ? mintRecords.map((r) => ({
+                  hash: r.txHash.length > 12 ? `${r.txHash.slice(0, 5)}...${r.txHash.slice(-4)}` : r.txHash,
+                  name: r.assetName,
+                  tokenId: String(r.tokenId),
+                  value: `$${r.value.toLocaleString()}`,
+                  time: new Date(r.timestamp).toLocaleTimeString(),
+                  status: r.status === "confirmed" ? "Confirmed" : r.status === "processing" ? "Processing" : "Failed",
+                }))
+              : history.map((h) => ({
+                  hash: h.hash,
+                  name: h.name,
+                  tokenId: h.vintage,
+                  value: h.quantity,
+                  time: h.time,
+                  status: h.status,
+                }))
+            ).map((item, i) => (
               <motion.tr
-                key={item.hash}
+                key={item.hash + i}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.1 }}
@@ -176,15 +193,17 @@ function MintHistory() {
                 <td className="px-6 py-6 font-semibold text-on-surface">
                   {item.name}
                 </td>
-                <td className="px-6 py-6 text-outline">{item.vintage}</td>
-                <td className="px-6 py-6 text-on-surface">{item.quantity}</td>
+                <td className="px-6 py-6 text-outline">{item.tokenId}</td>
+                <td className="px-6 py-6 text-on-surface">{item.value}</td>
                 <td className="px-6 py-6 text-outline">{item.time}</td>
                 <td className="px-6 py-6">
                   <span
                     className={`px-2 py-1 text-[10px] font-label uppercase ${
                       item.status === "Confirmed"
                         ? "bg-secondary/10 text-secondary"
-                        : "bg-tertiary/10 text-tertiary"
+                        : item.status === "Processing"
+                          ? "bg-tertiary/10 text-tertiary"
+                          : "bg-error/10 text-error"
                     }`}
                   >
                     {item.status}
@@ -273,6 +292,13 @@ function InventoryGrid() {
 
 /* ---------- Main Admin Page ---------- */
 export default function AdminPage() {
+  const teaCakes = useStore((s) => s.teaCakes);
+  const tokens = useStore((s) => s.tokens);
+  const mintRecords = useStore((s) => s.mintRecords);
+
+  const totalMintedValue = teaCakes.reduce((s, t) => s + t.priceUsd, 0);
+  const totalTokens = tokens.reduce((s, t) => s + t.supply, 0);
+
   return (
     <div className="page-padding space-y-12">
       {/* Header Section */}
@@ -306,23 +332,23 @@ export default function AdminPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <MetricCard
           label="Total Minted Value"
-          value="$4,821,400"
+          value={`$${totalMintedValue.toLocaleString()}`}
           trend="+12.4%"
           icon={Sparkles}
-          progress={78}
+          progress={Math.min(100, Math.round((totalMintedValue / 10_000_000) * 100))}
           colorClass="bg-primary"
         />
         <MetricCard
           label="Assets Burned (Redeemed)"
-          value="1,240"
+          value={mintRecords.length > 0 ? mintRecords.length.toLocaleString() : "1,240"}
           subValue="Units"
           icon={Flame}
-          progress={22}
+          progress={mintRecords.length > 0 ? Math.min(100, Math.round((mintRecords.length / 100) * 100)) : 22}
           colorClass="bg-error"
         />
         <MetricCard
           label="Active Ledger Tokens"
-          value="3,581"
+          value={totalTokens > 0 ? totalTokens.toLocaleString() : "3,581"}
           trend="STABLE"
           icon={Box}
           progress={100}

@@ -106,11 +106,15 @@ interface AppStore {
 
   teaCakes: TeaCake[];
   setTeaCakes: (t: TeaCake[]) => void;
+  addTeaCake: (t: TeaCake) => void;
+  removeTeaCake: (id: string) => void;
 
   tokens: Token[];
   setTokens: (t: Token[]) => void;
   addToken: (t: Token) => void;
   updateToken: (id: string, data: Partial<Token>) => void;
+  mintTokenSupply: (id: string, amount: number) => void;
+  deleteToken: (id: string) => void;
 
   stakingPools: StakingPool[];
   setStakingPools: (p: StakingPool[]) => void;
@@ -363,6 +367,25 @@ export const useStore = create<AppStore>()(
 
       teaCakes: DEMO_TEA_CAKES,
       setTeaCakes: (teaCakes) => set({ teaCakes }),
+      addTeaCake: (t) => {
+        set((s) => ({ teaCakes: [...s.teaCakes, t] }));
+        const genId = () => Math.random().toString(36).slice(2, 10);
+        get().addMintRecord({
+          id: genId(),
+          assetName: t.name,
+          tokenId: t.tokenId,
+          txHash: `0x${genId()}...${genId()}`,
+          status: "confirmed",
+          timestamp: Date.now(),
+          value: t.priceUsd,
+        });
+        get().addToast({ type: "success", title: "NFT Minted", message: `${t.name} has been minted as NFT #${t.tokenId}` });
+      },
+      removeTeaCake: (id) => {
+        const cake = get().teaCakes.find((t) => t.id === id);
+        set((s) => ({ teaCakes: s.teaCakes.filter((t) => t.id !== id) }));
+        if (cake) get().addToast({ type: "info", title: "NFT Burned", message: `${cake.name} has been redeemed` });
+      },
 
       tokens: DEMO_TOKENS,
       setTokens: (tokens) => set({ tokens }),
@@ -372,6 +395,20 @@ export const useStore = create<AppStore>()(
       },
       updateToken: (id, data) =>
         set((s) => ({ tokens: s.tokens.map((t) => (t.id === id ? { ...t, ...data } : t)) })),
+      mintTokenSupply: (id, amount) => {
+        set((s) => ({
+          tokens: s.tokens.map((t) =>
+            t.id === id ? { ...t, supply: Math.min(t.supply + amount, t.maxSupply) } : t
+          ),
+        }));
+        const token = get().tokens.find((t) => t.id === id);
+        if (token) get().addToast({ type: "success", title: "Tokens Minted", message: `${amount.toLocaleString()} ${token.symbol} minted` });
+      },
+      deleteToken: (id) => {
+        const token = get().tokens.find((t) => t.id === id);
+        set((s) => ({ tokens: s.tokens.filter((t) => t.id !== id) }));
+        if (token) get().addToast({ type: "info", title: "Token Removed", message: `${token.symbol} has been removed` });
+      },
 
       stakingPools: DEMO_POOLS,
       setStakingPools: (stakingPools) => set({ stakingPools }),
@@ -405,8 +442,8 @@ export const useStore = create<AppStore>()(
       toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
     }),
     {
-      name: "kkikda-store-v2",
-      partialize: (s) => ({ lang: s.lang, user: s.user, orders: s.orders }),
+      name: "kkikda-store-v3",
+      partialize: (s) => ({ lang: s.lang, user: s.user, orders: s.orders, teaCakes: s.teaCakes, tokens: s.tokens, mintRecords: s.mintRecords, stakingPools: s.stakingPools }),
     }
   )
 );

@@ -15,6 +15,8 @@ export default function AdminTokensPage() {
   const tokens = useStore((s) => s.tokens);
   const addToken = useStore((s) => s.addToken);
   const updateToken = useStore((s) => s.updateToken);
+  const mintTokenSupply = useStore((s) => s.mintTokenSupply);
+  const deleteToken = useStore((s) => s.deleteToken);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
@@ -23,6 +25,12 @@ export default function AdminTokensPage() {
   const [newName, setNewName] = useState("");
   const [newSymbol, setNewSymbol] = useState("");
   const [newMaxSupply, setNewMaxSupply] = useState("");
+  const [newSupply, setNewSupply] = useState("");
+  const [newPrice, setNewPrice] = useState("");
+  const [newCategory, setNewCategory] = useState<"rwa" | "utility" | "governance">("utility");
+
+  // Mint supply state
+  const [mintAmount, setMintAmount] = useState("");
 
   const selectedToken = tokens.find((t) => t.id === selectedId) ?? null;
 
@@ -33,13 +41,13 @@ export default function AdminTokensPage() {
       id: genId(),
       symbol: newSymbol.toUpperCase(),
       name: newName,
-      price: 0,
+      price: Number(newPrice) || 0,
       change24h: 0,
       volume24h: 0,
       marketCap: 0,
-      supply: 0,
+      supply: Number(newSupply) || 0,
       maxSupply: Number(newMaxSupply),
-      category: "utility",
+      category: newCategory,
       isPaused: false,
       contractAddress: `0x${genId()}...${genId()}`,
     };
@@ -48,6 +56,9 @@ export default function AdminTokensPage() {
     setNewName("");
     setNewSymbol("");
     setNewMaxSupply("");
+    setNewSupply("");
+    setNewPrice("");
+    setNewCategory("utility");
     setShowCreate(false);
   }
 
@@ -121,6 +132,46 @@ export default function AdminTokensPage() {
                   type="number"
                   className="w-full bg-surface-container-high border-[0.5px] border-outline-variant px-3 py-2 font-body text-sm text-on-surface placeholder:text-outline outline-none focus:border-primary transition-colors"
                 />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="space-y-1">
+                <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                  Initial Supply
+                </label>
+                <input
+                  value={newSupply}
+                  onChange={(e) => setNewSupply(e.target.value)}
+                  placeholder="e.g. 500000"
+                  type="number"
+                  className="w-full bg-surface-container-high border-[0.5px] border-outline-variant px-3 py-2 font-body text-sm text-on-surface placeholder:text-outline outline-none focus:border-primary transition-colors"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                  Price
+                </label>
+                <input
+                  value={newPrice}
+                  onChange={(e) => setNewPrice(e.target.value)}
+                  placeholder="e.g. 1.50"
+                  type="number"
+                  className="w-full bg-surface-container-high border-[0.5px] border-outline-variant px-3 py-2 font-body text-sm text-on-surface placeholder:text-outline outline-none focus:border-primary transition-colors"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                  Category
+                </label>
+                <select
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value as "rwa" | "utility" | "governance")}
+                  className="w-full bg-surface-container-high border-[0.5px] border-outline-variant px-3 py-2 font-body text-sm text-on-surface outline-none focus:border-primary transition-colors"
+                >
+                  <option value="rwa">RWA</option>
+                  <option value="utility">Utility</option>
+                  <option value="governance">Governance</option>
+                </select>
               </div>
             </div>
             <button
@@ -263,6 +314,37 @@ export default function AdminTokensPage() {
                     </p>
                   </div>
 
+                  {/* Mint Supply */}
+                  <div className="space-y-2">
+                    <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                      Mint Additional Supply
+                    </p>
+                    <div className="flex gap-2">
+                      <input
+                        value={mintAmount}
+                        onChange={(e) => setMintAmount(e.target.value)}
+                        placeholder="Amount"
+                        type="number"
+                        className="flex-1 bg-surface-container-high border-[0.5px] border-outline-variant px-3 py-2 font-body text-sm text-on-surface placeholder:text-outline outline-none focus:border-primary transition-colors"
+                      />
+                      <button
+                        onClick={() => {
+                          if (mintAmount && Number(mintAmount) > 0) {
+                            mintTokenSupply(selectedToken.id, Number(mintAmount));
+                            setMintAmount("");
+                          }
+                        }}
+                        disabled={!mintAmount || Number(mintAmount) <= 0}
+                        className="px-4 py-2 bg-secondary/10 text-secondary border-[0.5px] border-secondary/40 font-label text-[10px] uppercase tracking-[0.15em] hover:bg-secondary/20 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      >
+                        Mint
+                      </button>
+                    </div>
+                    <p className="font-body text-[10px] text-on-surface-variant">
+                      Remaining: {(selectedToken.maxSupply - selectedToken.supply).toLocaleString()} tokens available
+                    </p>
+                  </div>
+
                   {/* Contract */}
                   <div className="space-y-1">
                     <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
@@ -287,6 +369,15 @@ export default function AdminTokensPage() {
                     }`}
                   >
                     {selectedToken.isPaused ? "Resume Token" : "Pause Token"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      deleteToken(selectedToken.id);
+                      setSelectedId(null);
+                    }}
+                    className="flex-1 py-2.5 font-label text-[10px] uppercase tracking-[0.15em] border-[0.5px] bg-error/10 text-error border-error/40 hover:bg-error/20 transition-colors"
+                  >
+                    Delete Token
                   </button>
                 </div>
               </motion.div>
