@@ -205,6 +205,53 @@ export default function StakingPage() {
         ))}
       </motion.div>
 
+      {/* ── Tokenomics / APY Policy ── */}
+      <motion.section
+        className="bg-surface-container-low border-[0.5px] border-outline-variant p-6 space-y-3"
+        {...fade}
+        transition={{ duration: 0.5, delay: 0.15 }}
+      >
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <h3 className="font-headline text-base text-on-surface">
+            {t("staking.tokenomicsTitle")}
+          </h3>
+          <span className="font-label text-[10px] uppercase tracking-[0.15em] text-secondary">
+            {t("staking.formula")}
+          </span>
+        </div>
+        <ul className="space-y-1.5 font-body text-xs text-on-surface-variant leading-relaxed">
+          <li>· {t("staking.tokenomicsLine1")}</li>
+          <li>· {t("staking.tokenomicsLine2")}</li>
+          <li>· {t("staking.tokenomicsLine3")}</li>
+        </ul>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-outline-variant/15">
+          <div>
+            <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+              KKDA Single · 30d
+            </p>
+            <p className="font-body text-xs text-on-surface-variant mt-1">
+              base 12% · no IL
+            </p>
+          </div>
+          <div>
+            <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+              KKDA-USDT LP · 90d
+            </p>
+            <p className="font-body text-xs text-on-surface-variant mt-1">
+              base × 2.0 = 24%
+            </p>
+          </div>
+          <div>
+            <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+              PUER-USDT LP · 180d
+            </p>
+            <p className="font-body text-xs text-on-surface-variant mt-1">
+              base × 1.5 = 18%
+            </p>
+          </div>
+        </div>
+      </motion.section>
+
       {/* ── Pools List ── */}
       <div className="space-y-4">
         {stakingPools.map((pool, i) => {

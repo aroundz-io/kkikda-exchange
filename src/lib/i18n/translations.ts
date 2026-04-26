@@ -364,6 +364,24 @@ export const translations = {
     en: "Your stake is now earning rewards.",
     ko: "스테이킹이 시작되어 보상이 누적되고 있습니다.",
   },
+  "staking.tokenomicsTitle": { en: "APY Policy", ko: "APY 정책" },
+  "staking.tokenomicsLine1": {
+    en: "5-year emission program: 5% of total supply (50M KKDA / ~$2.5M FDV) → ≈$500K/year distributed to stakers.",
+    ko: "5년 배출 프로그램: 총 발행량의 5% (50M KKDA · FDV $2.5M) → 연 약 $500K가 스테이커에게 분배됩니다.",
+  },
+  "staking.tokenomicsLine2": {
+    en: "Base APY 12% (single-side, no IL risk). LP pools earn an IL premium and lock-duration premium on top.",
+    ko: "베이스 APY 12% (단일 자산 · IL 위험 없음). LP 풀은 IL 프리미엄과 락업 기간 프리미엄을 추가로 받습니다.",
+  },
+  "staking.tokenomicsLine3": {
+    en: "Pool-1 APY is read live from STAKING.apy() on-chain. Pool-2/3 use these defaults until their LP-staking contracts deploy.",
+    ko: "Pool-1 APY는 온체인의 STAKING.apy()에서 실시간으로 읽습니다. Pool-2/3은 LP 스테이킹 컨트랙트가 배포될 때까지 이 기본값을 사용합니다.",
+  },
+  "staking.formulaTitle": { en: "Formula", ko: "산출 공식" },
+  "staking.formula": {
+    en: "APY = annual_emission_USD ÷ pool_TVL_USD — diluted as TVL grows",
+    ko: "APY = 연간 배출액(USD) ÷ 풀 TVL(USD) — TVL 증가 시 자연 희석",
+  },
 
   // ──────────────────────────────────────────────
   // Redeem (/redeem)

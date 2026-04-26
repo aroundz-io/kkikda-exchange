@@ -514,13 +514,23 @@ const DEMO_TOKENS: Token[] = [
  * pool-2 / pool-3 = LP staking — contracts not yet deployed; UI marks them
  *          as "coming soon" so users don't expect to be able to stake.
  */
+/**
+ * Staking APY policy (demo values; pool-1 overlays live `STAKING.apy()` read):
+ *   base 12% (single-side, no impermanent-loss risk, 30d lock).
+ *   LP pools earn an IL premium and a lock-duration premium on top:
+ *     LP 90d  = base × 2.0 = 24%
+ *     LP 180d = base × 1.5 = 18%   (longer lock but lower than 90d LP because
+ *                                   liquidity provider here is more passive
+ *                                   institutional capital — sticky-yield tier)
+ *   Funded by a 5-year, 5%-of-supply emission program (~$500K/yr at $0.05/KKDA).
+ */
 const DEMO_POOLS: StakingPool[] = [
   // 50M KKDA × $0.05 = $2.5M TVL (5% of total supply staked at launch)
-  { id: "pool-1", name: "KKDA Single Staking", pair: "KKDA", apy: 14.5, totalStaked: 50_000_000, totalStakedUsd: 2_500_000, minStake: 100, lockDays: 30, rewardToken: "KKDA" },
+  { id: "pool-1", name: "KKDA Single Staking", pair: "KKDA", apy: 12.0, totalStaked: 50_000_000, totalStakedUsd: 2_500_000, minStake: 100, lockDays: 30, rewardToken: "KKDA" },
   // 5M KKDA + 250K USDT in LP = $250K + $250K = $500K TVL
-  { id: "pool-2", name: "KKDA-USDT LP", pair: "KKDA-USDT", apy: 18.4, totalStaked: 5_000_000, totalStakedUsd: 500_000, minStake: 50, lockDays: 90, rewardToken: "KKDA" },
+  { id: "pool-2", name: "KKDA-USDT LP", pair: "KKDA-USDT", apy: 24.0, totalStaked: 5_000_000, totalStakedUsd: 500_000, minStake: 50, lockDays: 90, rewardToken: "KKDA" },
   // 1,000 PUER + 2M USDT = $2.01M + $2M ≈ $4.01M (institutional-tier RWA pool)
-  { id: "pool-3", name: "PUER-USDT LP", pair: "PUER-USDT", apy: 12.1, totalStaked: 1_000, totalStakedUsd: 4_010_000, minStake: 500, lockDays: 180, rewardToken: "KKDA" },
+  { id: "pool-3", name: "PUER-USDT LP", pair: "PUER-USDT", apy: 18.0, totalStaked: 1_000, totalStakedUsd: 4_010_000, minStake: 500, lockDays: 180, rewardToken: "KKDA" },
 ];
 
 const genId = () => Math.random().toString(36).slice(2, 10);
@@ -639,7 +649,7 @@ export const useStore = create<AppStore>()(
       toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
     }),
     {
-      name: "kkikda-store-v6-staking-tvl",
+      name: "kkikda-store-v7-apy-policy",
       partialize: (s) => ({ lang: s.lang, user: s.user, orders: s.orders, teaCakes: s.teaCakes, tokens: s.tokens, mintRecords: s.mintRecords, stakingPools: s.stakingPools }),
     }
   )
