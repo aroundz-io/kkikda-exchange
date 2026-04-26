@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useStore } from "@/stores/useStore";
 import { useWalletSync } from "@/hooks/useWallet";
 import { useT } from "@/lib/i18n/useT";
@@ -58,93 +57,6 @@ export function Navbar() {
         >
           {lang === "ko" ? "KO/EN" : "EN/KO"}
         </button>
-
-        <ConnectButton.Custom>
-          {({
-            account,
-            chain,
-            openAccountModal,
-            openChainModal,
-            openConnectModal,
-            mounted,
-          }) => {
-            const ready = mounted;
-            const connected = ready && account && chain;
-
-            return (
-              <div
-                {...(!ready && {
-                  "aria-hidden": true,
-                  style: {
-                    opacity: 0,
-                    pointerEvents: "none" as const,
-                    userSelect: "none" as const,
-                  },
-                })}
-              >
-                {(() => {
-                  if (!connected) {
-                    return (
-                      <button
-                        onClick={openConnectModal}
-                        className="bg-primary text-on-primary px-6 py-2 font-label font-bold uppercase text-[10px] active:scale-95 hover:opacity-90 transition-all"
-                      >
-                        {t("common.connectWallet")}
-                      </button>
-                    );
-                  }
-
-                  if (chain.unsupported) {
-                    return (
-                      <button
-                        onClick={openChainModal}
-                        className="border border-error text-error font-label text-[10px] tracking-widest px-5 py-2 uppercase"
-                      >
-                        {t("common.network")}
-                      </button>
-                    );
-                  }
-
-                  return (
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={openChainModal}
-                        className="flex items-center gap-1.5"
-                      >
-                        {chain.hasIcon && (
-                          <div
-                            className="w-5 h-5 overflow-hidden"
-                            style={{ background: chain.iconBackground }}
-                          >
-                            {chain.iconUrl && (
-                              <img
-                                alt={chain.name ?? "Chain"}
-                                src={chain.iconUrl}
-                                className="w-5 h-5"
-                              />
-                            )}
-                          </div>
-                        )}
-                      </button>
-
-                      <button
-                        onClick={openAccountModal}
-                        className="font-label text-[10px] tracking-widest text-on-surface hover:text-primary transition-colors"
-                      >
-                        {account.displayBalance && (
-                          <span className="text-outline mr-2">
-                            {account.displayBalance}
-                          </span>
-                        )}
-                        {account.displayName}
-                      </button>
-                    </div>
-                  );
-                })()}
-              </div>
-            );
-          }}
-        </ConnectButton.Custom>
 
         <button
           onClick={toggleSidebar}

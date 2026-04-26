@@ -55,74 +55,83 @@ export function Sidebar() {
     <div className="flex flex-col h-full py-8">
       {/* User Profile — disconnected / collector / admin */}
       <div className="px-8 mb-10">
-        <div className="flex items-center gap-4 mb-6">
-          <div
-            className={`w-10 h-10 border-[0.5px] flex items-center justify-center ${
-              isConnected
-                ? "bg-surface-container-highest border-outline-variant"
-                : "bg-surface-container border-outline-variant/40"
-            }`}
-          >
-            <User
-              className={`w-5 h-5 ${
-                isConnected ? "text-primary" : "text-outline"
-              }`}
-            />
-          </div>
-          <div className="min-w-0">
-            <p
-              className={`font-headline font-bold text-sm tracking-tight ${
-                isConnected ? "text-primary" : "text-outline"
-              }`}
-            >
-              {!isConnected
-                ? t("sidebar.guest")
-                : isAdmin
-                  ? t("sidebar.kuraMaster")
-                  : t("sidebar.collector")}
-            </p>
-            <p className="text-outline font-label text-[10px] uppercase tracking-widest flex items-center gap-1.5 truncate">
-              {!isConnected ? (
-                t("sidebar.guestPrompt")
-              ) : isAdmin ? (
-                <>
-                  <ShieldCheck className="w-3 h-3 text-secondary" />
-                  <span className="truncate normal-case tracking-normal text-on-surface-variant">
-                    {t("sidebar.admin")} · {shortAddr}
-                  </span>
-                </>
-              ) : (
-                <span className="truncate normal-case tracking-normal text-on-surface-variant">
-                  {shortAddr}
-                </span>
-              )}
-            </p>
-          </div>
-        </div>
-
-        {!isConnected ? (
-          <ConnectButton.Custom>
-            {({ openConnectModal }) => (
+        <ConnectButton.Custom>
+          {({ openConnectModal, openAccountModal }) => (
+            <>
               <button
                 onClick={() => {
-                  openConnectModal();
-                  setSidebarOpen(false);
+                  if (isConnected) openAccountModal();
+                  else openConnectModal();
                 }}
-                className="block w-full text-center bg-gradient-to-br from-primary to-on-primary-container text-on-primary py-3 px-4 font-label font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity"
+                title={isConnected ? "Manage wallet" : "Connect wallet"}
+                className="flex items-center gap-4 mb-6 w-full text-left hover:opacity-80 transition-opacity"
               >
-                {t("sidebar.connectCta")}
+                <div
+                  className={`w-10 h-10 border-[0.5px] flex items-center justify-center shrink-0 ${
+                    isConnected
+                      ? "bg-surface-container-highest border-outline-variant"
+                      : "bg-surface-container border-outline-variant/40"
+                  }`}
+                >
+                  <User
+                    className={`w-5 h-5 ${
+                      isConnected ? "text-primary" : "text-outline"
+                    }`}
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p
+                    className={`font-headline font-bold text-sm tracking-tight ${
+                      isConnected ? "text-primary" : "text-outline"
+                    }`}
+                  >
+                    {!isConnected
+                      ? t("sidebar.guest")
+                      : isAdmin
+                        ? t("sidebar.kuraMaster")
+                        : t("sidebar.collector")}
+                  </p>
+                  <p className="text-outline font-label text-[10px] uppercase tracking-widest flex items-center gap-1.5 truncate">
+                    {!isConnected ? (
+                      t("sidebar.guestPrompt")
+                    ) : isAdmin ? (
+                      <>
+                        <ShieldCheck className="w-3 h-3 text-secondary shrink-0" />
+                        <span className="truncate normal-case tracking-normal text-on-surface-variant">
+                          {t("sidebar.admin")} · {shortAddr}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="truncate normal-case tracking-normal text-on-surface-variant">
+                        {shortAddr}
+                      </span>
+                    )}
+                  </p>
+                </div>
               </button>
-            )}
-          </ConnectButton.Custom>
-        ) : (
-          <Link
-            href={isAdmin ? "/admin/nft-manage" : "/dex"}
-            onClick={() => setSidebarOpen(false)}
-            className="block w-full text-center bg-gradient-to-br from-primary to-on-primary-container text-on-primary py-3 px-4 font-label font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity"
-          >
-            {isAdmin ? t("sidebar.newMint") : t("sidebar.quickTrade")}
-          </Link>
-        )}
+
+              {!isConnected ? (
+                <button
+                  onClick={() => {
+                    openConnectModal();
+                    setSidebarOpen(false);
+                  }}
+                  className="block w-full text-center bg-gradient-to-br from-primary to-on-primary-container text-on-primary py-3 px-4 font-label font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity"
+                >
+                  {t("sidebar.connectCta")}
+                </button>
+              ) : (
+                <Link
+                  href={isAdmin ? "/admin/nft-manage" : "/dex"}
+                  onClick={() => setSidebarOpen(false)}
+                  className="block w-full text-center bg-gradient-to-br from-primary to-on-primary-container text-on-primary py-3 px-4 font-label font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity"
+                >
+                  {isAdmin ? t("sidebar.newMint") : t("sidebar.quickTrade")}
+                </Link>
+              )}
+            </>
+          )}
+        </ConnectButton.Custom>
       </div>
 
       {/* Navigation */}
