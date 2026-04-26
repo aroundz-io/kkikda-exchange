@@ -119,6 +119,29 @@ export interface PurchaseOrder {
   deliveredTokenIds?: string;
 }
 
+export type RedemptionStatus =
+  | "submitted"        // user just burned NFT(s) and submitted request
+  | "verified"         // vault staff verified inventory match
+  | "ready_for_pickup" // physical item is staged at pickup location
+  | "completed"        // user has collected the item in person
+  | "cancelled";
+
+export interface RedemptionRequest {
+  id: string;
+  cakeId: string;
+  cakeName: string;
+  tokenIds: number[];         // burned tokenIds
+  burnTxHash: string;         // KKIKDA_NFT.burn tx
+  owner: string;              // wallet that initiated
+  pickupPointId: string;      // selected trade-point
+  timestamp: number;
+  status: RedemptionStatus;
+  /** ISO timestamp set by admin/vault when status moves to ready_for_pickup. */
+  readyAt?: number;
+  /** ISO timestamp when user collected. */
+  completedAt?: number;
+}
+
 /* ───── Store Interface ───── */
 
 interface AppStore {
@@ -154,6 +177,10 @@ interface AppStore {
   purchaseOrders: PurchaseOrder[];
   addPurchaseOrder: (p: PurchaseOrder) => void;
   fulfillPurchaseOrder: (id: string, deliveredTokenIds: string) => void;
+
+  redemptionRequests: RedemptionRequest[];
+  addRedemptionRequest: (r: RedemptionRequest) => void;
+  updateRedemptionStatus: (id: string, status: RedemptionStatus) => void;
 
   toasts: Toast[];
   addToast: (t: Omit<Toast, "id">) => void;
@@ -689,6 +716,32 @@ export const useStore = create<AppStore>()(
         });
       },
 
+      redemptionRequests: [],
+      addRedemptionRequest: (r) => {
+        set((s) => ({
+          redemptionRequests: [r, ...s.redemptionRequests],
+        }));
+        get().addToast({
+          type: "success",
+          title: "Redemption Submitted",
+          message: `${r.tokenIds.length} unit(s) of ${r.cakeName} queued for pickup`,
+        });
+      },
+      updateRedemptionStatus: (id, status) => {
+        set((s) => ({
+          redemptionRequests: s.redemptionRequests.map((r) =>
+            r.id === id
+              ? {
+                  ...r,
+                  status,
+                  readyAt: status === "ready_for_pickup" ? Date.now() : r.readyAt,
+                  completedAt: status === "completed" ? Date.now() : r.completedAt,
+                }
+              : r,
+          ),
+        }));
+      },
+
       toasts: [],
       addToast: (t) => {
         const toast: Toast = { ...t, id: genId() };
@@ -702,7 +755,7 @@ export const useStore = create<AppStore>()(
       toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
     }),
     {
-      name: "kkikda-store-v8-purchase-orders",
+      name: "kkikda-store-v9-redemption",
       partialize: (s) => ({
         lang: s.lang,
         user: s.user,
@@ -712,6 +765,7 @@ export const useStore = create<AppStore>()(
         mintRecords: s.mintRecords,
         stakingPools: s.stakingPools,
         purchaseOrders: s.purchaseOrders,
+        redemptionRequests: s.redemptionRequests,
       }),
     }
   )

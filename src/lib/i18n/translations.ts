@@ -300,6 +300,99 @@ export const translations = {
     ko: "진정한 차는 기억의 보관소에서 현재의 잔으로 옮겨질 때 비로소 완성됩니다.",
   },
   "rwa.guide": { en: "Redemption Guide", ko: "인수 안내서" },
+  // New flow
+  "rwa.disconnectedTitle": {
+    en: "Pickup-only physical redemption",
+    ko: "직접 방문 픽업 전용 인수",
+  },
+  "rwa.disconnectedBody": {
+    en: "Burn your Vintage Pu'er NFT to release the corresponding physical cake from our climate-controlled vault. KKIKDAGEO does not ship — collect in person at a designated trade point with a valid ID.",
+    ko: "보유하신 골동보이차 NFT를 소각하여 항온 보관소의 실물 차를 인수하실 수 있습니다. 끽다거는 배송하지 않으며, 지정된 거래지점에서 신분증 지참 후 직접 수령하셔야 합니다.",
+  },
+  "rwa.connectToStart": {
+    en: "Connect your wallet to begin",
+    ko: "시작하려면 지갑을 연결하세요",
+  },
+  "rwa.howItWorks": { en: "How redemption works", ko: "인수 절차" },
+  "rwa.howStep1": { en: "Connect your BSC wallet", ko: "BSC 지갑 연결" },
+  "rwa.howStep1Desc": {
+    en: "Holdings of KKIKDA_NFT (BEP-721) are detected automatically.",
+    ko: "KKIKDA_NFT(BEP-721) 보유 내역이 자동 감지됩니다.",
+  },
+  "rwa.howStep2": { en: "Choose NFT(s) and pickup point", ko: "NFT 선택 및 거래지점 지정" },
+  "rwa.howStep2Desc": {
+    en: "Select the tokenIds to redeem and the trade point where you will collect.",
+    ko: "인수할 tokenId와 수령할 거래지점을 선택합니다.",
+  },
+  "rwa.howStep3": { en: "Burn NFT on-chain", ko: "온체인 NFT 소각" },
+  "rwa.howStep3Desc": {
+    en: "Burn permanently destroys the digital token, locking the physical release.",
+    ko: "소각하면 디지털 토큰이 영구 삭제되고 실물 인수가 확정됩니다.",
+  },
+  "rwa.howStep4": { en: "Visit the trade point", ko: "거래지점 방문" },
+  "rwa.howStep4Desc": {
+    en: "Bring your ID. Vault staff hands over the cake when status reaches Ready.",
+    ko: "신분증을 지참하여 방문하시면, 상태가 인수 준비 완료가 되었을 때 직원이 차를 인계해드립니다.",
+  },
+  "rwa.tradePoints": { en: "Trade Points", ko: "거래지점" },
+  "rwa.tradePointsDesc": {
+    en: "Three vault-grade locations. Pick whichever is closest at request time.",
+    ko: "보관소급 3개 지점. 신청 시 가장 가까운 곳을 선택하세요.",
+  },
+  "rwa.address": { en: "Address", ko: "주소" },
+  "rwa.hoursWeekday": { en: "Weekdays", ko: "평일" },
+  "rwa.hoursWeekend": { en: "Weekend", ko: "주말" },
+  "rwa.contact": { en: "Contact", ko: "연락처" },
+  "rwa.appointmentRequired": {
+    en: "Appointment required for redemption visits.",
+    ko: "인수 방문은 사전 예약이 필요합니다.",
+  },
+
+  "rwa.myHoldings": { en: "My Vintage Pu'er Holdings", ko: "내 골동보이차 보유 현황" },
+  "rwa.holdingsDesc": {
+    en: "Read live from KKIKDA_NFT.balanceOf and tokenOfOwnerByIndex on BSC.",
+    ko: "KKIKDA_NFT.balanceOf와 tokenOfOwnerByIndex를 통해 BSC에서 실시간으로 조회됩니다.",
+  },
+  "rwa.holdings.empty": {
+    en: "No KKIKDA_NFT held in this wallet yet.",
+    ko: "이 지갑은 아직 KKIKDA_NFT를 보유하고 있지 않습니다.",
+  },
+  "rwa.totalHeld": { en: "Total NFTs held", ko: "총 NFT 보유 수" },
+  "rwa.requestRedeem": { en: "Request Redemption", ko: "인수 신청" },
+  "rwa.connectButton": { en: "Connect Wallet", ko: "지갑 연결" },
+
+  "rwa.modalTitle": { en: "Redeem Vintage Pu'er", ko: "골동보이차 인수 신청" },
+  "rwa.tokenIdInput": { en: "Token ID(s) to redeem", ko: "인수할 토큰 ID" },
+  "rwa.tokenIdHint": {
+    en: "Comma-separate multiple — must all be owned by you.",
+    ko: "여러 개는 쉼표로 구분 — 모두 본인 소유여야 합니다.",
+  },
+  "rwa.pickupPoint": { en: "Pickup point", ko: "수령 지점" },
+  "rwa.confirmRedemption": { en: "Burn & Submit Request", ko: "소각 및 신청 제출" },
+  "rwa.confirmingBurn": { en: "Burning on-chain…", ko: "온체인 소각 중…" },
+  "rwa.cancel": { en: "Cancel", ko: "취소" },
+
+  "rwa.requests": { en: "My Redemption Requests", ko: "내 인수 신청 내역" },
+  "rwa.requestsDesc": {
+    en: "Track each submitted request through verification, staging, and pickup.",
+    ko: "각 신청의 검증·준비·수령 단계를 추적합니다.",
+  },
+  "rwa.noRequests": {
+    en: "No redemption requests submitted yet.",
+    ko: "제출된 인수 신청이 없습니다.",
+  },
+  // Status labels
+  "rwa.status.submitted": { en: "Submitted", ko: "신청 접수" },
+  "rwa.status.verified": { en: "Verified", ko: "검증 완료" },
+  "rwa.status.ready_for_pickup": { en: "Ready for Pickup", ko: "인수 준비 완료" },
+  "rwa.status.completed": { en: "Completed", ko: "수령 완료" },
+  "rwa.status.cancelled": { en: "Cancelled", ko: "취소됨" },
+  "rwa.statusStep1": { en: "Request received", ko: "신청 접수" },
+  "rwa.statusStep2": { en: "Inventory verified", ko: "재고 검증" },
+  "rwa.statusStep3": { en: "Staged at trade point", ko: "거래지점 준비" },
+  "rwa.statusStep4": { en: "Handed over", ko: "수령 완료" },
+  "rwa.viewBurnTx": { en: "View Burn Tx", ko: "소각 트랜잭션 보기" },
+  "rwa.pickupAt": { en: "Pickup at", ko: "수령 지점" },
 
   // ──────────────────────────────────────────────
   // Dashboard (/dashboard) — transaction history
