@@ -1,10 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStore, type TeaCake } from "@/stores/useStore";
 import { ArrowRight, X } from "lucide-react";
 import { useT } from "@/lib/i18n/useT";
+
+type CategoryFilter = "all" | TeaCake["category"];
+type GradeFilter = "all" | "AAA" | "AA+" | "A" | "B";
+type VintageSort = "oldest" | "newest";
+type PriceSort = "high" | "low";
 
 /* ---------- Provenance Sidebar Panel ---------- */
 function ProvenanceSidebar({
@@ -192,11 +197,66 @@ export default function NftMarketplacePage() {
   const [selectedCake, setSelectedCake] = useState<TeaCake | null>(null);
   const t = useT();
 
-  const listedCakes = teaCakes.filter((c) => c.isListed);
+  // Filter & sort state
+  const [category, setCategory] = useState<CategoryFilter>("all");
+  const [grade, setGrade] = useState<GradeFilter>("all");
+  const [vintageSort, setVintageSort] = useState<VintageSort>("oldest");
+  const [priceSort, setPriceSort] = useState<PriceSort | null>(null);
+
+  // Apply filters + sort
+  const filteredCakes = useMemo(() => {
+    let cakes = teaCakes.filter((c) => c.isListed);
+
+    if (category !== "all") {
+      cakes = cakes.filter((c) => c.category === category);
+    }
+    if (grade !== "all") {
+      cakes = cakes.filter((c) => c.grade === grade);
+    }
+
+    // Sort: priceSort takes precedence when explicitly set, otherwise vintage
+    cakes = [...cakes];
+    if (priceSort) {
+      cakes.sort((a, b) =>
+        priceSort === "high" ? b.priceUsd - a.priceUsd : a.priceUsd - b.priceUsd,
+      );
+    } else {
+      cakes.sort((a, b) =>
+        vintageSort === "oldest" ? a.vintage - b.vintage : b.vintage - a.vintage,
+      );
+    }
+
+    return cakes;
+  }, [teaCakes, category, grade, vintageSort, priceSort]);
+
+  const totalCount = teaCakes.filter((c) => c.isListed).length;
+  const filteredCount = filteredCakes.length;
+  const hasActiveFilter =
+    category !== "all" || grade !== "all" || priceSort !== null;
+
+  function clearFilters() {
+    setCategory("all");
+    setGrade("all");
+    setPriceSort(null);
+    setVintageSort("oldest");
+  }
+
+  const categoryOptions: { value: CategoryFilter; labelKey: string }[] = [
+    { value: "all", labelKey: "nft.catAll" },
+    { value: "raw", labelKey: "nft.catRaw" },
+    { value: "ripe", labelKey: "nft.catRipe" },
+    { value: "aged", labelKey: "nft.catAged" },
+  ];
+  const gradeOptions: { value: GradeFilter; label: string }[] = [
+    { value: "all", label: t("nft.gradeAll") },
+    { value: "AAA", label: "AAA" },
+    { value: "AA+", label: "AA+" },
+    { value: "A", label: "A" },
+  ];
 
   return (
     <div className="page-padding">
-      <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
+      <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div className="max-w-2xl">
           <h1 className="text-5xl font-headline text-on-surface mb-4 tracking-tight leading-tight">
             {t("nft.titlePrefix")}{" "}
@@ -207,14 +267,21 @@ export default function NftMarketplacePage() {
           </p>
         </div>
 
-        <div className="flex gap-4 border-b border-outline-variant/15 pb-2">
+        <div className="flex gap-4 border-b border-outline-variant/15 pb-2 shrink-0">
           <div className="flex flex-col">
             <label className="text-[10px] font-label uppercase text-white/40 mb-1 tracking-tighter">
               {t("nft.sortVintage")}
             </label>
-            <select className="bg-transparent border-none text-primary font-label text-xs focus:ring-0 p-0 pr-8 cursor-pointer uppercase tracking-widest outline-none">
-              <option>{t("nft.oldestFirst")}</option>
-              <option>{t("nft.newestFirst")}</option>
+            <select
+              value={vintageSort}
+              onChange={(e) => {
+                setVintageSort(e.target.value as VintageSort);
+                setPriceSort(null);
+              }}
+              className="bg-transparent border-none text-primary font-label text-xs focus:ring-0 p-0 pr-8 cursor-pointer uppercase tracking-widest outline-none"
+            >
+              <option value="oldest">{t("nft.oldestFirst")}</option>
+              <option value="newest">{t("nft.newestFirst")}</option>
             </select>
           </div>
           <div className="w-px h-8 bg-outline-variant/15 self-end mb-1" />
@@ -222,23 +289,101 @@ export default function NftMarketplacePage() {
             <label className="text-[10px] font-label uppercase text-white/40 mb-1 tracking-tighter">
               {t("nft.sortPrice")}
             </label>
-            <select className="bg-transparent border-none text-primary font-label text-xs focus:ring-0 p-0 pr-8 cursor-pointer uppercase tracking-widest outline-none">
-              <option>{t("nft.highToLow")}</option>
-              <option>{t("nft.lowToHigh")}</option>
+            <select
+              value={priceSort ?? ""}
+              onChange={(e) =>
+                setPriceSort(e.target.value === "" ? null : (e.target.value as PriceSort))
+              }
+              className="bg-transparent border-none text-primary font-label text-xs focus:ring-0 p-0 pr-8 cursor-pointer uppercase tracking-widest outline-none"
+            >
+              <option value="">—</option>
+              <option value="high">{t("nft.highToLow")}</option>
+              <option value="low">{t("nft.lowToHigh")}</option>
             </select>
           </div>
         </div>
       </header>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {listedCakes.map((cake) => (
-          <TeaCard
-            key={cake.id}
-            cake={cake}
-            onSelect={setSelectedCake}
-          />
-        ))}
+      {/* Filter chip rows */}
+      <div className="mb-8 space-y-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline mr-2 min-w-[64px]">
+            {t("nft.category")}
+          </span>
+          {categoryOptions.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setCategory(opt.value)}
+              className={`px-3 py-1 font-label text-[10px] uppercase tracking-[0.15em] border-[0.5px] transition-colors ${
+                category === opt.value
+                  ? "bg-primary text-on-primary border-primary"
+                  : "border-outline-variant text-outline hover:text-on-surface hover:border-outline"
+              }`}
+            >
+              {t(opt.labelKey as Parameters<typeof t>[0])}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline mr-2 min-w-[64px]">
+            {t("nft.gradeLabel")}
+          </span>
+          {gradeOptions.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setGrade(opt.value)}
+              className={`px-3 py-1 font-label text-[10px] uppercase tracking-[0.15em] border-[0.5px] transition-colors ${
+                grade === opt.value
+                  ? "bg-primary text-on-primary border-primary"
+                  : "border-outline-variant text-outline hover:text-on-surface hover:border-outline"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </div>
+
+      {/* Results bar */}
+      <div className="mb-6 flex items-center justify-between font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+        <span>
+          <span className="text-on-surface">{filteredCount}</span> /{" "}
+          {totalCount} {t("nft.resultsCount")}
+        </span>
+        {hasActiveFilter && (
+          <button
+            onClick={clearFilters}
+            className="text-primary hover:opacity-70 transition-opacity"
+          >
+            {t("nft.clearFilters")} ✕
+          </button>
+        )}
+      </div>
+
+      {filteredCakes.length === 0 ? (
+        <div className="bg-surface-container-low border-[0.5px] border-outline-variant p-12 text-center">
+          <p className="font-body text-sm text-on-surface-variant mb-4">
+            {t("nft.noResults")}
+          </p>
+          <button
+            onClick={clearFilters}
+            className="font-label text-[10px] uppercase tracking-[0.15em] text-primary border-[0.5px] border-primary px-4 py-2 hover:bg-primary/10 transition-colors"
+          >
+            {t("nft.clearFilters")}
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredCakes.map((cake) => (
+            <TeaCard
+              key={cake.id}
+              cake={cake}
+              onSelect={setSelectedCake}
+            />
+          ))}
+        </div>
+      )}
 
       <AnimatePresence>
         {selectedCake && (

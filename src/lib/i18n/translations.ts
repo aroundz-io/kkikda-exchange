@@ -149,6 +149,20 @@ export const translations = {
   "nft.placeBid": { en: "Place Bid", ko: "입찰" },
   "nft.selectedProvenance": { en: "Selected Provenance", ko: "선택된 이력" },
   "nft.inquireSale": { en: "Inquire for Private Sale", ko: "프라이빗 판매 문의" },
+  "nft.category": { en: "Category", ko: "분류" },
+  "nft.gradeLabel": { en: "Grade", ko: "등급" },
+  "nft.catAll": { en: "All", ko: "전체" },
+  "nft.catRaw": { en: "Raw 청차", ko: "청차" },
+  "nft.catRipe": { en: "Ripe 숙차", ko: "숙차" },
+  "nft.catAged": { en: "Aged 골동", ko: "골동" },
+  "nft.catWhite": { en: "White 백차", ko: "백차" },
+  "nft.gradeAll": { en: "All", ko: "전체" },
+  "nft.resultsCount": { en: "results", ko: "개 결과" },
+  "nft.noResults": {
+    en: "No products match the selected filters.",
+    ko: "선택한 조건에 맞는 상품이 없습니다.",
+  },
+  "nft.clearFilters": { en: "Clear filters", ko: "필터 초기화" },
 
   // ──────────────────────────────────────────────
   // DEX (/dex)
