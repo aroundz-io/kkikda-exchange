@@ -10,6 +10,7 @@ import { buildTeaCakeURI } from "@/lib/web3/metadata";
 import { ADDRESSES, KKIKDA_NFT_ABI } from "@/lib/web3/contracts";
 import { TxStatus } from "@/components/ui/TxStatus";
 import { useT } from "@/lib/i18n/useT";
+import { useCakeName } from "@/lib/i18n/useCakeName";
 
 const fade = {
   initial: { opacity: 0, y: 16 },
@@ -44,6 +45,7 @@ const INITIAL_FORM = {
 
 export default function NftManagePage() {
   const t = useT();
+  const cakeName = useCakeName();
   const teaCakes = useStore((s) => s.teaCakes);
   const addTeaCake = useStore((s) => s.addTeaCake);
   const removeTeaCake = useStore((s) => s.removeTeaCake);
@@ -122,7 +124,7 @@ export default function NftManagePage() {
       return;
     }
 
-    if (!confirm(`${t("adminNft.confirmBurn")} "${cake.name}" (token #${cake.tokenId})? ${t("adminNft.confirmBurnSuffix")}`)) {
+    if (!confirm(`${t("adminNft.confirmBurn")} "${cakeName(cake)}" (token #${cake.tokenId})? ${t("adminNft.confirmBurnSuffix")}`)) {
       return;
     }
 
@@ -533,7 +535,7 @@ export default function NftManagePage() {
                 {cake.image ? (
                   <img
                     src={cake.image}
-                    alt={cake.name}
+                    alt={cakeName(cake)}
                     className="w-full h-full object-contain"
                     loading="lazy"
                   />
@@ -559,7 +561,7 @@ export default function NftManagePage() {
               {/* Info */}
               <div className="p-4 space-y-2">
                 <h3 className="font-headline text-sm text-on-surface group-hover:text-primary transition-colors truncate">
-                  {cake.name}
+                  {cakeName(cake)}
                 </h3>
                 <div className="flex items-center justify-between">
                   <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
@@ -604,7 +606,7 @@ export default function NftManagePage() {
                 {cake.image ? (
                   <img
                     src={cake.image}
-                    alt={cake.name}
+                    alt={cakeName(cake)}
                     className="w-full h-full object-contain"
                     loading="lazy"
                   />
@@ -617,7 +619,7 @@ export default function NftManagePage() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <h3 className="font-headline text-sm text-on-surface truncate">
-                    {cake.name}
+                    {cakeName(cake)}
                   </h3>
                   <span
                     className={`font-label text-[9px] uppercase tracking-[0.15em] px-1.5 py-0.5 border-[0.5px] shrink-0 ${gradeBadge(cake.grade)}`}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useStore } from "@/stores/useStore";
 import { useT } from "@/lib/i18n/useT";
+import { useCakeName } from "@/lib/i18n/useCakeName";
 import { ExternalLink, ShoppingCart, Sparkles, Boxes, Flame } from "lucide-react";
 import { findPickupPoint } from "@/lib/pickupPoints";
 
@@ -49,7 +50,19 @@ export default function LedgerPage() {
   const mintRecords = useStore((s) => s.mintRecords);
   const redemptionRequests = useStore((s) => s.redemptionRequests);
   const teaCakes = useStore((s) => s.teaCakes);
+  const cakeName = useCakeName();
   const [tab, setTab] = useState<Tab>("all");
+
+  // Helper: resolve product name lang-aware via cakeId or assetName fallback
+  const resolveCakeName = (cakeId: string | undefined, fallback: string) => {
+    if (cakeId) {
+      const c = teaCakes.find((c) => c.id === cakeId);
+      if (c) return cakeName(c);
+    }
+    // Fallback: try matching by name across both KO and EN fields
+    const c = teaCakes.find((c) => c.name === fallback || c.nameEn === fallback);
+    return c ? cakeName(c) : fallback;
+  };
 
   // Aggregate stats
   const totalSold = purchaseOrders.reduce((s, p) => s + p.totalUsdt, 0);
@@ -71,7 +84,7 @@ export default function LedgerPage() {
         id: p.id,
         ts: p.timestamp,
         kind: "purchase",
-        title: p.cakeName,
+        title: resolveCakeName(p.cakeId, p.cakeName),
         detail: `${p.quantity} × ${p.pricePerUnit.toLocaleString()} USDT`,
         valueLabel: `${p.totalUsdt.toLocaleString()} USDT`,
         actor: p.buyer,
@@ -91,7 +104,7 @@ export default function LedgerPage() {
         id: m.id,
         ts: m.timestamp,
         kind: "mint",
-        title: m.assetName,
+        title: resolveCakeName(undefined, m.assetName),
         detail: `Token #${m.tokenId}`,
         valueLabel: `${m.value.toLocaleString()} USDT`,
         actor: "0xKKIKDAGEO_VAULT",
@@ -112,7 +125,7 @@ export default function LedgerPage() {
         id: r.id,
         ts: r.timestamp,
         kind: "redemption",
-        title: r.cakeName,
+        title: resolveCakeName(r.cakeId, r.cakeName),
         detail: `${r.tokenIds.length} unit${r.tokenIds.length > 1 ? "s" : ""} · ${point?.name ?? "—"}`,
         valueLabel: `#${r.tokenIds.join(", #")}`,
         actor: r.owner,
@@ -139,7 +152,10 @@ export default function LedgerPage() {
     }
 
     return out.sort((a, b) => b.ts - a.ts);
-  }, [purchaseOrders, mintRecords, redemptionRequests]);
+    // resolveCakeName depends on teaCakes + lang via cakeName closure;
+    // re-run when teaCakes content (or lang) changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [purchaseOrders, mintRecords, redemptionRequests, teaCakes, cakeName]);
 
   const filtered = useMemo(
     () => (tab === "all" ? entries : entries.filter((e) => e.kind === tab)),

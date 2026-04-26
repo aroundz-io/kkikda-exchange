@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useStore, type TeaCake } from "@/stores/useStore";
 import { ArrowRight, X } from "lucide-react";
 import { useT } from "@/lib/i18n/useT";
+import { useCakeName } from "@/lib/i18n/useCakeName";
 import { BuyModal } from "@/components/nft/BuyModal";
 
 type CategoryFilter = "all" | TeaCake["category"];
@@ -21,6 +22,7 @@ function ProvenanceSidebar({
   onClose: () => void;
 }) {
   const t = useT();
+  const cakeName = useCakeName();
   return (
     <>
       <motion.div
@@ -53,16 +55,16 @@ function ProvenanceSidebar({
             {cake.image ? (
               <img
                 src={cake.image}
-                alt={cake.name}
+                alt={cakeName(cake)}
                 className="w-full h-full object-contain"
               />
             ) : (
               <span className="text-outline text-xs font-label uppercase">
-                {cake.name}
+                {cakeName(cake)}
               </span>
             )}
           </div>
-          <h2 className="text-2xl font-headline mb-2">{cake.name}</h2>
+          <h2 className="text-2xl font-headline mb-2">{cakeName(cake)}</h2>
           <p className="text-xs font-body text-on-surface-variant leading-relaxed opacity-70">
             {cake.subtitle}
           </p>
@@ -112,6 +114,7 @@ function TeaCard({
   onBuy: (cake: TeaCake) => void;
 }) {
   const t = useT();
+  const cakeName = useCakeName();
   const sold = cake.soldUnits ?? 0;
   const available = Math.max(0, (cake.totalUnits ?? 1) - sold);
   const outOfStock = available === 0;
@@ -126,7 +129,7 @@ function TeaCard({
         {cake.image ? (
           <img
             src={cake.image}
-            alt={cake.name}
+            alt={cakeName(cake)}
             className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
             loading="lazy"
           />
@@ -153,7 +156,7 @@ function TeaCard({
       <div className="p-6 flex-1 flex flex-col">
         <div className="flex justify-between items-start mb-4 gap-3">
           <div className="min-w-0">
-            <h3 className="text-xl font-headline truncate">{cake.name}</h3>
+            <h3 className="text-xl font-headline truncate">{cakeName(cake)}</h3>
             <p className="text-[10px] font-label uppercase tracking-widest text-white/40 line-clamp-2 mt-1">
               {cake.subtitle}
             </p>

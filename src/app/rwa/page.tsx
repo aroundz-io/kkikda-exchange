@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useStore, type RedemptionStatus } from "@/stores/useStore";
 import { useT } from "@/lib/i18n/useT";
+import { useCakeName } from "@/lib/i18n/useCakeName";
 import { useNFTBalance } from "@/hooks/useNFTContract";
 import { ADDRESSES } from "@/lib/web3/contracts";
 import { PICKUP_POINTS, findPickupPoint } from "@/lib/pickupPoints";
@@ -120,6 +121,7 @@ function RedemptionModal({
   ownerAddress: Address;
 }) {
   const t = useT();
+  const cakeName = useCakeName();
   const teaCakes = useStore((s) => s.teaCakes);
   const addRedemptionRequest = useStore((s) => s.addRedemptionRequest);
   const addToast = useStore((s) => s.addToast);
@@ -217,14 +219,14 @@ function RedemptionModal({
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={matchedCake.image}
-                      alt={matchedCake.name}
+                      alt={cakeName(matchedCake)}
                       className="w-full h-full object-contain"
                     />
                   </div>
                 )}
                 <div className="min-w-0">
                   <p className="font-headline text-sm text-on-surface truncate">
-                    {matchedCake.name}
+                    {cakeName(matchedCake)}
                   </p>
                   <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
                     {matchedCake.vintage} · {matchedCake.weight} · {matchedCake.grade}
@@ -350,10 +352,12 @@ function StatusTracker({ status }: { status: RedemptionStatus }) {
 /* ───────────── Main Page ───────────── */
 export default function RwaPage() {
   const t = useT();
+  const cakeName = useCakeName();
   const { address, isConnected } = useAccount();
   const { balance } = useNFTBalance(address as Address | undefined);
   const nftCount = balance ? Number(balance) : 0;
 
+  const teaCakes = useStore((s) => s.teaCakes);
   const allRequests = useStore((s) => s.redemptionRequests);
   const myRequests = useMemo(
     () =>
@@ -496,6 +500,7 @@ export default function RwaPage() {
               <div className="space-y-3">
                 {myRequests.map((r) => {
                   const point = findPickupPoint(r.pickupPointId);
+                  const cake = teaCakes.find((c) => c.id === r.cakeId);
                   return (
                     <div
                       key={r.id}
@@ -504,7 +509,7 @@ export default function RwaPage() {
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
                           <h4 className="font-headline text-base text-on-surface">
-                            {r.cakeName}
+                            {cake ? cakeName(cake) : r.cakeName}
                           </h4>
                           <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline mt-1">
                             {new Date(r.timestamp).toLocaleString()} ·{" "}

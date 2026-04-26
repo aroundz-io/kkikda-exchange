@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useStore } from "@/stores/useStore";
 import { useT } from "@/lib/i18n/useT";
+import { useCakeName } from "@/lib/i18n/useCakeName";
 import { ExternalLink, CheckCircle2, Clock } from "lucide-react";
 import { ADDRESSES } from "@/lib/web3/contracts";
 
@@ -13,6 +14,7 @@ const fade = {
 
 export default function AdminOrdersPage() {
   const t = useT();
+  const cakeName = useCakeName();
   const purchaseOrders = useStore((s) => s.purchaseOrders);
   const fulfillPurchaseOrder = useStore((s) => s.fulfillPurchaseOrder);
   const teaCakes = useStore((s) => s.teaCakes);
@@ -112,14 +114,14 @@ export default function AdminOrdersPage() {
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={cake.image}
-                            alt={cake.name}
+                            alt={cakeName(cake)}
                             className="w-full h-full object-contain"
                           />
                         </div>
                       )}
                       <div className="min-w-0">
                         <h4 className="font-headline text-base text-on-surface truncate">
-                          {order.cakeName}
+                          {cake ? cakeName(cake) : order.cakeName}
                         </h4>
                         <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline mt-1">
                           {new Date(order.timestamp).toLocaleString()} ·{" "}
@@ -221,7 +223,9 @@ export default function AdminOrdersPage() {
                 </tr>
               </thead>
               <tbody className="text-sm font-body">
-                {delivered.map((o) => (
+                {delivered.map((o) => {
+                  const cake = teaCakes.find((c) => c.id === o.cakeId);
+                  return (
                   <tr key={o.id} className="border-b border-outline-variant/15">
                     <td className="px-4 py-3 text-on-surface-variant whitespace-nowrap">
                       {new Date(o.timestamp).toLocaleString(undefined, {
@@ -231,7 +235,7 @@ export default function AdminOrdersPage() {
                         minute: "2-digit",
                       })}
                     </td>
-                    <td className="px-4 py-3 text-on-surface">{o.cakeName}</td>
+                    <td className="px-4 py-3 text-on-surface">{cake ? cakeName(cake) : o.cakeName}</td>
                     <td className="px-4 py-3 text-right">{o.quantity}</td>
                     <td className="px-4 py-3 text-right text-primary">
                       {o.totalUsdt.toLocaleString()} USDT
@@ -243,7 +247,8 @@ export default function AdminOrdersPage() {
                       #{o.deliveredTokenIds ?? "—"}
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

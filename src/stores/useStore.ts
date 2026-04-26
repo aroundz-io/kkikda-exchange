@@ -8,6 +8,8 @@ export type Lang = "ko" | "en";
 export interface TeaCake {
   id: string;
   name: string;
+  /** Optional English display name. Falls back to `name` when missing or KO mode. */
+  nameEn?: string;
   subtitle: string;
   vintage: number;
   weight: string;
@@ -215,6 +217,7 @@ const DEMO_TEA_CAKES: TeaCake[] = [
   {
     id: "puer-001",
     name: "8892 후기홍인",
+    nameEn: "8892 Late-period Hong Yin",
     subtitle: "Late-period Hong Yin (Red Mark) · Zhongcha 1988 recipe",
     vintage: 1988,
     weight: "357g",
@@ -241,6 +244,7 @@ const DEMO_TEA_CAKES: TeaCake[] = [
   {
     id: "puer-002",
     name: "녹설헌 (홍표)",
+    nameEn: "Noksolheon (Red Label)",
     subtitle: "Noksolheon · Imu Mountain wild-grape ancient-tree raw Pu'er",
     vintage: 2002,
     weight: "370g",
@@ -267,6 +271,7 @@ const DEMO_TEA_CAKES: TeaCake[] = [
   {
     id: "puer-003",
     name: "7808 중타",
+    nameEn: "7808 Medium Tuo",
     subtitle: "Xiaguan 7808 · 70/30 raw-ripe blend, exported via Yunnan Province",
     vintage: 1978,
     weight: "250g",
@@ -293,6 +298,7 @@ const DEMO_TEA_CAKES: TeaCake[] = [
   {
     id: "puer-004",
     name: "소법 하관 중타",
+    nameEn: "Xiaofa Xiaguan Medium Tuo",
     subtitle: "Xiaofa (銷法) · Xiaguan 1984 export-to-France medium Tuo",
     vintage: 1984,
     weight: "250g",
@@ -319,6 +325,7 @@ const DEMO_TEA_CAKES: TeaCake[] = [
   {
     id: "puer-005",
     name: "7592 삼분숙병",
+    nameEn: "7592 Three-part Ripening Bing",
     subtitle: "Menghai 7592 · 70/30 raw-ripe \"three-part ripening\" Bing",
     vintage: 1993,
     weight: "300g",
@@ -345,6 +352,7 @@ const DEMO_TEA_CAKES: TeaCake[] = [
   {
     id: "puer-006",
     name: "운남 봉황 소타",
+    nameEn: "Yunnan Phoenix Small Tuo",
     subtitle: "Phoenix (鳳凰) Small Tuo · Dali 1990 70/30 raw-ripe blend",
     vintage: 1990,
     weight: "100g",
@@ -371,6 +379,7 @@ const DEMO_TEA_CAKES: TeaCake[] = [
   {
     id: "puer-007",
     name: "하관 청소타",
+    nameEn: "Xiaguan Raw Small Tuo",
     subtitle: "Xiaguan Raw Small Tuo (青小沱) · grade 1-2 tender leaves, tight-pressed",
     vintage: 1989,
     weight: "100g",
@@ -397,6 +406,7 @@ const DEMO_TEA_CAKES: TeaCake[] = [
   {
     id: "puer-008",
     name: "보이차전 (1970)",
+    nameEn: "Pu'er Tea Brick (1970)",
     subtitle: "Pu'er Cha Zhuan (茶磚) · 1970s Xiaguan brick-form, 50/50 raw-ripe",
     vintage: 1970,
     weight: "250g",
@@ -423,6 +433,7 @@ const DEMO_TEA_CAKES: TeaCake[] = [
   {
     id: "puer-009",
     name: "완전건창 맹해 청소타",
+    nameEn: "Fully Dry-Stored Menghai Raw",
     subtitle: "Menghai 8582 青餅 · fully dry-stored Xishuangbanna raw cake",
     vintage: 1985,
     weight: "320g",
@@ -449,6 +460,7 @@ const DEMO_TEA_CAKES: TeaCake[] = [
   {
     id: "puer-010",
     name: "맹해 소타",
+    nameEn: "Menghai Small Tuo",
     subtitle: "Menghai 三分小沱 · 70/30 raw-ripe small Tuo, grade 1-2 leaves",
     vintage: 1980,
     weight: "100g",
@@ -475,6 +487,7 @@ const DEMO_TEA_CAKES: TeaCake[] = [
   {
     id: "puer-011",
     name: "홍태창",
+    nameEn: "Hung Tai Chang",
     subtitle: "Hung Tai Chang (鴻泰昌) · 1950s Thailand-made wild-leaf antique",
     vintage: 1950,
     weight: "300g",
@@ -501,6 +514,7 @@ const DEMO_TEA_CAKES: TeaCake[] = [
   {
     id: "puer-012",
     name: "하내원차",
+    nameEn: "Ha Nai Yuan",
     subtitle: "Ha Nai Yuan (河內圓茶) · 1930s Vietnam wild-leaf antique round cake",
     vintage: 1930,
     weight: "290g",
@@ -769,7 +783,7 @@ export const useStore = create<AppStore>()(
       toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
     }),
     {
-      name: "kkikda-store-v9-redemption",
+      name: "kkikda-store-v10-product-i18n",
       partialize: (s) => ({
         lang: s.lang,
         user: s.user,

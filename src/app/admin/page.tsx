@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { useStore } from "@/stores/useStore";
 import { useT } from "@/lib/i18n/useT";
+import { useCakeName } from "@/lib/i18n/useCakeName";
 import { Sparkles, Flame, Box, Grid, List } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -229,6 +230,7 @@ function MintHistory() {
 /* ---------- Inventory Grid ---------- */
 function InventoryGrid() {
   const t = useT();
+  const cakeName = useCakeName();
   const teaCakes = useStore((s) => s.teaCakes);
 
   return (
@@ -261,7 +263,7 @@ function InventoryGrid() {
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   src={item.image}
-                  alt={item.name}
+                  alt={cakeName(item)}
                   className="w-full h-full object-contain"
                   loading="lazy"
                 />
@@ -281,7 +283,7 @@ function InventoryGrid() {
                 </span>
               </div>
               <h4 className="text-lg font-headline font-bold leading-tight group-hover:text-primary transition-colors">
-                {item.name}
+                {cakeName(item)}
               </h4>
               <div className="flex items-center justify-between pt-4 border-t border-outline-variant/20">
                 <div className="space-y-1">

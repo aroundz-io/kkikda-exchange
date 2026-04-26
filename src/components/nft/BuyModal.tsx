@@ -11,6 +11,7 @@ import { USDT_ADDRESS } from "@/hooks/useSwap";
 import { TREASURY_ADDRESS } from "@/lib/web3/contracts";
 import { TxStatus } from "@/components/ui/TxStatus";
 import { useT } from "@/lib/i18n/useT";
+import { useCakeName } from "@/lib/i18n/useCakeName";
 
 interface Props {
   cake: TeaCake;
@@ -22,6 +23,7 @@ export function BuyModal({ cake, onClose }: Props) {
   const { address, isConnected } = useAccount();
   const addPurchaseOrder = useStore((s) => s.addPurchaseOrder);
   const addToast = useStore((s) => s.addToast);
+  const cakeName = useCakeName();
 
   const { balance: usdtBalance } = useTokenBalance(USDT_ADDRESS, address);
   const usdt = usdtBalance ? Number(formatUnits(usdtBalance, 18)) : 0;
@@ -119,14 +121,14 @@ export function BuyModal({ cake, onClose }: Props) {
                   /* eslint-disable-next-line @next/next/no-img-element */
                   <img
                     src={cake.image}
-                    alt={cake.name}
+                    alt={cakeName(cake)}
                     className="w-full h-full object-contain"
                   />
                 )}
               </div>
               <div className="min-w-0 flex-1">
                 <h4 className="font-headline text-lg text-on-surface truncate">
-                  {cake.name}
+                  {cakeName(cake)}
                 </h4>
                 <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline mt-1">
                   {cake.vintage} · {cake.weight} · {cake.grade}
