@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useStore } from "@/stores/useStore";
 import { motion } from "framer-motion";
 import {
@@ -78,6 +79,12 @@ export default function DashboardPage() {
             {t("dashboard.subtitle")}
           </p>
         </div>
+        <Link
+          href="/ledger"
+          className="font-label text-[10px] uppercase tracking-[0.2em] text-primary border-[0.5px] border-primary px-4 py-2 hover:bg-primary/10 transition-colors"
+        >
+          {t("dashboard.viewLedger")}
+        </Link>
       </header>
 
       {/* Summary Cards */}

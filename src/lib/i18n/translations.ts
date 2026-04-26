@@ -22,7 +22,7 @@ export const translations = {
   "nav.market": { en: "Market", ko: "마켓" },
   "nav.exchange": { en: "Exchange", ko: "거래소" },
   "nav.vault": { en: "Vault", ko: "보관소" },
-  "nav.history": { en: "History", ko: "내역" },
+  "nav.history": { en: "Ledger", ko: "전체 내역" },
 
   // ──────────────────────────────────────────────
   // Layout — Sidebar
@@ -403,11 +403,12 @@ export const translations = {
   // ──────────────────────────────────────────────
   // Dashboard (/dashboard) — transaction history
   // ──────────────────────────────────────────────
-  "dashboard.title": { en: "Transaction History", ko: "거래 내역" },
+  "dashboard.title": { en: "My Activity", ko: "내 활동" },
   "dashboard.subtitle": {
-    en: "A complete ledger of your trading activity across the Heritage Exchange.",
-    ko: "헤리티지 거래소에서의 모든 거래 내역을 한눈에 확인하세요.",
+    en: "Personal trading and order history scoped to your wallet. For the protocol-wide public record, see the Ledger.",
+    ko: "본인 지갑에 한정된 개인 거래·주문 내역입니다. 프로토콜 전체 공개 기록은 전체 거래 원장에서 확인하세요.",
   },
+  "dashboard.viewLedger": { en: "View Public Ledger ↗", ko: "전체 원장 보기 ↗" },
   "dashboard.totalTrades": { en: "Total Trades", ko: "총 거래" },
   "dashboard.totalVolume": { en: "Total Volume", ko: "총 거래액" },
   "dashboard.avgTradeSize": { en: "Avg Trade Size", ko: "평균 거래 규모" },
@@ -432,6 +433,34 @@ export const translations = {
     en: "No activity to display yet.",
     ko: "표시할 활동이 없습니다.",
   },
+
+  // ──────────────────────────────────────────────
+  // Public Ledger (/ledger) — 전체 투명 공개 내역
+  // ──────────────────────────────────────────────
+  "ledger.title": { en: "Public Ledger", ko: "전체 거래 원장" },
+  "ledger.subtitle": {
+    en: "Transparent on-chain record of every purchase, mint, redemption and burn across the protocol. Open by principle — every entry links to the BSC tx.",
+    ko: "프로토콜 전반의 모든 구매, 발행, 인수, 소각을 투명하게 공개하는 온체인 원장. 원칙적으로 전부 공개되며, 각 항목은 BSC 트랜잭션으로 연결됩니다.",
+  },
+  "ledger.tabAll": { en: "All", ko: "전체" },
+  "ledger.tabPurchases": { en: "Purchases", ko: "구매" },
+  "ledger.tabMints": { en: "Mints", ko: "발행" },
+  "ledger.tabRedemptions": { en: "Redemptions", ko: "인수" },
+  "ledger.empty": { en: "No activity recorded yet.", ko: "기록된 활동이 없습니다." },
+  "ledger.totalRevenue": { en: "Total Sold", ko: "총 판매액" },
+  "ledger.totalMinted": { en: "Total Minted", ko: "총 발행 수량" },
+  "ledger.totalRedeemed": { en: "Active Redemptions", ko: "진행 중 인수" },
+  "ledger.totalBurned": { en: "Burned NFTs", ko: "소각 NFT" },
+  "ledger.col.time": { en: "Time", ko: "시각" },
+  "ledger.col.type": { en: "Type", ko: "유형" },
+  "ledger.col.detail": { en: "Detail", ko: "상세" },
+  "ledger.col.value": { en: "Value", ko: "가치" },
+  "ledger.col.actor": { en: "Wallet", ko: "지갑" },
+  "ledger.col.tx": { en: "Tx", ko: "트랜잭션" },
+  "ledger.type.purchase": { en: "Purchase", ko: "구매" },
+  "ledger.type.mint": { en: "Mint", ko: "발행" },
+  "ledger.type.redemption": { en: "Redemption", ko: "인수" },
+  "ledger.viewOnScan": { en: "View on BSCScan", ko: "BSCScan에서 보기" },
 
   // ──────────────────────────────────────────────
   // Staking (/staking)

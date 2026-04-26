@@ -12,7 +12,7 @@ const NAV_LINKS = [
   { labelKey: "nav.market", href: "/nft" },
   { labelKey: "nav.exchange", href: "/dex" },
   { labelKey: "nav.vault", href: "/rwa" },
-  { labelKey: "nav.history", href: "/dashboard" },
+  { labelKey: "nav.history", href: "/ledger" },
 ] as const;
 
 export function Navbar() {
