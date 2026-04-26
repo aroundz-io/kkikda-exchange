@@ -210,7 +210,7 @@ interface AppStore {
  * Each unit is tokenized 1:1 as an ERC-721 NFT on KKIKDA_NFT (BSC).
  * tokenId is the START of each product's NFT range; contiguous 1..33,159.
  */
-const NFT_CONTRACT = "0x96f91e0757aa5769aEEc509408c7Ab86A81539bc"; // ADDRESSES.KKIKDA_NFT
+const NFT_CONTRACT = "0x5043C557E7c2DC0F62f86EACa60845938552eb7C"; // ADDRESSES.KKIKDA_NFT
 const VAULT_OWNER = "0xKKIKDAGEO_VAULT";
 
 const DEMO_TEA_CAKES: TeaCake[] = [
@@ -563,7 +563,7 @@ const DEMO_TOKENS: Token[] = [
     maxSupply: 1_000_000_000,
     category: "governance",
     isPaused: false,
-    contractAddress: "0xdae7BE3dAe2f8E90b7B68FdF92cb13a0aa5Ee479", // ADDRESSES.KKD_TOKEN
+    contractAddress: "0xEB9F26cF82846adB0547669AEab89e5511fd9098", // ADDRESSES.KKD_TOKEN
   },
   {
     id: "puer",
@@ -577,7 +577,7 @@ const DEMO_TOKENS: Token[] = [
     maxSupply: 33_159,
     category: "rwa",
     isPaused: false,
-    contractAddress: "0x374609bfC6492E618fB44985f6548A218e1bF757", // ADDRESSES.RWA_PUER_TOKEN
+    contractAddress: "0xcb667c2D689F2e08AD9110fC9f0F57BDf7547c66", // ADDRESSES.RWA_PUER_TOKEN
   },
 ];
 
@@ -783,7 +783,7 @@ export const useStore = create<AppStore>()(
       toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
     }),
     {
-      name: "kkikda-store-v10-product-i18n",
+      name: "kkikda-store-v11-redeploy",
       partialize: (s) => ({
         lang: s.lang,
         user: s.user,

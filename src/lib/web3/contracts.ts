@@ -28,7 +28,7 @@ export const USDT =
  * Marketplace contract address as a placeholder.
  */
 export const TREASURY_ADDRESS = (process.env.NEXT_PUBLIC_TREASURY ??
-  "0x1C80967399D0146b7DcEAAE45aEdc89aFa128656") as `0x${string}`;
+  "0xb1623d80F00e735CF2D360bdba6b3Ad3e0623804") as `0x${string}`;
 
 // ---------------------------------------------------------------------------
 // Contract Addresses
@@ -37,19 +37,19 @@ export const TREASURY_ADDRESS = (process.env.NEXT_PUBLIC_TREASURY ??
 
 export const TESTNET_ADDRESSES = {
   /** KKD utility/governance token */
-  KKD_TOKEN: "0xdae7BE3dAe2f8E90b7B68FdF92cb13a0aa5Ee479" as const,
+  KKD_TOKEN: "0xEB9F26cF82846adB0547669AEab89e5511fd9098" as const,
   /** RWA-backed Puer tea token */
-  RWA_PUER_TOKEN: "0x374609bfC6492E618fB44985f6548A218e1bF757" as const,
+  RWA_PUER_TOKEN: "0xcb667c2D689F2e08AD9110fC9f0F57BDf7547c66" as const,
   /** RWA-backed Aged tea token */
-  RWA_AGED_TOKEN: "0xB73d530Af0A8A07A94465656e2B4fe6eE8CFEA8c" as const,
+  RWA_AGED_TOKEN: "0x0F88F739d74153DaC6dEdd676BC3891867784C57" as const,
   /** RWA-backed Cera (ceramics) token */
-  RWA_CERA_TOKEN: "0x211E83e3cfE323791fcd57b44474d3FFD38F114C" as const,
+  RWA_CERA_TOKEN: "0x9a6dBf85400CBD01d030D3313ccF24892fBea587" as const,
   /** KKIKDA NFT collection */
-  KKIKDA_NFT: "0x96f91e0757aa5769aEEc509408c7Ab86A81539bc" as const,
+  KKIKDA_NFT: "0x5043C557E7c2DC0F62f86EACa60845938552eb7C" as const,
   /** NFT Marketplace */
-  MARKETPLACE: "0x1C80967399D0146b7DcEAAE45aEdc89aFa128656" as const,
+  MARKETPLACE: "0xb1623d80F00e735CF2D360bdba6b3Ad3e0623804" as const,
   /** KKD Staking pool */
-  STAKING: "0x1A58c14DEEb7f1B555f9ea08dC486C191719F081" as const,
+  STAKING: "0xEE979430b15B76F072128C00080aC5746Fe91234" as const,
 } as const;
 
 export const MAINNET_ADDRESSES = {
