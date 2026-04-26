@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
+import { useAccount } from "wagmi";
 import { useStore } from "@/stores/useStore";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import {
@@ -19,7 +20,7 @@ import {
 
 const NAV_ITEMS = [
   { label: "Collections", href: "/nft", icon: FolderOpen },
-  { label: "My Kura", href: "/dashboard", icon: Package },
+  { label: "My Kura", href: "/dashboard", icon: Package, requiresWallet: true },
   { label: "Governance", href: "/staking", icon: Gavel },
 ] as const;
 
@@ -34,6 +35,11 @@ export function Sidebar() {
   const sidebarOpen = useStore((s) => s.sidebarOpen);
   const setSidebarOpen = useStore((s) => s.setSidebarOpen);
   const { isAdmin } = useIsAdmin();
+  const { isConnected } = useAccount();
+
+  const visibleNavItems = NAV_ITEMS.filter(
+    (item) => !("requiresWallet" in item && item.requiresWallet) || isConnected,
+  );
 
   const sidebarContent = (
     <div className="flex flex-col h-full py-8">
@@ -70,7 +76,7 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 space-y-1">
-        {NAV_ITEMS.map((item) => {
+        {visibleNavItems.map((item) => {
           const active = pathname === item.href || pathname.startsWith(item.href + "/");
           const Icon = item.icon;
           return (
