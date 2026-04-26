@@ -27,7 +27,33 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https:",
-              "connect-src 'self' https://*.infura.io https://*.alchemy.com wss://*.infura.io wss://*.alchemy.com https://api.coingecko.com",
+              [
+                "connect-src 'self'",
+                // BSC public RPCs (testnet + mainnet)
+                "https://*.bnbchain.org",
+                "https://*.binance.org",
+                "https://*.publicnode.com",
+                "https://bsc.publicnode.com",
+                // Generic node providers (kept for fallback)
+                "https://*.infura.io",
+                "wss://*.infura.io",
+                "https://*.alchemy.com",
+                "wss://*.alchemy.com",
+                // WalletConnect / Reown / RainbowKit relay + verify + explorer
+                "https://*.walletconnect.com",
+                "https://*.walletconnect.org",
+                "https://*.web3modal.org",
+                "https://*.reown.com",
+                "wss://*.walletconnect.com",
+                "wss://*.walletconnect.org",
+                "wss://*.reown.com",
+                "wss://relay.walletconnect.com",
+                "wss://relay.walletconnect.org",
+                // Misc data
+                "https://api.coingecko.com",
+              ].join(" "),
+              // WalletConnect modal renders inside an iframe
+              "frame-src 'self' https://*.walletconnect.com https://*.walletconnect.org https://*.reown.com https://verify.walletconnect.com",
               "frame-ancestors 'none'",
             ].join("; "),
           },
