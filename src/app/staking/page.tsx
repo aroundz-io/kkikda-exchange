@@ -1,8 +1,24 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { useAccount, useReadContract } from "wagmi";
+import { parseUnits, formatUnits, type Address } from "viem";
 import { useStore } from "@/stores/useStore";
 import { useT } from "@/lib/i18n/useT";
+import {
+  useStake,
+  useUnstake,
+  useClaimRewards,
+  useStakedBalance,
+  usePendingRewards,
+  useStakingInfo,
+} from "@/hooks/useStaking";
+import { useTokenBalance, useTokenApprove } from "@/hooks/useTokenContract";
+import { KKDA_ADDRESS } from "@/hooks/useSwap";
+import { ADDRESSES, KKD_TOKEN_ABI } from "@/lib/web3/contracts";
+import { TxStatus } from "@/components/ui/TxStatus";
+import { ExternalLink } from "lucide-react";
 
 const fade = {
   initial: { opacity: 0, y: 16 },
@@ -10,46 +26,152 @@ const fade = {
 };
 
 function formatUsd(n: number) {
-  if (n >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(1)}B`;
-  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(2)}B`;
+  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`;
   if (n >= 1_000) return `$${(n / 1_000).toFixed(1)}K`;
-  return `$${n.toFixed(0)}`;
+  return `$${n.toFixed(2)}`;
 }
+
+const STAKING_ADDRESS = ADDRESSES.STAKING as Address;
 
 export default function StakingPage() {
   const t = useT();
   const stakingPools = useStore((s) => s.stakingPools);
-  const user = useStore((s) => s.user);
+  const tokens = useStore((s) => s.tokens);
+  const addToast = useStore((s) => s.addToast);
 
-  const HOW_IT_WORKS = [
-    {
-      step: "01",
-      title: t("staking.step1Title"),
-      description: t("staking.step1Desc"),
-    },
-    {
-      step: "02",
-      title: t("staking.step2Title"),
-      description: t("staking.step2Desc"),
-    },
-    {
-      step: "03",
-      title: t("staking.step3Title"),
-      description: t("staking.step3Desc"),
-    },
-  ];
+  const { address, isConnected } = useAccount();
+  const kkda = tokens.find((tk) => tk.symbol === "KKDA");
+  const kkdaPrice = kkda?.price ?? 0.05;
 
-  const totalStaked = stakingPools.reduce((s, p) => s + p.totalStakedUsd, 0);
+  // ── Live data from STAKING contract (pool-1) ─────────────────────
+  const live = useStakingInfo();
+  const liveTotalStakedKkda =
+    live.totalStaked !== undefined
+      ? Number(formatUnits(live.totalStaked, 18))
+      : undefined;
+  const liveApy =
+    live.apyRate !== undefined ? Number(live.apyRate) / 100 : undefined; // assume basis points
+  const liveLockDays =
+    live.lockPeriodSeconds !== undefined
+      ? Math.round(live.lockPeriodSeconds / 86400)
+      : undefined;
+  const liveMinStakeKkda =
+    live.minStake !== undefined ? Number(formatUnits(live.minStake, 18)) : undefined;
+
+  // ── User-side reads (only when connected) ────────────────────────
+  const { staked: userStakedRaw } = useStakedBalance(address as Address | undefined);
+  const { rewards: userRewardsRaw } = usePendingRewards(address as Address | undefined);
+  const userStakedKkda = userStakedRaw ? Number(formatUnits(userStakedRaw, 18)) : 0;
+  const userRewardsKkda = userRewardsRaw ? Number(formatUnits(userRewardsRaw, 18)) : 0;
+  const userStakedUsd = userStakedKkda * kkdaPrice;
+  const userRewardsUsd = userRewardsKkda * kkdaPrice;
+
+  // ── Pool-1 effective values (live overlay or fallback) ───────────
+  const pool1 = stakingPools[0];
+  const pool1Tvl = liveTotalStakedKkda
+    ? liveTotalStakedKkda * kkdaPrice
+    : (pool1?.totalStakedUsd ?? 0);
+  const pool1Apy = liveApy ?? pool1?.apy ?? 0;
+  const pool1LockDays = liveLockDays ?? pool1?.lockDays ?? 0;
+  const pool1MinStake = liveMinStakeKkda ?? pool1?.minStake ?? 0;
+
+  // Aggregated TVL = pool1 (live or fallback) + pool2 + pool3 demos
+  const totalStaked =
+    pool1Tvl +
+    (stakingPools[1]?.totalStakedUsd ?? 0) +
+    (stakingPools[2]?.totalStakedUsd ?? 0);
   const avgApy =
     stakingPools.length > 0
-      ? stakingPools.reduce((s, p) => s + p.apy, 0) / stakingPools.length
+      ? (pool1Apy +
+          (stakingPools[1]?.apy ?? 0) +
+          (stakingPools[2]?.apy ?? 0)) /
+        stakingPools.length
       : 0;
+
+  // ── Stake form state (pool-1 only) ───────────────────────────────
+  const [stakeInput, setStakeInput] = useState("");
+  const stakeWei = useMemo(() => {
+    if (!stakeInput) return undefined;
+    try { return parseUnits(stakeInput, 18); } catch { return undefined; }
+  }, [stakeInput]);
+
+  const { balance: kkdaBalance } = useTokenBalance(KKDA_ADDRESS, address);
+
+  // Allowance for STAKING contract
+  const allowanceQuery = useReadContract({
+    address: KKDA_ADDRESS,
+    abi: KKD_TOKEN_ABI,
+    functionName: "allowance",
+    args: address ? [address, STAKING_ADDRESS] : undefined,
+    query: { enabled: !!address },
+  });
+  const allowance = (allowanceQuery.data as bigint | undefined) ?? BigInt(0);
+  const needsApproval = stakeWei !== undefined && allowance < stakeWei;
+
+  const approve = useTokenApprove(KKDA_ADDRESS);
+  const stake = useStake();
+  const unstake = useUnstake();
+  const claim = useClaimRewards();
+
+  useEffect(() => {
+    if (approve.isSuccess) {
+      allowanceQuery.refetch();
+      approve.reset();
+    }
+  }, [approve.isSuccess, allowanceQuery, approve]);
+
+  useEffect(() => {
+    if (stake.isSuccess) {
+      addToast({
+        type: "success",
+        title: t("staking.successTitle"),
+        message: t("staking.successMsg"),
+      });
+      setStakeInput("");
+      stake.reset();
+      live.refetch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stake.isSuccess]);
+
+  function handleApprove() {
+    if (!stakeWei) return;
+    approve.approve(STAKING_ADDRESS, stakeWei);
+  }
+  function handleStake() {
+    if (!isConnected || !address) return;
+    if (!stakeWei) return;
+    stake.stake(stakeWei);
+  }
+  function handleUnstake() {
+    if (!userStakedRaw) return;
+    unstake.unstake(userStakedRaw);
+  }
+  function handleClaim() {
+    claim.claimRewards();
+  }
+
+  const fmtKkda = (n: number) =>
+    n.toLocaleString(undefined, { maximumFractionDigits: 4 });
 
   const summaryCards = [
     { label: t("staking.totalStaked"), value: formatUsd(totalStaked) },
     { label: t("staking.avgApy"), value: `${avgApy.toFixed(1)}%` },
-    { label: t("staking.yourStaked"), value: formatUsd(user.stakedValue) },
-    { label: t("staking.rewardsEarned"), value: "$1,248" },
+    {
+      label: t("staking.yourStaked"),
+      value: isConnected ? formatUsd(userStakedUsd) : t("staking.notConnected"),
+    },
+    {
+      label: t("staking.rewardsEarned"),
+      value: isConnected ? formatUsd(userRewardsUsd) : t("staking.notConnected"),
+    },
+  ];
+
+  const HOW_IT_WORKS = [
+    { step: "01", title: t("staking.step1Title"), description: t("staking.step1Desc") },
+    { step: "02", title: t("staking.step2Title"), description: t("staking.step2Desc") },
+    { step: "03", title: t("staking.step3Title"), description: t("staking.step3Desc") },
   ];
 
   return (
@@ -86,9 +208,15 @@ export default function StakingPage() {
       {/* ── Pools List ── */}
       <div className="space-y-4">
         {stakingPools.map((pool, i) => {
+          const isPool1 = i === 0;
+          const effectiveTvl = isPool1 ? pool1Tvl : pool.totalStakedUsd;
+          const effectiveApy = isPool1 ? pool1Apy : pool.apy;
+          const effectiveLockDays = isPool1 ? pool1LockDays : pool.lockDays;
+          const effectiveMinStake = isPool1 ? pool1MinStake : pool.minStake;
+
           const utilization = Math.min(
-            (pool.totalStaked / (pool.totalStaked + 1_000_000)) * 100,
-            95
+            (effectiveTvl / (effectiveTvl + 1_000_000)) * 100,
+            95,
           );
 
           return (
@@ -101,31 +229,40 @@ export default function StakingPage() {
               <div className="flex flex-col lg:flex-row lg:items-center gap-6">
                 {/* Pool Info */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-3 mb-2 flex-wrap">
                     <h3 className="font-headline text-lg text-on-surface">
                       {pool.name}
                     </h3>
                     <span className="font-label text-[10px] uppercase tracking-[0.15em] text-secondary border-[0.5px] border-secondary/40 px-2 py-0.5">
                       {pool.pair}
                     </span>
+                    {isPool1 ? (
+                      <span className="font-label text-[10px] uppercase tracking-[0.15em] text-secondary px-2 py-0.5 bg-secondary/10 border-[0.5px] border-secondary/40">
+                        ● {t("staking.live")}
+                      </span>
+                    ) : (
+                      <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline px-2 py-0.5 bg-outline/10 border-[0.5px] border-outline/40">
+                        {t("staking.comingSoon")}
+                      </span>
+                    )}
                   </div>
-                  <div className="flex flex-wrap gap-6 text-xs text-on-surface-variant font-body">
+                  <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-on-surface-variant font-body">
                     <span>
                       {t("staking.tvl")}:{" "}
                       <span className="text-on-surface">
-                        {formatUsd(pool.totalStakedUsd)}
+                        {formatUsd(effectiveTvl)}
                       </span>
                     </span>
                     <span>
                       {t("staking.minStake")}:{" "}
                       <span className="text-on-surface">
-                        {pool.minStake.toLocaleString()}
+                        {effectiveMinStake.toLocaleString()}
                       </span>
                     </span>
                     <span>
                       {t("staking.lock")}:{" "}
                       <span className="text-on-surface">
-                        {pool.lockDays} {t("staking.lockDays")}
+                        {effectiveLockDays} {t("staking.lockDays")}
                       </span>
                     </span>
                     <span>
@@ -134,6 +271,17 @@ export default function StakingPage() {
                         {pool.rewardToken}
                       </span>
                     </span>
+                    {isPool1 && (
+                      <a
+                        href={`https://testnet.bscscan.com/address/${STAKING_ADDRESS}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:opacity-70 transition-opacity inline-flex items-center gap-1"
+                      >
+                        {t("staking.viewContract")}
+                        <ExternalLink size={11} />
+                      </a>
+                    )}
                   </div>
                 </div>
 
@@ -143,17 +291,140 @@ export default function StakingPage() {
                     {t("dex.apy")}
                   </p>
                   <p className="font-headline text-3xl text-primary">
-                    {pool.apy}%
+                    {effectiveApy.toFixed(1)}%
                   </p>
                 </div>
 
-                {/* Action */}
-                <div className="shrink-0">
-                  <button className="btn-gradient w-full lg:w-auto">
-                    {t("staking.stakeNow")}
-                  </button>
+                {/* Action — pool-1 only is interactive */}
+                <div className="shrink-0 w-full lg:w-auto">
+                  {isPool1 ? (
+                    isConnected ? (
+                      <div className="space-y-2 w-full lg:w-64">
+                        <input
+                          type="number"
+                          step="any"
+                          value={stakeInput}
+                          onChange={(e) => setStakeInput(e.target.value)}
+                          placeholder={t("staking.stakeAmount")}
+                          className="w-full bg-surface-container-high border-[0.5px] border-outline-variant px-3 py-2 font-body text-sm text-on-surface placeholder:text-outline outline-none focus:border-primary transition-colors"
+                        />
+                        <p className="font-label text-[9px] uppercase tracking-[0.15em] text-outline">
+                          {t("dex.balance")}: {fmtKkda(kkdaBalance ? Number(formatUnits(kkdaBalance, 18)) : 0)} KKDA
+                        </p>
+                        {needsApproval ? (
+                          <button
+                            onClick={handleApprove}
+                            disabled={!stakeWei || approve.isPending || approve.isConfirming}
+                            className="btn-gradient w-full disabled:opacity-30 disabled:cursor-not-allowed"
+                          >
+                            {approve.isPending
+                              ? t("staking.signing")
+                              : approve.isConfirming
+                                ? t("staking.confirmingApprove")
+                                : t("staking.approve")}
+                          </button>
+                        ) : (
+                          <button
+                            onClick={handleStake}
+                            disabled={!stakeWei || stake.isPending || stake.isConfirming}
+                            className="btn-gradient w-full disabled:opacity-30 disabled:cursor-not-allowed"
+                          >
+                            {stake.isPending
+                              ? t("staking.signing")
+                              : stake.isConfirming
+                                ? t("staking.confirmingStake")
+                                : t("staking.stakeNow")}
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <button
+                        disabled
+                        className="btn-gradient w-full lg:w-auto opacity-50 cursor-not-allowed"
+                      >
+                        {t("staking.connect")}
+                      </button>
+                    )
+                  ) : (
+                    <button
+                      disabled
+                      title={t("staking.contractPending")}
+                      className="btn-gradient w-full lg:w-auto opacity-30 cursor-not-allowed"
+                    >
+                      {t("staking.comingSoon")}
+                    </button>
+                  )}
                 </div>
               </div>
+
+              {/* User position (pool-1 only when staked) */}
+              {isPool1 && isConnected && userStakedKkda > 0 && (
+                <div className="mt-4 pt-4 border-t border-outline-variant/15 flex flex-wrap gap-4 items-center justify-between">
+                  <div className="flex flex-wrap gap-6 text-xs text-on-surface-variant font-body">
+                    <span>
+                      {t("staking.yourStaked")}:{" "}
+                      <span className="text-primary font-headline text-base">
+                        {fmtKkda(userStakedKkda)} KKDA
+                      </span>{" "}
+                      ({formatUsd(userStakedUsd)})
+                    </span>
+                    <span>
+                      {t("staking.rewardsEarned")}:{" "}
+                      <span className="text-secondary font-headline text-base">
+                        {fmtKkda(userRewardsKkda)} KKDA
+                      </span>{" "}
+                      ({formatUsd(userRewardsUsd)})
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleClaim}
+                      disabled={
+                        userRewardsKkda === 0 || claim.isPending || claim.isConfirming
+                      }
+                      className="px-4 py-2 bg-secondary/10 text-secondary border-[0.5px] border-secondary/40 font-label text-[10px] uppercase tracking-[0.15em] hover:bg-secondary/20 disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                      {claim.isPending || claim.isConfirming
+                        ? t("staking.signing")
+                        : t("staking.claim")}
+                    </button>
+                    <button
+                      onClick={handleUnstake}
+                      disabled={
+                        userStakedKkda === 0 || unstake.isPending || unstake.isConfirming
+                      }
+                      className="px-4 py-2 bg-error/10 text-error border-[0.5px] border-error/40 font-label text-[10px] uppercase tracking-[0.15em] hover:bg-error/20 disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                      {unstake.isPending || unstake.isConfirming
+                        ? t("staking.signing")
+                        : t("staking.unstake")}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Tx status (pool-1 only) */}
+              {isPool1 && (
+                <TxStatus
+                  hash={
+                    stake.hash ?? approve.hash ?? unstake.hash ?? claim.hash
+                  }
+                  isPending={
+                    stake.isPending || approve.isPending || unstake.isPending || claim.isPending
+                  }
+                  isConfirming={
+                    stake.isConfirming ||
+                    approve.isConfirming ||
+                    unstake.isConfirming ||
+                    claim.isConfirming
+                  }
+                  isSuccess={false}
+                  isError={
+                    stake.isError || approve.isError || unstake.isError || claim.isError
+                  }
+                  error={stake.error || approve.error || unstake.error || claim.error}
+                />
+              )}
 
               {/* Utilization Bar */}
               <div className="mt-4">

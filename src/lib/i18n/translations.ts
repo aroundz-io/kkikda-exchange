@@ -343,6 +343,27 @@ export const translations = {
     en: "Rewards accrue in real-time and can be claimed after the lock period expires.",
     ko: "보상은 실시간으로 누적되며 잠금 기간이 끝난 후 수령할 수 있습니다.",
   },
+  "staking.live": { en: "Live · BSC", ko: "활성 · BSC" },
+  "staking.comingSoon": { en: "Coming Soon", ko: "출시 예정" },
+  "staking.contractPending": {
+    en: "LP staking contract deployment pending",
+    ko: "LP 스테이킹 컨트랙트 배포 대기 중",
+  },
+  "staking.connect": { en: "Connect to stake", ko: "스테이킹하려면 연결" },
+  "staking.stakeAmount": { en: "Stake amount", ko: "스테이킹 수량" },
+  "staking.approve": { en: "Approve KKDA", ko: "KKDA 승인" },
+  "staking.confirmingApprove": { en: "Approving…", ko: "승인 중…" },
+  "staking.confirmingStake": { en: "Staking…", ko: "스테이킹 중…" },
+  "staking.signing": { en: "Signing…", ko: "서명 중…" },
+  "staking.unstake": { en: "Unstake", ko: "언스테이킹" },
+  "staking.claim": { en: "Claim Rewards", ko: "보상 수령" },
+  "staking.viewContract": { en: "View Contract", ko: "컨트랙트 보기" },
+  "staking.notConnected": { en: "—", ko: "—" },
+  "staking.successTitle": { en: "Stake Confirmed", ko: "스테이킹 완료" },
+  "staking.successMsg": {
+    en: "Your stake is now earning rewards.",
+    ko: "스테이킹이 시작되어 보상이 누적되고 있습니다.",
+  },
 
   // ──────────────────────────────────────────────
   // Redeem (/redeem)

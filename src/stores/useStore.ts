@@ -507,10 +507,20 @@ const DEMO_TOKENS: Token[] = [
   },
 ];
 
+/**
+ * Staking pools — TVL recomputed against the real $0.05 KKDA launch price.
+ * pool-1 = KKDA single-staking (deployed STAKING contract, ADDRESSES.STAKING)
+ *          UI overlays live `useStakingInfo()` reads on top of these defaults.
+ * pool-2 / pool-3 = LP staking — contracts not yet deployed; UI marks them
+ *          as "coming soon" so users don't expect to be able to stake.
+ */
 const DEMO_POOLS: StakingPool[] = [
-  { id: "pool-1", name: "KKDA Staking", pair: "KKDA", apy: 14.5, totalStaked: 2_500_000, totalStakedUsd: 3_121_250_000, minStake: 100, lockDays: 30, rewardToken: "KKDA" },
-  { id: "pool-2", name: "KKDA-USDT LP", pair: "KKDA-USDT", apy: 18.4, totalStaked: 890_000, totalStakedUsd: 1_111_265_000, minStake: 50, lockDays: 90, rewardToken: "KKDA" },
-  { id: "pool-3", name: "PUER-USDT LP", pair: "PUER-USDT", apy: 12.1, totalStaked: 5_200_000, totalStakedUsd: 6_492_200_000, minStake: 500, lockDays: 180, rewardToken: "PUER" },
+  // 50M KKDA × $0.05 = $2.5M TVL (5% of total supply staked at launch)
+  { id: "pool-1", name: "KKDA Single Staking", pair: "KKDA", apy: 14.5, totalStaked: 50_000_000, totalStakedUsd: 2_500_000, minStake: 100, lockDays: 30, rewardToken: "KKDA" },
+  // 5M KKDA + 250K USDT in LP = $250K + $250K = $500K TVL
+  { id: "pool-2", name: "KKDA-USDT LP", pair: "KKDA-USDT", apy: 18.4, totalStaked: 5_000_000, totalStakedUsd: 500_000, minStake: 50, lockDays: 90, rewardToken: "KKDA" },
+  // 1,000 PUER + 2M USDT = $2.01M + $2M ≈ $4.01M (institutional-tier RWA pool)
+  { id: "pool-3", name: "PUER-USDT LP", pair: "PUER-USDT", apy: 12.1, totalStaked: 1_000, totalStakedUsd: 4_010_000, minStake: 500, lockDays: 180, rewardToken: "KKDA" },
 ];
 
 const genId = () => Math.random().toString(36).slice(2, 10);
@@ -629,7 +639,7 @@ export const useStore = create<AppStore>()(
       toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
     }),
     {
-      name: "kkikda-store-v5-product-images",
+      name: "kkikda-store-v6-staking-tvl",
       partialize: (s) => ({ lang: s.lang, user: s.user, orders: s.orders, teaCakes: s.teaCakes, tokens: s.tokens, mintRecords: s.mintRecords, stakingPools: s.stakingPools }),
     }
   )
