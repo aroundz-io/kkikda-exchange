@@ -21,6 +21,7 @@ export const translations = {
   // ──────────────────────────────────────────────
   "nav.market": { en: "Market", ko: "마켓" },
   "nav.exchange": { en: "Exchange", ko: "거래소" },
+  "nav.governance": { en: "Governance", ko: "거버넌스" },
   "nav.vault": { en: "Vault", ko: "보관소" },
   "nav.history": { en: "Ledger", ko: "전체 내역" },
 
@@ -46,6 +47,13 @@ export const translations = {
     ko: "BSC 지갑을 연결해 시작하세요",
   },
   "sidebar.connectCta": { en: "Connect Wallet", ko: "지갑 연결" },
+  "sidebar.holdings": { en: "Holdings", ko: "보유 자산" },
+  "sidebar.holdingsUsdt": { en: "USDT", ko: "USDT" },
+  "sidebar.holdingsKkda": { en: "KKDA", ko: "KKDA" },
+  "sidebar.holdingsNfts": { en: "NFTs", ko: "NFT" },
+  "sidebar.shortcuts": { en: "Quick Access", ko: "바로가기" },
+  "sidebar.myActivity": { en: "My Activity", ko: "내 활동" },
+  "sidebar.myRedemptions": { en: "My Redemptions", ko: "내 인수 신청" },
   "sidebar.newMint": { en: "New Mint", ko: "신규 발행" },
   "sidebar.quickTrade": { en: "Quick Trade", ko: "빠른 거래" },
   "sidebar.kycStatus": { en: "KYC Status", ko: "KYC 상태" },

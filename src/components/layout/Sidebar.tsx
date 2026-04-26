@@ -4,14 +4,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAccount } from "wagmi";
+import { formatUnits } from "viem";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useStore } from "@/stores/useStore";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useT } from "@/lib/i18n/useT";
+import { useTokenBalance } from "@/hooks/useTokenContract";
+import { useNFTBalance } from "@/hooks/useNFTContract";
+import { USDT_ADDRESS, KKDA_ADDRESS } from "@/hooks/useSwap";
+import type { Address } from "viem";
 import {
-  FolderOpen,
   Package,
-  Gavel,
+  Send,
   Settings,
   User,
   BadgeCheck,
@@ -22,10 +26,10 @@ import {
   Receipt,
 } from "lucide-react";
 
-const NAV_ITEMS = [
-  { labelKey: "sidebar.collections", href: "/nft", icon: FolderOpen },
-  { labelKey: "sidebar.myKura", href: "/dashboard", icon: Package, requiresWallet: true },
-  { labelKey: "sidebar.governance", href: "/staking", icon: Gavel },
+// Personal shortcuts — only visible when wallet connected
+const PERSONAL_SHORTCUTS = [
+  { labelKey: "sidebar.myActivity", href: "/dashboard", icon: Package },
+  { labelKey: "sidebar.myRedemptions", href: "/rwa", icon: Send },
 ] as const;
 
 const ADMIN_NAV_ITEMS = [
@@ -47,9 +51,21 @@ export function Sidebar() {
     ? `${address.slice(0, 6)}…${address.slice(-4)}`
     : "";
 
-  const visibleNavItems = NAV_ITEMS.filter(
-    (item) => !("requiresWallet" in item && item.requiresWallet) || isConnected,
-  );
+  // Live wallet holdings (only when connected)
+  const { balance: usdtBalance } = useTokenBalance(USDT_ADDRESS, address);
+  const { balance: kkdaBalance } = useTokenBalance(KKDA_ADDRESS, address);
+  const { balance: nftBalance } = useNFTBalance(address as Address | undefined);
+
+  const usdt = usdtBalance ? Number(formatUnits(usdtBalance, 18)) : 0;
+  const kkda = kkdaBalance ? Number(formatUnits(kkdaBalance, 18)) : 0;
+  const nfts = nftBalance ? Number(nftBalance) : 0;
+
+  const fmt = (n: number) =>
+    n >= 1_000_000
+      ? `${(n / 1_000_000).toFixed(2)}M`
+      : n >= 1_000
+        ? `${(n / 1_000).toFixed(1)}K`
+        : n.toLocaleString(undefined, { maximumFractionDigits: 2 });
 
   const sidebarContent = (
     <div className="flex flex-col h-full py-8">
@@ -134,27 +150,68 @@ export function Sidebar() {
         </ConnectButton.Custom>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 space-y-1">
-        {visibleNavItems.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(item.href + "/");
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-4 px-8 py-4 font-label text-xs tracking-tighter uppercase transition-all duration-200 ${
-                active
-                  ? "bg-surface-container-low text-primary font-bold border-l-2 border-primary"
-                  : "text-outline hover:bg-surface-container-low/50"
-              }`}
-            >
-              <Icon className="w-5 h-5" />
-              {t(item.labelKey)}
-            </Link>
-          );
-        })}
+      {/* Personal Dashboard — only when connected */}
+      <nav className="flex-1 space-y-1 overflow-y-auto">
+        {isConnected && (
+          <>
+            {/* Holdings card */}
+            <div className="px-8 mb-6">
+              <p className="font-label text-[9px] uppercase tracking-[0.2em] text-outline mb-3">
+                {t("sidebar.holdings")}
+              </p>
+              <div className="bg-surface-container-low border-[0.5px] border-outline-variant divide-y divide-outline-variant/30">
+                <div className="flex items-center justify-between px-3 py-2.5">
+                  <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                    {t("sidebar.holdingsUsdt")}
+                  </span>
+                  <span className="font-label text-xs text-on-surface">
+                    {fmt(usdt)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between px-3 py-2.5">
+                  <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                    {t("sidebar.holdingsKkda")}
+                  </span>
+                  <span className="font-label text-xs text-on-surface">
+                    {fmt(kkda)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between px-3 py-2.5">
+                  <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                    {t("sidebar.holdingsNfts")}
+                  </span>
+                  <span className="font-label text-xs text-on-surface">
+                    {nfts.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Personal shortcuts */}
+            <p className="px-8 mb-2 font-label text-[9px] uppercase tracking-[0.2em] text-outline">
+              {t("sidebar.shortcuts")}
+            </p>
+            {PERSONAL_SHORTCUTS.map((item) => {
+              const active = pathname === item.href;
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setSidebarOpen(false)}
+                  className={`flex items-center gap-4 px-8 py-3 font-label text-xs tracking-tighter uppercase transition-all duration-200 ${
+                    active
+                      ? "bg-surface-container-low text-primary font-bold border-l-2 border-primary"
+                      : "text-outline hover:bg-surface-container-low/50"
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {t(item.labelKey)}
+                </Link>
+              );
+            })}
+          </>
+        )}
 
         {/* Admin-only section */}
         {isAdmin && (

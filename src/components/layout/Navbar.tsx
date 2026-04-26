@@ -10,6 +10,7 @@ import { Menu, X } from "lucide-react";
 const NAV_LINKS = [
   { labelKey: "nav.market", href: "/nft" },
   { labelKey: "nav.exchange", href: "/dex" },
+  { labelKey: "nav.governance", href: "/staking" },
   { labelKey: "nav.vault", href: "/rwa" },
   { labelKey: "nav.history", href: "/ledger" },
 ] as const;
