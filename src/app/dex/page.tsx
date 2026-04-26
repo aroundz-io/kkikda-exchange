@@ -33,10 +33,14 @@ type Period = (typeof TIME_PERIODS)[number];
 
 function useBarHeights(count: number) {
   return useMemo(() => {
+    // Deterministic pseudo-random so the chart is stable across renders
+    // (React 19 strict mode calls render twice; Math.random would diverge).
     const heights: number[] = [];
     let base = 40;
     for (let i = 0; i < count; i++) {
-      base += Math.sin(i * 0.4) * 15 + (Math.random() - 0.5) * 20;
+      const noise = Math.sin(i * 12.9898) * 43758.5453;
+      const pseudo = noise - Math.floor(noise); // [0,1)
+      base += Math.sin(i * 0.4) * 15 + (pseudo - 0.5) * 20;
       heights.push(Math.max(15, Math.min(95, base)));
     }
     return heights;
@@ -145,7 +149,7 @@ function ExchangeWidget() {
   const tokenToBnbSwap = useSwapExactTokensForBnb();
   const active = bnbToToken ? bnbToTokenSwap : tokenToBnbSwap;
 
-  // Reset on success
+  // Reset on success — bridging wagmi tx state into local UI state.
   useEffect(() => {
     if (active.isSuccess) {
       setPayAmount("");

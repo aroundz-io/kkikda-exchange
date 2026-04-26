@@ -71,10 +71,13 @@ export default function AdminTokensPage() {
     reset,
   } = useTokenMint(onChainAddress);
 
-  // After tx confirms, sync the local store's supply.
+  // After tx confirms, sync the local store's supply. setState here is
+  // intentional — we're bridging an external system (wagmi tx state) into
+  // local state and the `pendingMint` guard ensures it runs once per tx.
   useEffect(() => {
     if (isSuccess && pendingMint) {
       mintTokenSupply(pendingMint.id, pendingMint.amount);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPendingMint(null);
       setMintAmount("");
       reset();

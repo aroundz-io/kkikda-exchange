@@ -12,7 +12,10 @@ const queryClient = new QueryClient();
 export function Web3Provider({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
+  // Standard wagmi/RainbowKit SSR-hydration guard: render children only
+  // after the client has hydrated to avoid SSR/CSR markup mismatches.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 

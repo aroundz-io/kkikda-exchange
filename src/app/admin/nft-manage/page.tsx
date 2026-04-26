@@ -85,9 +85,11 @@ export default function NftManagePage() {
   const [pendingBurnId, setPendingBurnId] = useState<string | null>(null);
 
   // After mint tx confirms, persist the new cake to the local store with the real tx hash.
+  // setState is intentional — bridging wagmi tx state into local UI state.
   useEffect(() => {
     if (isSuccess && pendingCake && hash) {
       addTeaCake({ ...pendingCake, txHash: hash });
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPendingCake(null);
       setForm(INITIAL_FORM);
       setShowMintForm(false);
@@ -99,6 +101,7 @@ export default function NftManagePage() {
   useEffect(() => {
     if (burnSuccess && pendingBurnId) {
       removeTeaCake(pendingBurnId);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPendingBurnId(null);
       burnReset();
     }

@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // CommonJS files (Hardhat config, deploy scripts) — they require `require()`.
+    "**/*.cjs",
   ]),
 ]);
 
