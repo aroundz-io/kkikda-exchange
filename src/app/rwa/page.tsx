@@ -6,9 +6,8 @@ import { useAccount } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import {
   Lock,
-  CheckCircle2,
   Wallet,
-  Flame,
+  Send,
   ShieldCheck,
   X,
   MapPin,
@@ -16,9 +15,8 @@ import {
 } from "lucide-react";
 import { useStore, type RedemptionStatus } from "@/stores/useStore";
 import { useT } from "@/lib/i18n/useT";
-import { useNFTBalance, useNFTBurn } from "@/hooks/useNFTContract";
+import { useNFTBalance } from "@/hooks/useNFTContract";
 import { ADDRESSES } from "@/lib/web3/contracts";
-import { TxStatus } from "@/components/ui/TxStatus";
 import { PICKUP_POINTS, findPickupPoint } from "@/lib/pickupPoints";
 import type { Address } from "viem";
 
@@ -113,7 +111,7 @@ function HowItWorks() {
   );
 }
 
-/* ───────────── Redemption Modal ───────────── */
+/* ───────────── Redemption Modal — submit-only (no wallet signature) ───────────── */
 function RedemptionModal({
   onClose,
   ownerAddress,
@@ -140,8 +138,6 @@ function RedemptionModal({
     [tokenIdsInput],
   );
 
-  // Find which product the first tokenId belongs to (assumes all same product
-  // when burning multiple — UI keeps it simple)
   const matchedCake = useMemo(() => {
     if (tokenIds.length === 0) return null;
     const id = tokenIds[0];
@@ -152,32 +148,7 @@ function RedemptionModal({
     );
   }, [tokenIds, teaCakes]);
 
-  // We burn the FIRST tokenId on-chain (single tx). For multi-NFT redemption
-  // user repeats the flow, OR a future iteration batches via multicall.
-  const { burn, hash, isPending, isConfirming, isSuccess, isError, error, reset } =
-    useNFTBurn();
-
-  useEffect(() => {
-    if (isSuccess && hash && tokenIds.length > 0 && matchedCake) {
-      const genId = () => Math.random().toString(36).slice(2, 10);
-      addRedemptionRequest({
-        id: `rdm-${Date.now()}-${genId()}`,
-        cakeId: matchedCake.id,
-        cakeName: matchedCake.name,
-        tokenIds,
-        burnTxHash: hash,
-        owner: ownerAddress,
-        pickupPointId,
-        timestamp: Date.now(),
-        status: "submitted",
-      });
-      reset();
-      onClose();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, hash]);
-
-  function handleConfirm() {
+  function handleSubmit() {
     if (tokenIds.length === 0) {
       addToast({
         type: "error",
@@ -186,8 +157,19 @@ function RedemptionModal({
       });
       return;
     }
-    // Burn first token only (single tx). Track ownership/multi-burn off-chain.
-    burn(BigInt(tokenIds[0]));
+    if (!matchedCake) return;
+    const genId = () => Math.random().toString(36).slice(2, 10);
+    addRedemptionRequest({
+      id: `rdm-${Date.now()}-${genId()}`,
+      cakeId: matchedCake.id,
+      cakeName: matchedCake.name,
+      tokenIds,
+      owner: ownerAddress,
+      pickupPointId,
+      timestamp: Date.now(),
+      status: "submitted",
+    });
+    onClose();
   }
 
   return (
@@ -206,8 +188,7 @@ function RedemptionModal({
         className="w-full max-w-lg bg-surface-container-low border-[0.5px] border-outline-variant max-h-[90vh] overflow-y-auto"
       >
         <div className="px-6 py-4 border-b border-outline-variant/15 flex items-center justify-between">
-          <h3 className="font-headline text-base text-on-surface flex items-center gap-2">
-            <Flame className="w-4 h-4 text-primary" />
+          <h3 className="font-headline text-base text-on-surface">
             {t("rwa.modalTitle")}
           </h3>
           <button onClick={onClose} className="text-outline hover:text-on-surface">
@@ -216,7 +197,6 @@ function RedemptionModal({
         </div>
 
         <div className="p-6 space-y-5">
-          {/* Token IDs */}
           <div className="space-y-1.5">
             <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
               {t("rwa.tokenIdInput")}
@@ -254,7 +234,6 @@ function RedemptionModal({
             )}
           </div>
 
-          {/* Pickup point */}
           <div className="space-y-1.5">
             <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
               {t("rwa.pickupPoint")}
@@ -272,14 +251,9 @@ function RedemptionModal({
             </select>
           </div>
 
-          <TxStatus
-            hash={hash}
-            isPending={isPending}
-            isConfirming={isConfirming}
-            isSuccess={isSuccess}
-            isError={isError}
-            error={error}
-          />
+          <p className="font-body text-xs text-on-surface-variant leading-relaxed bg-surface-container-high border-[0.5px] border-outline-variant px-4 py-3">
+            {t("rwa.modalNotice")}
+          </p>
 
           <div className="flex gap-3">
             <button
@@ -289,18 +263,11 @@ function RedemptionModal({
               {t("rwa.cancel")}
             </button>
             <button
-              onClick={handleConfirm}
-              disabled={tokenIds.length === 0 || isPending || isConfirming}
+              onClick={handleSubmit}
+              disabled={tokenIds.length === 0 || !matchedCake}
               className="flex-[2] btn-gradient disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              <span className="flex items-center justify-center gap-2">
-                <Flame size={14} />
-                {isPending
-                  ? "Awaiting signature…"
-                  : isConfirming
-                    ? t("rwa.confirmingBurn")
-                    : t("rwa.confirmRedemption")}
-              </span>
+              {t("rwa.confirmRedemption")}
             </button>
           </div>
         </div>
@@ -309,14 +276,15 @@ function RedemptionModal({
   );
 }
 
-/* ───────────── Status Tracker (per request) ───────────── */
+/* ───────────── Status Tracker (5-step flow) ───────────── */
 function StatusTracker({ status }: { status: RedemptionStatus }) {
   const t = useT();
   const order: RedemptionStatus[] = [
     "submitted",
-    "verified",
+    "frozen",
     "ready_for_pickup",
-    "completed",
+    "picked_up",
+    "burned",
   ];
   if (status === "cancelled") {
     return (
@@ -331,6 +299,7 @@ function StatusTracker({ status }: { status: RedemptionStatus }) {
     t("rwa.statusStep2"),
     t("rwa.statusStep3"),
     t("rwa.statusStep4"),
+    t("rwa.statusStep5"),
   ];
 
   return (
@@ -342,7 +311,7 @@ function StatusTracker({ status }: { status: RedemptionStatus }) {
           <div key={i} className="flex items-center gap-2">
             <div className="flex items-center gap-2">
               <span
-                className={`w-5 h-5 flex items-center justify-center border-[0.5px] font-label text-[9px] ${
+                className={`w-5 h-5 flex items-center justify-center border-[0.5px] font-label text-[9px] shrink-0 ${
                   reached
                     ? current
                       ? "bg-primary text-on-primary border-primary"
@@ -353,7 +322,7 @@ function StatusTracker({ status }: { status: RedemptionStatus }) {
                 {reached && !current ? "✓" : i + 1}
               </span>
               <span
-                className={`font-label text-[10px] uppercase tracking-[0.15em] ${
+                className={`font-label text-[10px] uppercase tracking-[0.15em] whitespace-nowrap ${
                   reached
                     ? current
                       ? "text-primary"
@@ -366,7 +335,7 @@ function StatusTracker({ status }: { status: RedemptionStatus }) {
             </div>
             {i < labels.length - 1 && (
               <div
-                className={`w-6 h-[1px] ${
+                className={`w-5 h-[1px] shrink-0 ${
                   reached && i < idx ? "bg-secondary/50" : "bg-outline-variant/30"
                 }`}
               />
@@ -494,7 +463,7 @@ export default function RwaPage() {
                   onClick={() => setShowModal(true)}
                   className="btn-gradient inline-flex items-center gap-2"
                 >
-                  <Flame size={14} />
+                  <Send size={14} />
                   {t("rwa.requestRedeem")}
                 </button>
               </div>
@@ -543,14 +512,28 @@ export default function RwaPage() {
                             #{r.tokenIds.join(", #")}
                           </p>
                         </div>
-                        <a
-                          href={`https://testnet.bscscan.com/tx/${r.burnTxHash}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-label text-[10px] uppercase tracking-[0.15em] text-outline hover:text-primary"
-                        >
-                          {t("rwa.viewBurnTx")} ↗
-                        </a>
+                        <div className="flex flex-col items-end gap-1">
+                          {r.freezeTxHash && (
+                            <a
+                              href={`https://testnet.bscscan.com/tx/${r.freezeTxHash}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-label text-[10px] uppercase tracking-[0.15em] text-outline hover:text-primary"
+                            >
+                              {t("rwa.viewFreezeTx")} ↗
+                            </a>
+                          )}
+                          {r.burnTxHash && (
+                            <a
+                              href={`https://testnet.bscscan.com/tx/${r.burnTxHash}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-label text-[10px] uppercase tracking-[0.15em] text-outline hover:text-primary"
+                            >
+                              {t("rwa.viewBurnTx")} ↗
+                            </a>
+                          )}
+                        </div>
                       </div>
 
                       <StatusTracker status={r.status} />
@@ -600,5 +583,3 @@ export default function RwaPage() {
   );
 }
 
-/* Mark CheckCircle2 used elsewhere if needed (kept for compatibility) */
-void CheckCircle2;

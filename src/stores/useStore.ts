@@ -119,27 +119,39 @@ export interface PurchaseOrder {
   deliveredTokenIds?: string;
 }
 
+/**
+ * Redemption flow — admin executes every on-chain step. User only submits
+ * the request and selects the pickup point.
+ *
+ *   submitted        → user clicked "Request Redemption"
+ *   frozen           → admin froze the NFTs (transfer suspended) · 1차 거래정지
+ *   ready_for_pickup → admin verified inventory and staged item at trade point
+ *   picked_up        → user collected the physical item in person
+ *   burned           → admin burned the NFT on-chain after pickup
+ *   cancelled        → request voided
+ */
 export type RedemptionStatus =
-  | "submitted"        // user just burned NFT(s) and submitted request
-  | "verified"         // vault staff verified inventory match
-  | "ready_for_pickup" // physical item is staged at pickup location
-  | "completed"        // user has collected the item in person
+  | "submitted"
+  | "frozen"
+  | "ready_for_pickup"
+  | "picked_up"
+  | "burned"
   | "cancelled";
 
 export interface RedemptionRequest {
   id: string;
   cakeId: string;
   cakeName: string;
-  tokenIds: number[];         // burned tokenIds
-  burnTxHash: string;         // KKIKDA_NFT.burn tx
-  owner: string;              // wallet that initiated
-  pickupPointId: string;      // selected trade-point
+  tokenIds: number[];
+  owner: string;
+  pickupPointId: string;
   timestamp: number;
   status: RedemptionStatus;
-  /** ISO timestamp set by admin/vault when status moves to ready_for_pickup. */
+  // Admin-set fields (set as status advances):
+  freezeTxHash?: string;
   readyAt?: number;
-  /** ISO timestamp when user collected. */
-  completedAt?: number;
+  pickedUpAt?: number;
+  burnTxHash?: string;
 }
 
 /* ───── Store Interface ───── */
@@ -734,8 +746,10 @@ export const useStore = create<AppStore>()(
               ? {
                   ...r,
                   status,
-                  readyAt: status === "ready_for_pickup" ? Date.now() : r.readyAt,
-                  completedAt: status === "completed" ? Date.now() : r.completedAt,
+                  readyAt:
+                    status === "ready_for_pickup" ? Date.now() : r.readyAt,
+                  pickedUpAt:
+                    status === "picked_up" ? Date.now() : r.pickedUpAt,
                 }
               : r,
           ),

@@ -32,15 +32,6 @@ export const PICKUP_POINTS: PickupPoint[] = [
     hoursWeekend: "By appointment only",
     contact: "+852-2580-0188",
   },
-  {
-    id: "tokyo-annex",
-    name: "Tokyo Ginza Annex",
-    region: "Ginza, Japan",
-    address: "5-9-1 Ginza, Chuo City (KKIKDA Lounge, B1F)",
-    hoursWeekday: "12:00 – 20:00 JST",
-    hoursWeekend: "12:00 – 18:00 JST",
-    contact: "+81-3-3573-0188",
-  },
 ];
 
 export function findPickupPoint(id: string): PickupPoint | undefined {
