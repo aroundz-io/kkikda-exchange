@@ -34,6 +34,7 @@ export const translations = {
   "sidebar.dashboard": { en: "Dashboard", ko: "대시보드" },
   "sidebar.tokens": { en: "Tokens", ko: "토큰" },
   "sidebar.nftInventory": { en: "NFT Inventory", ko: "NFT 인벤토리" },
+  "sidebar.liquidity": { en: "Liquidity", ko: "유동성" },
   "sidebar.kuraMaster": { en: "Kura Master", ko: "쿠라 마스터" },
   "sidebar.collector": { en: "Collector", ko: "수집가" },
   "sidebar.admin": { en: "Admin", ko: "관리자" },
@@ -496,6 +497,37 @@ export const translations = {
   "adminTok.active": { en: "Active", ko: "활성" },
   "adminTok.paused": { en: "Paused", ko: "일시중지" },
   "adminTok.vol24h": { en: "Vol 24h", ko: "24시간 거래량" },
+
+  // ──────────────────────────────────────────────
+  // Admin Liquidity Seeding (/admin/liquidity)
+  // ──────────────────────────────────────────────
+  "liq.title": { en: "Liquidity Management", ko: "유동성 관리" },
+  "liq.subtitle": {
+    en: "Seed and manage the KKDA-USDT pool on PancakeSwap V2 directly from this panel. The first deposit sets the initial price.",
+    ko: "이 패널에서 PancakeSwap V2의 KKDA-USDT 풀을 직접 시딩하고 관리합니다. 최초 예치 비율이 초기 가격을 결정합니다.",
+  },
+  "liq.amount": { en: "Amount", ko: "수량" },
+  "liq.seedInitial": { en: "Seed Initial Liquidity", ko: "초기 유동성 시딩" },
+  "liq.addMore": { en: "Add Liquidity", ko: "유동성 추가" },
+  "liq.seedShort": { en: "Seed Pool", ko: "풀 시딩" },
+  "liq.addMoreShort": { en: "Add", ko: "추가" },
+  "liq.approveKkda": { en: "Approve KKDA", ko: "KKDA 승인" },
+  "liq.approveUsdt": { en: "Approve USDT", ko: "USDT 승인" },
+  "liq.approved": { en: "Approved", ko: "승인됨" },
+  "liq.priceWillBe": { en: "Initial price will be", ko: "초기 가격" },
+  "liq.priceImplied": { en: "Implied price", ko: "암묵 가격" },
+  "liq.reserveKkda": { en: "KKDA reserve", ko: "KKDA 예치량" },
+  "liq.reserveUsdt": { en: "USDT reserve", ko: "USDT 예치량" },
+  "liq.viewPair": { en: "View Pair", ko: "페어 보기" },
+  "liq.addSuccess": { en: "Liquidity Added", ko: "유동성 추가 완료" },
+  "liq.addSuccessMsg": {
+    en: "Pool reserves updated on PancakeSwap V2.",
+    ko: "PancakeSwap V2의 풀 예치량이 업데이트되었습니다.",
+  },
+  "liq.helpText": {
+    en: "After this transaction confirms, swaps on /dex execute against this pool. Initial seed sets the price (e.g. 1,000,000 KKDA + 50,000 USDT → $0.05/KKDA). Subsequent additions must match the current ratio within slippage.",
+    ko: "트랜잭션이 확정되면 /dex 페이지의 스왑이 이 풀을 통해 실행됩니다. 초기 시딩 비율이 가격을 결정합니다 (예: 1,000,000 KKDA + 50,000 USDT → $0.05/KKDA). 이후 추가 시에는 현재 비율과 일치해야 합니다.",
+  },
 
   // ──────────────────────────────────────────────
   // AdminGuard

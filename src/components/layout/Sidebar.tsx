@@ -17,6 +17,7 @@ import {
   ShieldCheck,
   Coins,
   Boxes,
+  Droplets,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -29,6 +30,7 @@ const ADMIN_NAV_ITEMS = [
   { labelKey: "sidebar.dashboard", href: "/admin", icon: Settings },
   { labelKey: "sidebar.tokens", href: "/admin/tokens", icon: Coins },
   { labelKey: "sidebar.nftInventory", href: "/admin/nft-manage", icon: Boxes },
+  { labelKey: "sidebar.liquidity", href: "/admin/liquidity", icon: Droplets },
 ] as const;
 
 export function Sidebar() {

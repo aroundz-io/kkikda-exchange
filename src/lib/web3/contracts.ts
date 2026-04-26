@@ -769,4 +769,74 @@ export const PANCAKE_ROUTER_ABI = [
     ],
     stateMutability: "nonpayable",
   },
+  {
+    type: "function",
+    name: "addLiquidity",
+    inputs: [
+      { name: "tokenA", type: "address", internalType: "address" },
+      { name: "tokenB", type: "address", internalType: "address" },
+      { name: "amountADesired", type: "uint256", internalType: "uint256" },
+      { name: "amountBDesired", type: "uint256", internalType: "uint256" },
+      { name: "amountAMin", type: "uint256", internalType: "uint256" },
+      { name: "amountBMin", type: "uint256", internalType: "uint256" },
+      { name: "to", type: "address", internalType: "address" },
+      { name: "deadline", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [
+      { name: "amountA", type: "uint256", internalType: "uint256" },
+      { name: "amountB", type: "uint256", internalType: "uint256" },
+      { name: "liquidity", type: "uint256", internalType: "uint256" },
+    ],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "factory",
+    inputs: [],
+    outputs: [{ name: "", type: "address", internalType: "address" }],
+    stateMutability: "view",
+  },
+] as const;
+
+// PancakeSwap V2 Pair ABI subset — for reading reserves of an LP pool
+export const PANCAKE_PAIR_ABI = [
+  {
+    type: "function",
+    name: "getReserves",
+    inputs: [],
+    outputs: [
+      { name: "reserve0", type: "uint112", internalType: "uint112" },
+      { name: "reserve1", type: "uint112", internalType: "uint112" },
+      { name: "blockTimestampLast", type: "uint32", internalType: "uint32" },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "token0",
+    inputs: [],
+    outputs: [{ name: "", type: "address", internalType: "address" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "token1",
+    inputs: [],
+    outputs: [{ name: "", type: "address", internalType: "address" }],
+    stateMutability: "view",
+  },
+] as const;
+
+// PancakeSwap V2 Factory ABI subset — get pair address for two tokens
+export const PANCAKE_FACTORY_ABI = [
+  {
+    type: "function",
+    name: "getPair",
+    inputs: [
+      { name: "tokenA", type: "address", internalType: "address" },
+      { name: "tokenB", type: "address", internalType: "address" },
+    ],
+    outputs: [{ name: "pair", type: "address", internalType: "address" }],
+    stateMutability: "view",
+  },
 ] as const;
