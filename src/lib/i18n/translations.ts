@@ -186,7 +186,6 @@ export const translations = {
   "nft.cancel": { en: "Cancel", ko: "취소" },
   "nft.outOfStock": { en: "Sold out", ko: "품절" },
   "nft.selectedProvenance": { en: "Selected Provenance", ko: "선택된 이력" },
-  "nft.inquireSale": { en: "Inquire for Private Sale", ko: "프라이빗 판매 문의" },
   "nft.category": { en: "Category", ko: "분류" },
   "nft.gradeLabel": { en: "Grade", ko: "등급" },
   "nft.catAll": { en: "All", ko: "전체" },

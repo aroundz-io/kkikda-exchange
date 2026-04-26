@@ -13,16 +13,22 @@ type GradeFilter = "all" | "AAA" | "AA+" | "A" | "B";
 type VintageSort = "oldest" | "newest";
 type PriceSort = "high" | "low";
 
-/* ---------- Provenance Sidebar Panel ---------- */
+/* ---------- Provenance Sidebar Panel — view details + buy entry point ---------- */
 function ProvenanceSidebar({
   cake,
   onClose,
+  onBuy,
 }: {
   cake: TeaCake;
   onClose: () => void;
+  onBuy: (cake: TeaCake) => void;
 }) {
   const t = useT();
   const cakeName = useCakeName();
+  const sold = cake.soldUnits ?? 0;
+  const available = Math.max(0, (cake.totalUnits ?? 1) - sold);
+  const outOfStock = available === 0;
+
   return (
     <>
       <motion.div
@@ -37,65 +43,112 @@ function ProvenanceSidebar({
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
         transition={{ type: "tween", duration: 0.3 }}
-        className="fixed right-0 top-0 h-full w-96 bg-surface-container-low border-l border-outline-variant/15 p-10 z-50 overflow-y-auto no-scrollbar"
+        className="fixed right-0 top-0 h-full w-96 bg-surface-container-low border-l border-outline-variant/15 z-50 flex flex-col"
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-outline hover:text-on-surface"
+          className="absolute top-4 right-4 text-outline hover:text-on-surface z-10"
+          title={t("rwa.cancel")}
         >
           <X size={20} />
         </button>
 
-        <h4 className="text-[10px] font-label uppercase tracking-[0.4em] text-primary mb-8">
-          {t("nft.selectedProvenance")}
-        </h4>
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto no-scrollbar p-10 pb-6">
+          <h4 className="text-[10px] font-label uppercase tracking-[0.4em] text-primary mb-8">
+            {t("nft.selectedProvenance")}
+          </h4>
 
-        <div className="mb-12">
-          <div className="aspect-square w-full bg-surface-container mb-6 border border-outline-variant/10 overflow-hidden flex items-center justify-center">
-            {cake.image ? (
-              <img
-                src={cake.image}
-                alt={cakeName(cake)}
-                className="w-full h-full object-contain"
-              />
-            ) : (
-              <span className="text-outline text-xs font-label uppercase">
-                {cakeName(cake)}
-              </span>
-            )}
-          </div>
-          <h2 className="text-2xl font-headline mb-2">{cakeName(cake)}</h2>
-          <p className="text-xs font-body text-on-surface-variant leading-relaxed opacity-70">
-            {cake.subtitle}
-          </p>
-        </div>
-
-        <div className="space-y-8 relative">
-          <div className="absolute left-[3.5px] top-2 w-[1px] h-full border-l border-outline-variant/30 border-dashed" />
-          {cake.provenance.map((entry, idx) => (
-            <div key={idx} className="relative pl-8 mb-10">
-              <div
-                className={`absolute -left-[8px] top-1.5 w-4 h-4 border-2 border-surface-container-low rounded-full ${
-                  idx === 0 ? "bg-secondary" : idx === 1 ? "bg-primary" : "bg-white/20"
-                }`}
-              />
-              <div
-                className={`text-[10px] font-label uppercase mb-1 ${
-                  idx === 1 ? "text-primary" : "text-white/40"
-                }`}
-              >
-                {entry.date} | {entry.event}
-              </div>
-              <p className="text-xs font-body opacity-60 leading-relaxed">
-                {entry.detail}
-              </p>
+          <div className="mb-8">
+            <div className="aspect-square w-full bg-surface-container mb-6 border border-outline-variant/10 overflow-hidden flex items-center justify-center">
+              {cake.image ? (
+                <img
+                  src={cake.image}
+                  alt={cakeName(cake)}
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <span className="text-outline text-xs font-label uppercase">
+                  {cakeName(cake)}
+                </span>
+              )}
             </div>
-          ))}
+            <h2 className="text-2xl font-headline mb-2">{cakeName(cake)}</h2>
+            <p className="text-xs font-body text-on-surface-variant leading-relaxed opacity-70">
+              {cake.subtitle}
+            </p>
+
+            {/* Price + availability summary */}
+            <div className="grid grid-cols-2 gap-3 mt-5 pt-5 border-t border-outline-variant/15">
+              <div>
+                <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline mb-1">
+                  {t("nft.unitPrice")}
+                </p>
+                <p className="font-headline text-base text-primary">
+                  {cake.priceUsd.toLocaleString()} USDT
+                </p>
+              </div>
+              <div>
+                <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline mb-1">
+                  {t("nft.available")}
+                </p>
+                <p
+                  className={`font-headline text-base ${
+                    outOfStock ? "text-error" : "text-secondary"
+                  }`}
+                >
+                  {available.toLocaleString()} /{" "}
+                  <span className="text-on-surface-variant text-sm">
+                    {(cake.totalUnits ?? 1).toLocaleString()}
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-8 relative">
+            <div className="absolute left-[3.5px] top-2 w-[1px] h-full border-l border-outline-variant/30 border-dashed" />
+            {cake.provenance.map((entry, idx) => (
+              <div key={idx} className="relative pl-8 mb-10">
+                <div
+                  className={`absolute -left-[8px] top-1.5 w-4 h-4 border-2 border-surface-container-low rounded-full ${
+                    idx === 0 ? "bg-secondary" : idx === 1 ? "bg-primary" : "bg-white/20"
+                  }`}
+                />
+                <div
+                  className={`text-[10px] font-label uppercase mb-1 ${
+                    idx === 1 ? "text-primary" : "text-white/40"
+                  }`}
+                >
+                  {entry.date} | {entry.event}
+                </div>
+                <p className="text-xs font-body opacity-60 leading-relaxed">
+                  {entry.detail}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="mt-12">
-          <button className="w-full bg-primary text-on-primary py-4 font-label font-bold uppercase text-xs tracking-widest hover:bg-primary/90 transition-all">
-            {t("nft.inquireSale")}
+        {/* Sticky footer: primary buy + secondary close */}
+        <div className="border-t border-outline-variant/15 p-6 space-y-3 bg-surface-container-low">
+          <button
+            onClick={() => {
+              if (!outOfStock) {
+                onBuy(cake);
+                onClose();
+              }
+            }}
+            disabled={outOfStock}
+            className="w-full bg-primary text-on-primary py-4 font-label font-bold uppercase text-xs tracking-widest hover:bg-primary/90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            {outOfStock ? t("nft.outOfStock") : t("nft.buy")}
+          </button>
+          <button
+            onClick={onClose}
+            className="w-full py-2 font-label text-[10px] uppercase tracking-widest text-outline hover:text-on-surface transition-colors"
+          >
+            {t("rwa.cancel")}
           </button>
         </div>
       </motion.div>
@@ -414,6 +467,7 @@ export default function NftMarketplacePage() {
           <ProvenanceSidebar
             cake={selectedCake}
             onClose={() => setSelectedCake(null)}
+            onBuy={setBuyCake}
           />
         )}
       </AnimatePresence>
