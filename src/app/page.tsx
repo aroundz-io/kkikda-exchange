@@ -4,6 +4,10 @@ import { useStore } from "@/stores/useStore";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { TrendingUp, MoreVertical, Waves } from "lucide-react";
+import { useAccount } from "wagmi";
+import { formatUnits } from "viem";
+import { useTokenBalance } from "@/hooks/useTokenContract";
+import { USDT_ADDRESS } from "@/hooks/useSwap";
 import { useT } from "@/lib/i18n/useT";
 
 type FilterTab = "all" | "tea" | "liquidity";
@@ -12,6 +16,15 @@ export default function HomePage() {
   const { user, teaCakes } = useStore();
   const [filter, setFilter] = useState<FilterTab>("all");
   const t = useT();
+
+  const { address, isConnected } = useAccount();
+  const { balance: usdtBalance } = useTokenBalance(USDT_ADDRESS, address);
+  const usdtDisplay = usdtBalance
+    ? Number(formatUnits(usdtBalance, 18)).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    : "0.00";
 
   return (
     <div className="page-padding">
@@ -29,18 +42,18 @@ export default function HomePage() {
           <p className="font-label text-[10px] text-outline uppercase tracking-[0.2em] mb-1">
             {t("home.globalBalance")}
           </p>
-          {user.address ? (
+          {isConnected ? (
             <p className="font-label text-4xl text-primary font-bold">
-              {user.balance.toFixed(4)}{" "}
+              {usdtDisplay}{" "}
               <span className="text-xl font-light text-on-primary-container">
-                BNB
+                USDT
               </span>
             </p>
           ) : (
             <p className="font-label text-4xl text-primary font-bold">
               142,850.42{" "}
               <span className="text-xl font-light text-on-primary-container">
-                USD
+                USDT
               </span>
             </p>
           )}

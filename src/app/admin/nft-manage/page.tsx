@@ -38,7 +38,6 @@ const INITIAL_FORM = {
   factory: "",
   grade: "AAA",
   category: "raw" as TeaCake["category"],
-  priceBnb: "",
   priceUsd: "",
   tags: "",
 };
@@ -184,7 +183,7 @@ export default function NftManagePage() {
       factory: form.factory,
       grade: form.grade,
       image: "",
-      price: Number(form.priceBnb) || 0,
+      price: Number(form.priceUsd) || 0,
       priceUsd: Number(form.priceUsd) || 0,
       appraisal: Number(form.priceUsd) || 0,
       tags,
@@ -206,8 +205,7 @@ export default function NftManagePage() {
       factory: cake.factory,
       grade: cake.grade,
       category: cake.category,
-      priceBnb: cake.price,
-      priceUsd: cake.priceUsd,
+      priceUsdt: cake.priceUsd,
       tags: cake.tags,
       mintedAt: today,
     });
@@ -366,24 +364,8 @@ export default function NftManagePage() {
                 </select>
               </div>
 
-              {/* Price in BNB */}
-              <div className="space-y-1.5">
-                <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  {t("adminNft.priceBnb")}
-                </label>
-                <input
-                  name="priceBnb"
-                  type="number"
-                  step="any"
-                  value={form.priceBnb}
-                  onChange={handleChange}
-                  placeholder="e.g. 4.8"
-                  className={inputClass}
-                />
-              </div>
-
-              {/* Price in USD */}
-              <div className="space-y-1.5">
+              {/* Price in USDT */}
+              <div className="space-y-1.5 sm:col-span-2">
                 <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
                   {t("adminNft.priceUsd")}
                 </label>
@@ -622,7 +604,7 @@ export default function NftManagePage() {
                     ${cake.priceUsd.toLocaleString()}
                   </p>
                   <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                    {cake.price} BNB
+                    {cake.priceUsd.toLocaleString()} USDT
                   </p>
                 </div>
                 <button

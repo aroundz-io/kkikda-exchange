@@ -167,8 +167,7 @@ export default function RwaPage() {
                 </span>
                 <div className="px-4 py-1 bg-primary/10 border border-primary/30">
                   <span className="font-label text-xs text-primary">
-                    {selectedCake?.price ?? 0.452} BNB / $
-                    {selectedCake?.priceUsd.toLocaleString() ?? "1,240"}
+                    {selectedCake?.priceUsd.toLocaleString() ?? "1,240"} USDT
                   </span>
                 </div>
               </div>

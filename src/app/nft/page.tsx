@@ -136,7 +136,7 @@ function TeaCard({
                 {t("nft.currentAppraisal")}
               </div>
               <div className="text-2xl font-label text-primary font-bold">
-                {cake.price} BNB
+                {cake.priceUsd.toLocaleString()} USDT
               </div>
             </div>
             <button className="bg-primary text-on-primary px-8 py-3 font-label font-bold uppercase text-xs hover:bg-primary/90 transition-all">
@@ -179,7 +179,7 @@ function TeaCard({
           </div>
           <div className="text-right">
             <div className="text-lg font-label text-primary font-bold">
-              {cake.price} BNB
+              {cake.priceUsd.toLocaleString()} USDT
             </div>
             <div className="text-[10px] font-label text-white/20">
               ${cake.priceUsd.toLocaleString()} USD

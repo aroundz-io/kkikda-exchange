@@ -153,7 +153,7 @@ export const translations = {
   // ──────────────────────────────────────────────
   // DEX (/dex)
   // ──────────────────────────────────────────────
-  "dex.pair": { en: "Vintage $KKDA / BNB", ko: "빈티지 $KKDA / BNB" },
+  "dex.pair": { en: "Vintage $KKDA / USDT", ko: "빈티지 $KKDA / USDT" },
   "dex.provenanceVerified": { en: "PROVENANCE VERIFIED", ko: "프로비넌스 검증 완료" },
   "dex.instantExchange": { en: "Instant Exchange", ko: "즉시 스왑" },
   "dex.youPay": { en: "You Pay", ko: "지급" },
@@ -185,12 +185,6 @@ export const translations = {
   "dex.performanceIndex": { en: "Performance Index", ko: "성과 지수" },
   "dex.liquidityReservoirs": { en: "Liquidity Reservoirs", ko: "유동성 풀" },
   "dex.apy": { en: "APY", ko: "연 수익률" },
-  "dex.fiatBuy": { en: "Buy with Fiat", ko: "법정화폐로 구매" },
-  "dex.fiatBuyDesc": {
-    en: "Direct bank transfer or Credit Card via MoonPay.",
-    ko: "MoonPay를 통한 계좌이체 또는 신용카드 결제.",
-  },
-  "dex.launchFiat": { en: "Launch Fiat Ramp", ko: "법정화폐 결제 열기" },
   "dex.mastersNote": { en: "The Master's Note", ko: "마스터의 노트" },
   "dex.mastersNoteText": {
     en: "Like a fine 1990s Menghai cake, $KKDA liquidity matures through patient holding. Each transaction is recorded on the perpetual scroll of the blockchain, ensuring your vintage remains untarnished.",
@@ -392,8 +386,7 @@ export const translations = {
   "adminNft.factory": { en: "Factory", ko: "제조사" },
   "adminNft.grade": { en: "Grade", ko: "등급" },
   "adminNft.category": { en: "Category", ko: "분류" },
-  "adminNft.priceBnb": { en: "Price in BNB", ko: "BNB 가격" },
-  "adminNft.priceUsd": { en: "Price in USD", ko: "USD 가격" },
+  "adminNft.priceUsd": { en: "Price in USDT", ko: "USDT 가격" },
   "adminNft.tags": { en: "Tags", ko: "태그" },
   "adminNft.tagsPh": { en: "Audited, Rare, Certified", ko: "감사, 희귀, 인증" },
   "adminNft.connectWalletWarn": {

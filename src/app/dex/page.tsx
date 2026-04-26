@@ -2,17 +2,18 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useAccount, useBalance } from "wagmi";
-import { parseEther, formatEther, parseUnits, formatUnits } from "viem";
+import { useAccount } from "wagmi";
+import { parseUnits, formatUnits } from "viem";
 import { useStore } from "@/stores/useStore";
 import {
   useSwapQuote,
-  useSwapExactBnbForTokens,
-  useSwapExactTokensForBnb,
+  useSwapExactTokensForTokens,
   KKDA_ADDRESS,
+  USDT_ADDRESS,
+  WBNB_ADDRESS,
 } from "@/hooks/useSwap";
 import { useTokenBalance, useTokenApprove } from "@/hooks/useTokenContract";
-import { PANCAKE_ROUTER, WBNB } from "@/lib/web3/contracts";
+import { PANCAKE_ROUTER } from "@/lib/web3/contracts";
 import { TxStatus } from "@/components/ui/TxStatus";
 import { useReadContract } from "wagmi";
 import { KKD_TOKEN_ABI } from "@/lib/web3/contracts";
@@ -24,7 +25,6 @@ import {
   Droplets,
   Waves,
   ArrowRight,
-  CreditCard,
 } from "lucide-react";
 import type { Address } from "viem";
 
@@ -47,50 +47,49 @@ function useBarHeights(count: number) {
   }, [count]);
 }
 
-/* ---------- Exchange Widget (PancakeSwap V2) ---------- */
+/* ---------- Exchange Widget (PancakeSwap V2 — USDT only DEX) ---------- */
 function ExchangeWidget() {
   const { address, isConnected } = useAccount();
   const addToast = useStore((s) => s.addToast);
   const t = useT();
 
-  // Swap direction: true = BNB → KKDA, false = KKDA → BNB
-  const [bnbToToken, setBnbToToken] = useState(true);
+  // Swap direction: true = USDT → KKDA (buy), false = KKDA → USDT (sell)
+  const [usdtToKkda, setUsdtToKkda] = useState(true);
   const [payAmount, setPayAmount] = useState("");
   const [slippage] = useState(0.005); // 0.5%
 
   // Live balances
-  const { data: bnbBalance } = useBalance({
-    address,
-    query: { enabled: !!address },
-  });
+  const { balance: usdtBalance } = useTokenBalance(USDT_ADDRESS, address);
   const { balance: kkdaBalance } = useTokenBalance(KKDA_ADDRESS, address);
 
-  // Token decimals
+  // Decimals (BSC USDT and KKDA both use 18)
   const decimalsQuery = useReadContract({
     address: KKDA_ADDRESS,
     abi: KKD_TOKEN_ABI,
     functionName: "decimals",
   });
   const decimals = (decimalsQuery.data as number | undefined) ?? 18;
+  const USDT_DECIMALS = 18;
+
+  const inDecimals = usdtToKkda ? USDT_DECIMALS : decimals;
+  const outDecimals = usdtToKkda ? decimals : USDT_DECIMALS;
 
   // Parse user input → wei
   const amountIn = useMemo(() => {
     if (!payAmount) return undefined;
     try {
-      return bnbToToken
-        ? parseEther(payAmount)
-        : parseUnits(payAmount, decimals);
+      return parseUnits(payAmount, inDecimals);
     } catch {
       return undefined;
     }
-  }, [payAmount, bnbToToken, decimals]);
+  }, [payAmount, inDecimals]);
 
-  // Quote
+  // Path: KKDA↔USDT via WBNB (multi-hop, since direct pair often missing on testnet)
   const path = useMemo(() => {
-    return bnbToToken
-      ? ([WBNB, KKDA_ADDRESS] as Address[])
-      : ([KKDA_ADDRESS, WBNB] as Address[]);
-  }, [bnbToToken]);
+    return usdtToKkda
+      ? ([USDT_ADDRESS, WBNB_ADDRESS, KKDA_ADDRESS] as Address[])
+      : ([KKDA_ADDRESS, WBNB_ADDRESS, USDT_ADDRESS] as Address[]);
+  }, [usdtToKkda]);
 
   const { amountOut, isLoading: quoting, isError: quoteFailed } = useSwapQuote(
     amountIn,
@@ -100,10 +99,8 @@ function ExchangeWidget() {
   // Format quote for display
   const receiveDisplay = useMemo(() => {
     if (!amountOut) return "";
-    return bnbToToken
-      ? Number(formatUnits(amountOut, decimals)).toFixed(4)
-      : Number(formatEther(amountOut)).toFixed(6);
-  }, [amountOut, bnbToToken, decimals]);
+    return Number(formatUnits(amountOut, outDecimals)).toFixed(4);
+  }, [amountOut, outDecimals]);
 
   // Min received with slippage
   const minOut = useMemo(() => {
@@ -112,7 +109,9 @@ function ExchangeWidget() {
     return (amountOut * slippageBps) / BigInt(10_000);
   }, [amountOut, slippage]);
 
-  // Approval state for KKDA → BNB direction
+  // Approval — every direction needs it (ERC20→ERC20)
+  const inputTokenAddress: Address = usdtToKkda ? USDT_ADDRESS : KKDA_ADDRESS;
+
   const {
     approve,
     hash: approveHash,
@@ -122,19 +121,17 @@ function ExchangeWidget() {
     isError: approveIsError,
     error: approveError,
     reset: approveReset,
-  } = useTokenApprove(KKDA_ADDRESS);
+  } = useTokenApprove(inputTokenAddress);
 
-  // Allowance check (KKDA → BNB requires router allowance)
   const allowanceQuery = useReadContract({
-    address: KKDA_ADDRESS,
+    address: inputTokenAddress,
     abi: KKD_TOKEN_ABI,
     functionName: "allowance",
     args: address ? [address, PANCAKE_ROUTER as Address] : undefined,
-    query: { enabled: !!address && !bnbToToken },
+    query: { enabled: !!address },
   });
   const allowance = (allowanceQuery.data as bigint | undefined) ?? BigInt(0);
-  const needsApproval =
-    !bnbToToken && amountIn !== undefined && allowance < amountIn;
+  const needsApproval = amountIn !== undefined && allowance < amountIn;
 
   // Refetch allowance after approval succeeds
   useEffect(() => {
@@ -144,24 +141,22 @@ function ExchangeWidget() {
     }
   }, [approveSuccess, allowanceQuery, approveReset]);
 
-  // Swap hooks
-  const bnbToTokenSwap = useSwapExactBnbForTokens();
-  const tokenToBnbSwap = useSwapExactTokensForBnb();
-  const active = bnbToToken ? bnbToTokenSwap : tokenToBnbSwap;
+  // Swap hook
+  const swapTx = useSwapExactTokensForTokens();
 
   // Reset on success — bridging wagmi tx state into local UI state.
   useEffect(() => {
-    if (active.isSuccess) {
+    if (swapTx.isSuccess) {
       setPayAmount("");
       addToast({
         type: "success",
         title: t("dex.swapConfirmed"),
         message: t("dex.swapConfirmedMsg"),
       });
-      active.reset();
+      swapTx.reset();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active.isSuccess]);
+  }, [swapTx.isSuccess]);
 
   function handleSwap() {
     if (!isConnected || !address) {
@@ -181,11 +176,7 @@ function ExchangeWidget() {
       return;
     }
 
-    if (bnbToToken) {
-      bnbToTokenSwap.swap(amountIn, minOut, KKDA_ADDRESS, address);
-    } else {
-      tokenToBnbSwap.swap(amountIn, minOut, KKDA_ADDRESS, address);
-    }
+    swapTx.swap(amountIn, minOut, path, address);
   }
 
   function handleApprove() {
@@ -193,16 +184,16 @@ function ExchangeWidget() {
     approve(PANCAKE_ROUTER as Address, amountIn);
   }
 
-  const payBalance = bnbToToken
-    ? bnbBalance
-      ? formatEther(bnbBalance.value).slice(0, 8)
+  const payBalance = usdtToKkda
+    ? usdtBalance
+      ? formatUnits(usdtBalance, USDT_DECIMALS).slice(0, 10)
       : "0"
     : kkdaBalance
       ? formatUnits(kkdaBalance, decimals).slice(0, 10)
       : "0";
 
-  const inputSymbol = bnbToToken ? "BNB" : "KKDA";
-  const outputSymbol = bnbToToken ? "KKDA" : "BNB";
+  const inputSymbol = usdtToKkda ? "USDT" : "KKDA";
+  const outputSymbol = usdtToKkda ? "KKDA" : "USDT";
 
   return (
     <div className="bg-surface-container p-8 shadow-2xl relative border border-outline-variant/10">
@@ -239,7 +230,7 @@ function ExchangeWidget() {
       <div className="flex justify-center -my-3 relative z-10">
         <button
           onClick={() => {
-            setBnbToToken((v) => !v);
+            setUsdtToKkda((v) => !v);
             setPayAmount("");
           }}
           className="w-10 h-10 bg-surface-container border border-outline-variant/30 flex items-center justify-center hover:border-primary transition-colors cursor-pointer active:scale-90"
@@ -278,11 +269,7 @@ function ExchangeWidget() {
         <div className="flex justify-between text-[11px] font-label uppercase tracking-tighter text-white/40">
           <span>{t("dex.minReceived")}</span>
           <span>
-            {minOut
-              ? bnbToToken
-                ? Number(formatUnits(minOut, decimals)).toFixed(4)
-                : Number(formatEther(minOut)).toFixed(6)
-              : "0"}{" "}
+            {minOut ? Number(formatUnits(minOut, outDecimals)).toFixed(4) : "0"}{" "}
             {outputSymbol}
           </span>
         </div>
@@ -297,12 +284,12 @@ function ExchangeWidget() {
       </div>
 
       <TxStatus
-        hash={active.hash ?? approveHash}
-        isPending={active.isPending || approvePending}
-        isConfirming={active.isConfirming || approveConfirming}
-        isSuccess={active.isSuccess}
-        isError={active.isError || approveIsError}
-        error={active.error || approveError}
+        hash={swapTx.hash ?? approveHash}
+        isPending={swapTx.isPending || approvePending}
+        isConfirming={swapTx.isConfirming || approveConfirming}
+        isSuccess={swapTx.isSuccess}
+        isError={swapTx.isError || approveIsError}
+        error={swapTx.error || approveError}
       />
 
       {needsApproval ? (
@@ -325,16 +312,16 @@ function ExchangeWidget() {
             !amountOut ||
             quoting ||
             quoteFailed ||
-            active.isPending ||
-            active.isConfirming
+            swapTx.isPending ||
+            swapTx.isConfirming
           }
           className="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary py-4 font-label font-bold uppercase tracking-[0.2em] shadow-lg active:scale-[0.98] transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed mt-4"
         >
           {!isConnected
             ? t("common.connectWallet")
-            : active.isPending
+            : swapTx.isPending
               ? t("dex.awaitingSig")
-              : active.isConfirming
+              : swapTx.isConfirming
                 ? t("dex.confirming")
                 : t("dex.executeTrade")}
         </button>
@@ -463,13 +450,13 @@ export default function DexPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <LiquidityPoolCard
-                title="KKDA-BNB"
-                apy="18.4%"
+                title="KKDA-USDT"
+                apy="12.1%"
                 icon={<Droplets className="text-primary" />}
               />
               <LiquidityPoolCard
-                title="KKDA-USDT"
-                apy="12.1%"
+                title="USDT-WBNB"
+                apy="6.8%"
                 icon={<Waves className="text-primary" />}
               />
             </div>
@@ -479,29 +466,6 @@ export default function DexPage() {
         {/* Right Column: Exchange Interface */}
         <div className="col-span-12 xl:col-span-4 space-y-6">
           <ExchangeWidget />
-
-          {/* Fiat Ramp */}
-          <div className="bg-tertiary-container p-6 flex flex-col gap-4 border border-outline-variant/10">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-surface flex items-center justify-center">
-                <CreditCard className="text-secondary" size={20} />
-              </div>
-              <div>
-                <h4 className="font-body font-bold text-sm text-white">
-                  {t("dex.fiatBuy")}
-                </h4>
-                <p className="font-body text-xs text-white/40">
-                  {t("dex.fiatBuyDesc")}
-                </p>
-              </div>
-            </div>
-            <a
-              className="text-primary font-label text-[10px] uppercase tracking-widest gold-underline self-start"
-              href="#"
-            >
-              {t("dex.launchFiat")}
-            </a>
-          </div>
 
           {/* Provenance Info */}
           <div className="bg-surface-container-low p-8 opacity-60">

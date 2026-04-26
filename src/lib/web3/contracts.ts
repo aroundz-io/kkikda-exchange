@@ -16,6 +16,12 @@ export const WBNB =
     ? "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c" // WBNB mainnet
     : "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd"; // WBNB testnet
 
+/** Tether USD on BSC. Used as the sole quote currency on this DEX. */
+export const USDT =
+  process.env.NEXT_PUBLIC_CHAIN === "mainnet"
+    ? "0x55d398326f99059fF775485246999027B3197955" // USDT mainnet (18 decimals on BSC)
+    : "0x337610d27c682E347C9cD60BD4b3b107C9d34dDd"; // USDT testnet (PancakeSwap)
+
 // ---------------------------------------------------------------------------
 // Contract Addresses
 // Replace placeholder addresses after deployment
@@ -736,6 +742,21 @@ export const PANCAKE_ROUTER_ABI = [
   {
     type: "function",
     name: "swapExactTokensForETH",
+    inputs: [
+      { name: "amountIn", type: "uint256", internalType: "uint256" },
+      { name: "amountOutMin", type: "uint256", internalType: "uint256" },
+      { name: "path", type: "address[]", internalType: "address[]" },
+      { name: "to", type: "address", internalType: "address" },
+      { name: "deadline", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [
+      { name: "amounts", type: "uint256[]", internalType: "uint256[]" },
+    ],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "swapExactTokensForTokens",
     inputs: [
       { name: "amountIn", type: "uint256", internalType: "uint256" },
       { name: "amountOutMin", type: "uint256", internalType: "uint256" },

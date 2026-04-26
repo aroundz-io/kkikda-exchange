@@ -14,7 +14,7 @@ export interface TeaCake {
   factory: string;
   grade: string;
   image: string;
-  price: number;       // in BNB
+  price: number;       // in USDT (the sole quote currency on this DEX)
   priceUsd: number;
   appraisal: number;   // USD
   tags: string[];
@@ -324,8 +324,8 @@ const DEMO_TOKENS: Token[] = [
 
 const DEMO_POOLS: StakingPool[] = [
   { id: "pool-1", name: "KKDA Staking", pair: "KKDA", apy: 14.5, totalStaked: 2_500_000, totalStakedUsd: 3_121_250_000, minStake: 100, lockDays: 30, rewardToken: "KKDA" },
-  { id: "pool-2", name: "KKDA-BNB LP", pair: "KKDA-BNB", apy: 18.4, totalStaked: 890_000, totalStakedUsd: 1_111_265_000, minStake: 50, lockDays: 90, rewardToken: "KKDA" },
-  { id: "pool-3", name: "KKDA-USDT LP", pair: "KKDA-USDT", apy: 12.1, totalStaked: 5_200_000, totalStakedUsd: 6_492_200_000, minStake: 500, lockDays: 180, rewardToken: "PUER" },
+  { id: "pool-2", name: "KKDA-USDT LP", pair: "KKDA-USDT", apy: 18.4, totalStaked: 890_000, totalStakedUsd: 1_111_265_000, minStake: 50, lockDays: 90, rewardToken: "KKDA" },
+  { id: "pool-3", name: "PUER-USDT LP", pair: "PUER-USDT", apy: 12.1, totalStaked: 5_200_000, totalStakedUsd: 6_492_200_000, minStake: 500, lockDays: 180, rewardToken: "PUER" },
 ];
 
 const genId = () => Math.random().toString(36).slice(2, 10);

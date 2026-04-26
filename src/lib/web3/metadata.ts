@@ -14,8 +14,7 @@ export interface TeaCakeMetadata {
   factory: string;
   grade: string;
   category: string;
-  priceBnb: number;
-  priceUsd: number;
+  priceUsdt: number;
   tags: string[];
   mintedAt: string;
 }
@@ -35,8 +34,7 @@ export function buildTeaCakeURI(meta: TeaCakeMetadata): string {
       { trait_type: "Factory", value: meta.factory },
       { trait_type: "Grade", value: meta.grade },
       { trait_type: "Category", value: meta.category },
-      { trait_type: "Price (BNB)", value: meta.priceBnb },
-      { trait_type: "Price (USD)", value: meta.priceUsd },
+      { trait_type: "Price (USDT)", value: meta.priceUsdt },
       ...meta.tags.map((t) => ({ trait_type: "Tag", value: t })),
     ],
     minted_at: meta.mintedAt,

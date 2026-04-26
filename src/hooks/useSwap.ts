@@ -10,6 +10,7 @@ import {
   PANCAKE_ROUTER,
   PANCAKE_ROUTER_ABI,
   WBNB,
+  USDT,
   ADDRESSES,
 } from "@/lib/web3/contracts";
 
@@ -40,37 +41,13 @@ export function useSwapQuote(
   };
 }
 
-/** Swap exact BNB for tokens via PancakeSwap V2. */
-export function useSwapExactBnbForTokens() {
-  const { writeContract, data: hash, isPending, isError, error, reset } =
-    useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash,
-  });
-
-  const swap = (
-    bnbAmount: bigint,
-    minOut: bigint,
-    tokenOut: Address,
-    to: Address,
-    deadlineSeconds = 60 * 20,
-  ) => {
-    const path = [WBNB as Address, tokenOut];
-    const deadline = BigInt(Math.floor(Date.now() / 1000) + deadlineSeconds);
-    writeContract({
-      address: ROUTER,
-      abi: PANCAKE_ROUTER_ABI,
-      functionName: "swapExactETHForTokens",
-      args: [minOut, path, to, deadline],
-      value: bnbAmount,
-    });
-  };
-
-  return { swap, hash, isPending, isConfirming, isSuccess, isError, error, reset };
-}
-
-/** Swap exact tokens for BNB via PancakeSwap V2. Requires prior token approval to the router. */
-export function useSwapExactTokensForBnb() {
+/**
+ * Swap exact ERC-20 tokens for ERC-20 tokens via PancakeSwap V2.
+ * Requires the caller to have approved the router for `tokenAmount` of the
+ * input token. Path must be a list of token addresses; for KKDA↔USDT we
+ * route through WBNB since direct pairs don't always exist on testnet.
+ */
+export function useSwapExactTokensForTokens() {
   const { writeContract, data: hash, isPending, isError, error, reset } =
     useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
@@ -80,22 +57,23 @@ export function useSwapExactTokensForBnb() {
   const swap = (
     tokenAmount: bigint,
     minOut: bigint,
-    tokenIn: Address,
+    path: readonly Address[],
     to: Address,
     deadlineSeconds = 60 * 20,
   ) => {
-    const path = [tokenIn, WBNB as Address];
     const deadline = BigInt(Math.floor(Date.now() / 1000) + deadlineSeconds);
     writeContract({
       address: ROUTER,
       abi: PANCAKE_ROUTER_ABI,
-      functionName: "swapExactTokensForETH",
-      args: [tokenAmount, minOut, path, to, deadline],
+      functionName: "swapExactTokensForTokens",
+      args: [tokenAmount, minOut, [...path], to, deadline],
     });
   };
 
   return { swap, hash, isPending, isConfirming, isSuccess, isError, error, reset };
 }
 
-/** Convenient KKDA token address constant. */
+/** Convenient address constants. */
 export const KKDA_ADDRESS = ADDRESSES.KKD_TOKEN as Address;
+export const USDT_ADDRESS = USDT as Address;
+export const WBNB_ADDRESS = WBNB as Address;
