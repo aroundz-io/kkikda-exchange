@@ -467,18 +467,24 @@ const DEMO_TEA_CAKES: TeaCake[] = [
 ];
 
 /* ───── BSC-issued Tokens ─────
- * KKDA · governance/utility token · 1,000,000,000 (1B) total supply
- * PUER · RWA index token · supply matches 33,159 RWA NFT units
+ * KKDA · governance/utility token · 1,000,000,000 (1B) total cap.
+ *   Price is set independently of current RWA backing — the 1B cap is the
+ *   long-term capacity for future Vintage Pu'er additions. Today's $66.685M
+ *   inventory is only the first batch; circulation expands as more RWA is
+ *   onboarded over time. Do NOT compute price as RWA-backing / supply.
+ *
+ * PUER · RWA index token · supply tracks current RWA NFT count (33,159).
+ *   Price reflects average USDT per unit of the inventory.
  */
 const DEMO_TOKENS: Token[] = [
   {
     id: "kkd",
     symbol: "KKDA",
     name: "KKIKDA Token",
-    price: 0.0667, // implied launch price = $66.685M RWA-backing / 1B supply
+    price: 0.05, // independent launch price — not pegged to current RWA value
     change24h: 5.24,
     volume24h: 2_840_000,
-    marketCap: 66_685_000,
+    marketCap: 50_000_000, // 1B × $0.05 fully-diluted; circulating value reflected by trading
     supply: 1_000_000_000,
     maxSupply: 1_000_000_000,
     category: "governance",
@@ -623,7 +629,7 @@ export const useStore = create<AppStore>()(
       toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
     }),
     {
-      name: "kkikda-store-v4-rwa-issuance",
+      name: "kkikda-store-v4-rwa-issuance-2",
       partialize: (s) => ({ lang: s.lang, user: s.user, orders: s.orders, teaCakes: s.teaCakes, tokens: s.tokens, mintRecords: s.mintRecords, stakingPools: s.stakingPools }),
     }
   )
