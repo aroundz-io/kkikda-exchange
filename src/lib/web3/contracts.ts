@@ -22,6 +22,14 @@ export const USDT =
     ? "0x55d398326f99059fF775485246999027B3197955" // USDT mainnet (18 decimals on BSC)
     : "0x337610d27c682E347C9cD60BD4b3b107C9d34dDd"; // USDT testnet (PancakeSwap)
 
+/**
+ * Treasury wallet that receives USDT payments from NFT purchases.
+ * Override via NEXT_PUBLIC_TREASURY env var; otherwise defaults to the
+ * Marketplace contract address as a placeholder.
+ */
+export const TREASURY_ADDRESS = (process.env.NEXT_PUBLIC_TREASURY ??
+  "0x1C80967399D0146b7DcEAAE45aEdc89aFa128656") as `0x${string}`;
+
 // ---------------------------------------------------------------------------
 // Contract Addresses
 // Replace placeholder addresses after deployment

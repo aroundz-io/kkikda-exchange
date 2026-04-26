@@ -32,6 +32,8 @@ export interface TeaCake {
   provenance: { date: string; event: string; detail: string }[];
   /** Mint transaction hash if this cake was minted on-chain. Empty for demo seeds. */
   txHash?: string;
+  /** Units already sold (NFTs transferred to buyers). */
+  soldUnits?: number;
 }
 
 export interface Token {
@@ -102,6 +104,21 @@ export interface MintRecord {
   value: number;
 }
 
+export interface PurchaseOrder {
+  id: string;
+  cakeId: string;
+  cakeName: string;
+  quantity: number;
+  pricePerUnit: number;
+  totalUsdt: number;
+  buyer: string;          // wallet address
+  txHash: string;         // USDT transfer tx
+  timestamp: number;
+  status: "paid" | "delivered" | "refunded";
+  /** Comma-separated tokenIds delivered (set by admin when fulfilling). */
+  deliveredTokenIds?: string;
+}
+
 /* ───── Store Interface ───── */
 
 interface AppStore {
@@ -133,6 +150,10 @@ interface AppStore {
 
   mintRecords: MintRecord[];
   addMintRecord: (m: MintRecord) => void;
+
+  purchaseOrders: PurchaseOrder[];
+  addPurchaseOrder: (p: PurchaseOrder) => void;
+  fulfillPurchaseOrder: (id: string, deliveredTokenIds: string) => void;
 
   toasts: Toast[];
   addToast: (t: Omit<Toast, "id">) => void;
@@ -636,6 +657,38 @@ export const useStore = create<AppStore>()(
         get().addToast({ type: "success", title: "Asset Minted", message: m.assetName });
       },
 
+      purchaseOrders: [],
+      addPurchaseOrder: (p) => {
+        set((s) => ({
+          purchaseOrders: [p, ...s.purchaseOrders],
+          // Increment soldUnits on the matching cake so availability tracks
+          teaCakes: s.teaCakes.map((c) =>
+            c.id === p.cakeId
+              ? { ...c, soldUnits: (c.soldUnits ?? 0) + p.quantity }
+              : c,
+          ),
+        }));
+        get().addToast({
+          type: "success",
+          title: "Purchase Confirmed",
+          message: `${p.quantity} × ${p.cakeName} · ${p.totalUsdt.toLocaleString()} USDT paid`,
+        });
+      },
+      fulfillPurchaseOrder: (id, deliveredTokenIds) => {
+        set((s) => ({
+          purchaseOrders: s.purchaseOrders.map((p) =>
+            p.id === id
+              ? { ...p, status: "delivered" as const, deliveredTokenIds }
+              : p,
+          ),
+        }));
+        get().addToast({
+          type: "info",
+          title: "Order Delivered",
+          message: `Tokens ${deliveredTokenIds} sent to buyer`,
+        });
+      },
+
       toasts: [],
       addToast: (t) => {
         const toast: Toast = { ...t, id: genId() };
@@ -649,8 +702,17 @@ export const useStore = create<AppStore>()(
       toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
     }),
     {
-      name: "kkikda-store-v7-apy-policy",
-      partialize: (s) => ({ lang: s.lang, user: s.user, orders: s.orders, teaCakes: s.teaCakes, tokens: s.tokens, mintRecords: s.mintRecords, stakingPools: s.stakingPools }),
+      name: "kkikda-store-v8-purchase-orders",
+      partialize: (s) => ({
+        lang: s.lang,
+        user: s.user,
+        orders: s.orders,
+        teaCakes: s.teaCakes,
+        tokens: s.tokens,
+        mintRecords: s.mintRecords,
+        stakingPools: s.stakingPools,
+        purchaseOrders: s.purchaseOrders,
+      }),
     }
   )
 );

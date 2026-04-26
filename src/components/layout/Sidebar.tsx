@@ -18,6 +18,7 @@ import {
   Coins,
   Boxes,
   Droplets,
+  Receipt,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -31,6 +32,7 @@ const ADMIN_NAV_ITEMS = [
   { labelKey: "sidebar.tokens", href: "/admin/tokens", icon: Coins },
   { labelKey: "sidebar.nftInventory", href: "/admin/nft-manage", icon: Boxes },
   { labelKey: "sidebar.liquidity", href: "/admin/liquidity", icon: Droplets },
+  { labelKey: "sidebar.orders", href: "/admin/orders", icon: Receipt },
 ] as const;
 
 export function Sidebar() {

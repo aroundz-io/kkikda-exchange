@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useStore, type TeaCake } from "@/stores/useStore";
 import { ArrowRight, X } from "lucide-react";
 import { useT } from "@/lib/i18n/useT";
+import { BuyModal } from "@/components/nft/BuyModal";
 
 type CategoryFilter = "all" | TeaCake["category"];
 type GradeFilter = "all" | "AAA" | "AA+" | "A" | "B";
@@ -104,11 +105,16 @@ function ProvenanceSidebar({
 function TeaCard({
   cake,
   onSelect,
+  onBuy,
 }: {
   cake: TeaCake;
   onSelect: (cake: TeaCake) => void;
+  onBuy: (cake: TeaCake) => void;
 }) {
   const t = useT();
+  const sold = cake.soldUnits ?? 0;
+  const available = Math.max(0, (cake.totalUnits ?? 1) - sold);
+  const outOfStock = available === 0;
 
   return (
     <div
@@ -156,8 +162,14 @@ function TeaCard({
             <div className="text-base font-label text-primary font-bold whitespace-nowrap">
               {cake.priceUsd.toLocaleString()} USDT
             </div>
-            <div className="text-[10px] font-label text-white/20 whitespace-nowrap">
-              {cake.totalUnits.toLocaleString()} units
+            <div className="text-[10px] font-label whitespace-nowrap">
+              <span className={available > 0 ? "text-secondary" : "text-error"}>
+                {available.toLocaleString()}
+              </span>
+              <span className="text-white/20">
+                {" "}
+                / {cake.totalUnits.toLocaleString()} {t("nft.available").toLowerCase()}
+              </span>
             </div>
           </div>
         </div>
@@ -182,8 +194,15 @@ function TeaCard({
             {t("nft.viewProvenance")}
             <ArrowRight className="w-3 h-3 transition-transform group-hover/btn:translate-x-1" />
           </button>
-          <button className="bg-primary-container text-primary border border-primary/20 px-4 py-2 text-[10px] font-label uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-all">
-            {t("nft.placeBid")}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!outOfStock) onBuy(cake);
+            }}
+            disabled={outOfStock}
+            className="bg-primary-container text-primary border border-primary/20 px-4 py-2 text-[10px] font-label uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            {outOfStock ? t("nft.outOfStock") : t("nft.buy")}
           </button>
         </div>
       </div>
@@ -195,6 +214,7 @@ function TeaCard({
 export default function NftMarketplacePage() {
   const teaCakes = useStore((s) => s.teaCakes);
   const [selectedCake, setSelectedCake] = useState<TeaCake | null>(null);
+  const [buyCake, setBuyCake] = useState<TeaCake | null>(null);
   const t = useT();
 
   // Filter & sort state
@@ -380,6 +400,7 @@ export default function NftMarketplacePage() {
               key={cake.id}
               cake={cake}
               onSelect={setSelectedCake}
+              onBuy={setBuyCake}
             />
           ))}
         </div>
@@ -391,6 +412,12 @@ export default function NftMarketplacePage() {
             cake={selectedCake}
             onClose={() => setSelectedCake(null)}
           />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {buyCake && (
+          <BuyModal cake={buyCake} onClose={() => setBuyCake(null)} />
         )}
       </AnimatePresence>
     </div>

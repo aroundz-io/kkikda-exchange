@@ -165,6 +165,26 @@ export function useTokenApprove(tokenAddress: Address | undefined) {
 }
 
 // ---------------------------------------------------------------------------
+// Transfer hook (ERC-20 transfer)
+// ---------------------------------------------------------------------------
+export function useTokenTransfer(tokenAddress: Address | undefined) {
+  const { writeContract, data: hash, isPending, isError, error, reset } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
+
+  const transfer = (to: Address, amount: bigint) => {
+    if (!tokenAddress) return;
+    writeContract({
+      address: tokenAddress,
+      abi: ERC20_ABI,
+      functionName: 'transfer',
+      args: [to, amount],
+    });
+  };
+
+  return { transfer, hash, isPending, isConfirming, isSuccess, isError, error, reset };
+}
+
+// ---------------------------------------------------------------------------
 // Redeem hook (RWA tokens -- uses extended ABI)
 // ---------------------------------------------------------------------------
 export function useTokenRedeem(tokenAddress: Address | undefined) {
