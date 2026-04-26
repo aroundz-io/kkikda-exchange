@@ -47,6 +47,12 @@ export const translations = {
     ko: "BSC 지갑을 연결해 시작하세요",
   },
   "sidebar.connectCta": { en: "Connect Wallet", ko: "지갑 연결" },
+  "sidebar.wrongChain": { en: "Wrong Network", ko: "잘못된 네트워크" },
+  "sidebar.wrongChainDesc": {
+    en: "Your wallet is on a different network. Switch to BSC to use this site.",
+    ko: "지갑이 다른 네트워크에 연결되어 있습니다. 이 사이트를 사용하려면 BSC로 전환하세요.",
+  },
+  "sidebar.switchChain": { en: "Switch to BSC", ko: "BSC로 전환" },
   "sidebar.holdings": { en: "Holdings", ko: "보유 자산" },
   "sidebar.holdingsUsdt": { en: "USDT", ko: "USDT" },
   "sidebar.holdingsKkda": { en: "KKDA", ko: "KKDA" },

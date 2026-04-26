@@ -62,10 +62,24 @@ export function useWalletSync() {
     }
   }, [isDisconnected, clearUser]);
 
-  // --- Auto-switch to BSC if on wrong chain ---
+  // --- Auto-switch to BSC if on wrong chain (try once per connection) ---
+  // Without the ref guard we would re-trigger switchChain on every render
+  // when the user rejects the MetaMask prompt, locking the UI in a loop.
+  const switchAttempted = useRef(false);
   useEffect(() => {
-    if (isConnected && chainId !== BSC_CHAIN_ID) {
+    if (!isConnected) {
+      switchAttempted.current = false;
+      return;
+    }
+    if (chainId === BSC_CHAIN_ID) return;
+    if (switchAttempted.current) return;
+    switchAttempted.current = true;
+    try {
       switchChain({ chainId: BSC_CHAIN_ID });
+    } catch {
+      // wagmi handles the addEthereumChain fallback internally if the
+      // chain config (rpcUrls, blockExplorerUrls, nativeCurrency) is set.
+      // We surface the wrong-chain state via `isWrongChain` for the UI.
     }
   }, [isConnected, chainId, switchChain]);
 

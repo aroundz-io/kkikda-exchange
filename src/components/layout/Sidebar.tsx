@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { useAccount } from "wagmi";
+import { useAccount, useChainId, useSwitchChain } from "wagmi";
+import { BSC_CHAIN_ID } from "@/lib/web3/contracts";
 import { formatUnits } from "viem";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useStore } from "@/stores/useStore";
@@ -24,6 +25,7 @@ import {
   Boxes,
   Droplets,
   Receipt,
+  AlertTriangle,
 } from "lucide-react";
 
 // Personal shortcuts — only visible when wallet connected
@@ -47,6 +49,9 @@ export function Sidebar() {
   const setSidebarOpen = useStore((s) => s.setSidebarOpen);
   const { isAdmin } = useIsAdmin();
   const { isConnected, address } = useAccount();
+  const chainId = useChainId();
+  const { switchChain, isPending: isSwitching } = useSwitchChain();
+  const isWrongChain = isConnected && chainId !== BSC_CHAIN_ID;
   const shortAddr = address
     ? `${address.slice(0, 6)}…${address.slice(-4)}`
     : "";
@@ -149,6 +154,32 @@ export function Sidebar() {
           )}
         </ConnectButton.Custom>
       </div>
+
+      {/* Wrong Network warning — only when connected on the wrong chain */}
+      {isWrongChain && (
+        <div className="px-8 mb-6">
+          <div className="bg-error/10 border-[0.5px] border-error/40 p-4 space-y-3">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="w-4 h-4 text-error shrink-0 mt-0.5" />
+              <div className="min-w-0">
+                <p className="font-label text-[10px] uppercase tracking-[0.15em] text-error">
+                  {t("sidebar.wrongChain")}
+                </p>
+                <p className="font-body text-[11px] text-on-surface-variant leading-snug mt-1 break-keep">
+                  {t("sidebar.wrongChainDesc")}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => switchChain({ chainId: BSC_CHAIN_ID })}
+              disabled={isSwitching}
+              className="w-full py-2 bg-error/20 hover:bg-error/30 text-error border-[0.5px] border-error/40 font-label text-[10px] uppercase tracking-[0.15em] disabled:opacity-50"
+            >
+              {isSwitching ? "…" : t("sidebar.switchChain")}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Personal Dashboard — only when connected */}
       <nav className="flex-1 space-y-1 overflow-y-auto">
