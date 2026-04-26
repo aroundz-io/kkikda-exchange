@@ -4,6 +4,19 @@
 export const BSC_CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN === "mainnet" ? 56 : 97;
 
 // ---------------------------------------------------------------------------
+// PancakeSwap V2 Router (used for DEX swaps against existing liquidity)
+// ---------------------------------------------------------------------------
+export const PANCAKE_ROUTER =
+  process.env.NEXT_PUBLIC_CHAIN === "mainnet"
+    ? "0x10ED43C718714eb63d5aA57B78B54704E256024E" // V2 mainnet
+    : "0xD99D1c33F9fC3444f8101754aBC46c52416550D1"; // V2 testnet
+
+export const WBNB =
+  process.env.NEXT_PUBLIC_CHAIN === "mainnet"
+    ? "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c" // WBNB mainnet
+    : "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd"; // WBNB testnet
+
+// ---------------------------------------------------------------------------
 // Contract Addresses
 // Replace placeholder addresses after deployment
 // ---------------------------------------------------------------------------
@@ -506,6 +519,27 @@ export const KKIKDA_NFT_ABI = [
     outputs: [],
     stateMutability: "nonpayable",
   },
+  {
+    type: "function",
+    name: "hasRole",
+    inputs: [
+      { name: "role", type: "bytes32", internalType: "bytes32" },
+      { name: "account", type: "address", internalType: "address" },
+    ],
+    outputs: [
+      { name: "", type: "bool", internalType: "bool" },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "MINTER_ROLE",
+    inputs: [],
+    outputs: [
+      { name: "", type: "bytes32", internalType: "bytes32" },
+    ],
+    stateMutability: "view",
+  },
 ] as const;
 
 export const MARKETPLACE_ABI = [
@@ -666,5 +700,52 @@ export const STAKING_ABI = [
       { name: "", type: "uint256", internalType: "uint256" },
     ],
     stateMutability: "view",
+  },
+] as const;
+
+// ---------------------------------------------------------------------------
+// PancakeSwap V2 Router ABI (subset — swap + quote only)
+// ---------------------------------------------------------------------------
+export const PANCAKE_ROUTER_ABI = [
+  {
+    type: "function",
+    name: "getAmountsOut",
+    inputs: [
+      { name: "amountIn", type: "uint256", internalType: "uint256" },
+      { name: "path", type: "address[]", internalType: "address[]" },
+    ],
+    outputs: [
+      { name: "amounts", type: "uint256[]", internalType: "uint256[]" },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "swapExactETHForTokens",
+    inputs: [
+      { name: "amountOutMin", type: "uint256", internalType: "uint256" },
+      { name: "path", type: "address[]", internalType: "address[]" },
+      { name: "to", type: "address", internalType: "address" },
+      { name: "deadline", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [
+      { name: "amounts", type: "uint256[]", internalType: "uint256[]" },
+    ],
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
+    name: "swapExactTokensForETH",
+    inputs: [
+      { name: "amountIn", type: "uint256", internalType: "uint256" },
+      { name: "amountOutMin", type: "uint256", internalType: "uint256" },
+      { name: "path", type: "address[]", internalType: "address[]" },
+      { name: "to", type: "address", internalType: "address" },
+      { name: "deadline", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [
+      { name: "amounts", type: "uint256[]", internalType: "uint256[]" },
+    ],
+    stateMutability: "nonpayable",
   },
 ] as const;

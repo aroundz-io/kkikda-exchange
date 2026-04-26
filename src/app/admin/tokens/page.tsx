@@ -6,7 +6,8 @@ import { useAccount } from "wagmi";
 import { parseUnits, type Address } from "viem";
 import { useStore, type Token } from "@/stores/useStore";
 import { useTokenMint } from "@/hooks/useTokenContract";
-import { ADDRESSES } from "@/lib/web3/contracts";
+import { useMinterRole } from "@/hooks/useMinterRole";
+import { ADDRESSES, KKD_TOKEN_ABI } from "@/lib/web3/contracts";
 import { TxStatus } from "@/components/ui/TxStatus";
 
 const fade = {
@@ -50,6 +51,12 @@ export default function AdminTokensPage() {
 
   const selectedToken = tokens.find((t) => t.id === selectedId) ?? null;
   const onChainAddress = selectedToken ? onChainAddressFor(selectedToken.id) : undefined;
+
+  const { hasRole: hasMinterRole, isLoading: roleLoading } = useMinterRole(
+    onChainAddress,
+    address,
+    KKD_TOKEN_ABI,
+  );
 
   const {
     mint,
@@ -416,6 +423,11 @@ export default function AdminTokensPage() {
                     <p className="font-body text-[10px] text-on-surface-variant">
                       Remaining: {(selectedToken.maxSupply - selectedToken.supply).toLocaleString()} tokens available
                     </p>
+                    {onChainAddress && isConnected && !roleLoading && !hasMinterRole && (
+                      <p className="font-label text-[10px] uppercase tracking-[0.15em] text-error">
+                        ⚠ Your wallet lacks MINTER_ROLE on this token contract — tx will revert.
+                      </p>
+                    )}
                     <TxStatus
                       hash={hash}
                       isPending={isPending}

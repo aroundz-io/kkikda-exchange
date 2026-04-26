@@ -1,8 +1,21 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useAccount, useBalance } from "wagmi";
+import { parseEther, formatEther, parseUnits, formatUnits } from "viem";
 import { useStore } from "@/stores/useStore";
+import {
+  useSwapQuote,
+  useSwapExactBnbForTokens,
+  useSwapExactTokensForBnb,
+  KKDA_ADDRESS,
+} from "@/hooks/useSwap";
+import { useTokenBalance, useTokenApprove } from "@/hooks/useTokenContract";
+import { PANCAKE_ROUTER, WBNB } from "@/lib/web3/contracts";
+import { TxStatus } from "@/components/ui/TxStatus";
+import { useReadContract } from "wagmi";
+import { KKD_TOKEN_ABI } from "@/lib/web3/contracts";
 import {
   ArrowUpDown,
   ChevronDown,
@@ -12,6 +25,7 @@ import {
   ArrowRight,
   CreditCard,
 } from "lucide-react";
+import type { Address } from "viem";
 
 const TIME_PERIODS = ["1D", "1W", "1M", "1Y", "ALL"] as const;
 type Period = (typeof TIME_PERIODS)[number];
@@ -28,10 +42,161 @@ function useBarHeights(count: number) {
   }, [count]);
 }
 
-/* ---------- Exchange Widget ---------- */
+/* ---------- Exchange Widget (PancakeSwap V2) ---------- */
 function ExchangeWidget() {
-  const [payAmount, setPayAmount] = useState("1.0");
-  const [receiveAmount, setReceiveAmount] = useState("0.45");
+  const { address, isConnected } = useAccount();
+  const addToast = useStore((s) => s.addToast);
+
+  // Swap direction: true = BNB → KKDA, false = KKDA → BNB
+  const [bnbToToken, setBnbToToken] = useState(true);
+  const [payAmount, setPayAmount] = useState("");
+  const [slippage] = useState(0.005); // 0.5%
+
+  // Live balances
+  const { data: bnbBalance } = useBalance({
+    address,
+    query: { enabled: !!address },
+  });
+  const { balance: kkdaBalance } = useTokenBalance(KKDA_ADDRESS, address);
+
+  // Token decimals
+  const decimalsQuery = useReadContract({
+    address: KKDA_ADDRESS,
+    abi: KKD_TOKEN_ABI,
+    functionName: "decimals",
+  });
+  const decimals = (decimalsQuery.data as number | undefined) ?? 18;
+
+  // Parse user input → wei
+  const amountIn = useMemo(() => {
+    if (!payAmount) return undefined;
+    try {
+      return bnbToToken
+        ? parseEther(payAmount)
+        : parseUnits(payAmount, decimals);
+    } catch {
+      return undefined;
+    }
+  }, [payAmount, bnbToToken, decimals]);
+
+  // Quote
+  const path = useMemo(() => {
+    return bnbToToken
+      ? ([WBNB, KKDA_ADDRESS] as Address[])
+      : ([KKDA_ADDRESS, WBNB] as Address[]);
+  }, [bnbToToken]);
+
+  const { amountOut, isLoading: quoting, isError: quoteFailed } = useSwapQuote(
+    amountIn,
+    path,
+  );
+
+  // Format quote for display
+  const receiveDisplay = useMemo(() => {
+    if (!amountOut) return "";
+    return bnbToToken
+      ? Number(formatUnits(amountOut, decimals)).toFixed(4)
+      : Number(formatEther(amountOut)).toFixed(6);
+  }, [amountOut, bnbToToken, decimals]);
+
+  // Min received with slippage
+  const minOut = useMemo(() => {
+    if (!amountOut) return BigInt(0);
+    const slippageBps = BigInt(Math.floor((1 - slippage) * 10_000));
+    return (amountOut * slippageBps) / BigInt(10_000);
+  }, [amountOut, slippage]);
+
+  // Approval state for KKDA → BNB direction
+  const {
+    approve,
+    hash: approveHash,
+    isPending: approvePending,
+    isConfirming: approveConfirming,
+    isSuccess: approveSuccess,
+    isError: approveIsError,
+    error: approveError,
+    reset: approveReset,
+  } = useTokenApprove(KKDA_ADDRESS);
+
+  // Allowance check (KKDA → BNB requires router allowance)
+  const allowanceQuery = useReadContract({
+    address: KKDA_ADDRESS,
+    abi: KKD_TOKEN_ABI,
+    functionName: "allowance",
+    args: address ? [address, PANCAKE_ROUTER as Address] : undefined,
+    query: { enabled: !!address && !bnbToToken },
+  });
+  const allowance = (allowanceQuery.data as bigint | undefined) ?? BigInt(0);
+  const needsApproval =
+    !bnbToToken && amountIn !== undefined && allowance < amountIn;
+
+  // Refetch allowance after approval succeeds
+  useEffect(() => {
+    if (approveSuccess) {
+      allowanceQuery.refetch();
+      approveReset();
+    }
+  }, [approveSuccess, allowanceQuery, approveReset]);
+
+  // Swap hooks
+  const bnbToTokenSwap = useSwapExactBnbForTokens();
+  const tokenToBnbSwap = useSwapExactTokensForBnb();
+  const active = bnbToToken ? bnbToTokenSwap : tokenToBnbSwap;
+
+  // Reset on success
+  useEffect(() => {
+    if (active.isSuccess) {
+      setPayAmount("");
+      addToast({
+        type: "success",
+        title: "Swap Confirmed",
+        message: "Your trade was executed on PancakeSwap.",
+      });
+      active.reset();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active.isSuccess]);
+
+  function handleSwap() {
+    if (!isConnected || !address) {
+      addToast({
+        type: "error",
+        title: "Wallet Not Connected",
+        message: "Connect your wallet to swap.",
+      });
+      return;
+    }
+    if (!amountIn || !amountOut) {
+      addToast({
+        type: "error",
+        title: "Invalid Amount",
+        message: "Enter a valid amount and wait for the quote.",
+      });
+      return;
+    }
+
+    if (bnbToToken) {
+      bnbToTokenSwap.swap(amountIn, minOut, KKDA_ADDRESS, address);
+    } else {
+      tokenToBnbSwap.swap(amountIn, minOut, KKDA_ADDRESS, address);
+    }
+  }
+
+  function handleApprove() {
+    if (!amountIn) return;
+    approve(PANCAKE_ROUTER as Address, amountIn);
+  }
+
+  const payBalance = bnbToToken
+    ? bnbBalance
+      ? formatEther(bnbBalance.value).slice(0, 8)
+      : "0"
+    : kkdaBalance
+      ? formatUnits(kkdaBalance, decimals).slice(0, 10)
+      : "0";
+
+  const inputSymbol = bnbToToken ? "BNB" : "KKDA";
+  const outputSymbol = bnbToToken ? "KKDA" : "BNB";
 
   return (
     <div className="bg-surface-container p-8 shadow-2xl relative border border-outline-variant/10">
@@ -49,28 +214,36 @@ function ExchangeWidget() {
           <input
             className="bg-transparent border-none p-0 font-label text-2xl focus:ring-0 w-1/2 outline-none"
             type="text"
+            inputMode="decimal"
+            placeholder="0.0"
             value={payAmount}
             onChange={(e) => setPayAmount(e.target.value)}
           />
           <div className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
-            <span className="font-body font-bold">BNB</span>
+            <span className="font-body font-bold">{inputSymbol}</span>
             <ChevronDown size={16} />
           </div>
         </div>
         <p className="font-label text-[10px] text-white/20 mt-2">
-          Balance: 4.821 BNB
+          Balance: {payBalance} {inputSymbol}
         </p>
       </div>
 
       {/* Swap Icon */}
       <div className="flex justify-center -my-3 relative z-10">
-        <button className="w-10 h-10 bg-surface-container border border-outline-variant/30 flex items-center justify-center hover:border-primary transition-colors cursor-pointer active:scale-90">
+        <button
+          onClick={() => {
+            setBnbToToken((v) => !v);
+            setPayAmount("");
+          }}
+          className="w-10 h-10 bg-surface-container border border-outline-variant/30 flex items-center justify-center hover:border-primary transition-colors cursor-pointer active:scale-90"
+        >
           <ArrowUpDown className="text-primary" size={18} />
         </button>
       </div>
 
       {/* Receive Input */}
-      <div className="mb-10">
+      <div className="mb-6">
         <label className="font-label text-[10px] text-secondary uppercase tracking-widest mb-2 block">
           You Receive
         </label>
@@ -79,38 +252,87 @@ function ExchangeWidget() {
             className="bg-transparent border-none p-0 font-label text-2xl focus:ring-0 w-1/2 outline-none"
             readOnly
             type="text"
-            value={receiveAmount}
+            placeholder="0.0"
+            value={quoting ? "..." : receiveDisplay}
           />
           <div className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
-            <span className="font-body font-bold text-primary">$KKDA</span>
+            <span className="font-body font-bold text-primary">${outputSymbol}</span>
             <ChevronDown size={16} className="text-primary" />
           </div>
         </div>
-        <p className="font-label text-[10px] text-white/20 mt-2">
-          1 $KKDA = 2.22 BNB
-        </p>
+        {quoteFailed && payAmount && (
+          <p className="font-label text-[10px] text-error mt-2 uppercase tracking-tighter">
+            No liquidity for this pair on PancakeSwap.
+          </p>
+        )}
       </div>
 
       {/* Summary */}
-      <div className="space-y-2 mb-8">
-        {[
-          { label: "Minimum Received", value: "0.448 $KKDA" },
-          { label: "Network Fee (Gas)", value: "~ $1.42" },
-          { label: "Slippage Tolerance", value: "0.5%" },
-        ].map((row) => (
-          <div
-            key={row.label}
-            className="flex justify-between text-[11px] font-label uppercase tracking-tighter text-white/40"
-          >
-            <span>{row.label}</span>
-            <span>{row.value}</span>
-          </div>
-        ))}
+      <div className="space-y-2 mb-6">
+        <div className="flex justify-between text-[11px] font-label uppercase tracking-tighter text-white/40">
+          <span>Minimum Received</span>
+          <span>
+            {minOut
+              ? bnbToToken
+                ? Number(formatUnits(minOut, decimals)).toFixed(4)
+                : Number(formatEther(minOut)).toFixed(6)
+              : "0"}{" "}
+            {outputSymbol}
+          </span>
+        </div>
+        <div className="flex justify-between text-[11px] font-label uppercase tracking-tighter text-white/40">
+          <span>Slippage Tolerance</span>
+          <span>{(slippage * 100).toFixed(1)}%</span>
+        </div>
+        <div className="flex justify-between text-[11px] font-label uppercase tracking-tighter text-white/40">
+          <span>Router</span>
+          <span>PancakeSwap V2</span>
+        </div>
       </div>
 
-      <button className="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary py-4 font-label font-bold uppercase tracking-[0.2em] shadow-lg active:scale-[0.98] transition-all hover:opacity-90">
-        Execute Trade
-      </button>
+      <TxStatus
+        hash={active.hash ?? approveHash}
+        isPending={active.isPending || approvePending}
+        isConfirming={active.isConfirming || approveConfirming}
+        isSuccess={active.isSuccess}
+        isError={active.isError || approveIsError}
+        error={active.error || approveError}
+      />
+
+      {needsApproval ? (
+        <button
+          onClick={handleApprove}
+          disabled={!isConnected || approvePending || approveConfirming}
+          className="w-full bg-gradient-to-br from-secondary to-secondary/60 text-on-secondary py-4 font-label font-bold uppercase tracking-[0.2em] shadow-lg active:scale-[0.98] transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed mt-4"
+        >
+          {approvePending
+            ? "Approving…"
+            : approveConfirming
+              ? "Confirming approval…"
+              : `Approve ${inputSymbol}`}
+        </button>
+      ) : (
+        <button
+          onClick={handleSwap}
+          disabled={
+            !isConnected ||
+            !amountOut ||
+            quoting ||
+            quoteFailed ||
+            active.isPending ||
+            active.isConfirming
+          }
+          className="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary py-4 font-label font-bold uppercase tracking-[0.2em] shadow-lg active:scale-[0.98] transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed mt-4"
+        >
+          {!isConnected
+            ? "Connect Wallet"
+            : active.isPending
+              ? "Awaiting signature…"
+              : active.isConfirming
+                ? "Confirming on-chain…"
+                : "Execute Trade"}
+        </button>
+      )}
     </div>
   );
 }

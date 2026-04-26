@@ -24,6 +24,8 @@ export interface TeaCake {
   owner: string;
   isListed: boolean;
   provenance: { date: string; event: string; detail: string }[];
+  /** Mint transaction hash if this cake was minted on-chain. Empty for demo seeds. */
+  txHash?: string;
 }
 
 export interface Token {

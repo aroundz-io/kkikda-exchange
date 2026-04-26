@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAccount } from "wagmi";
 import { useStore, type TeaCake } from "@/stores/useStore";
-import { useNFTMint } from "@/hooks/useNFTContract";
+import { useNFTMint, useNFTBurn } from "@/hooks/useNFTContract";
+import { useMinterRole } from "@/hooks/useMinterRole";
 import { buildTeaCakeURI } from "@/lib/web3/metadata";
-import { ADDRESSES } from "@/lib/web3/contracts";
+import { ADDRESSES, KKIKDA_NFT_ABI } from "@/lib/web3/contracts";
 import { TxStatus } from "@/components/ui/TxStatus";
 
 const fade = {
@@ -48,6 +49,11 @@ export default function NftManagePage() {
   const addToast = useStore((s) => s.addToast);
 
   const { address, isConnected } = useAccount();
+  const { hasRole: hasMinterRole, isLoading: roleLoading } = useMinterRole(
+    ADDRESSES.KKIKDA_NFT,
+    address,
+    KKIKDA_NFT_ABI,
+  );
   const {
     mint,
     hash,
@@ -59,21 +65,66 @@ export default function NftManagePage() {
     reset,
   } = useNFTMint();
 
+  const {
+    burn,
+    hash: burnHash,
+    isPending: burnPending,
+    isConfirming: burnConfirming,
+    isSuccess: burnSuccess,
+    isError: burnIsError,
+    error: burnError,
+    reset: burnReset,
+  } = useNFTBurn();
+
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showMintForm, setShowMintForm] = useState(false);
   const [form, setForm] = useState(INITIAL_FORM);
   const [pendingCake, setPendingCake] = useState<TeaCake | null>(null);
+  const [pendingBurnId, setPendingBurnId] = useState<string | null>(null);
 
-  // After tx confirms, persist the new cake to the local store with the real tx hash.
+  // After mint tx confirms, persist the new cake to the local store with the real tx hash.
   useEffect(() => {
     if (isSuccess && pendingCake && hash) {
-      addTeaCake({ ...pendingCake, contractAddress: hash });
+      addTeaCake({ ...pendingCake, txHash: hash });
       setPendingCake(null);
       setForm(INITIAL_FORM);
       setShowMintForm(false);
       reset();
     }
   }, [isSuccess, pendingCake, hash, addTeaCake, reset]);
+
+  // After burn tx confirms, remove the cake from the local store.
+  useEffect(() => {
+    if (burnSuccess && pendingBurnId) {
+      removeTeaCake(pendingBurnId);
+      setPendingBurnId(null);
+      burnReset();
+    }
+  }, [burnSuccess, pendingBurnId, removeTeaCake, burnReset]);
+
+  function handleBurn(cake: TeaCake) {
+    // Demo cakes (no txHash) — local-only delete, no on-chain call.
+    if (!cake.txHash) {
+      removeTeaCake(cake.id);
+      return;
+    }
+
+    if (!isConnected || !address) {
+      addToast({
+        type: "error",
+        title: "Wallet Not Connected",
+        message: "Connect your wallet to burn on BSC.",
+      });
+      return;
+    }
+
+    if (!confirm(`Burn "${cake.name}" (token #${cake.tokenId})? This action is permanent.`)) {
+      return;
+    }
+
+    setPendingBurnId(cake.id);
+    burn(BigInt(cake.tokenId));
+  }
 
   const totalAssets = teaCakes.length;
   const totalValue = teaCakes.reduce((s, t) => s + t.priceUsd, 0);
@@ -372,9 +423,27 @@ export default function NftManagePage() {
               </p>
             )}
 
+            {isConnected && !roleLoading && !hasMinterRole && (
+              <div className="border-[0.5px] border-error/40 bg-error/5 px-4 py-3 space-y-1">
+                <p className="font-label text-[10px] uppercase tracking-[0.15em] text-error">
+                  No MINTER_ROLE
+                </p>
+                <p className="font-body text-xs text-on-surface-variant">
+                  Your wallet ({address?.slice(0, 6)}…{address?.slice(-4)}) does
+                  not hold the MINTER_ROLE on the NFT contract. The transaction
+                  will revert. Ask the contract admin to grant this role.
+                </p>
+              </div>
+            )}
+
             <button
               type="submit"
-              disabled={!isConnected || isPending || isConfirming}
+              disabled={
+                !isConnected ||
+                !hasMinterRole ||
+                isPending ||
+                isConfirming
+              }
               className="btn-gradient disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {isPending
@@ -386,6 +455,18 @@ export default function NftManagePage() {
           </motion.form>
         )}
       </AnimatePresence>
+
+      {/* ── Burn Tx Status (global, shown when burning) ── */}
+      {(burnPending || burnConfirming || burnSuccess || burnIsError) && (
+        <TxStatus
+          hash={burnHash}
+          isPending={burnPending}
+          isConfirming={burnConfirming}
+          isSuccess={burnSuccess && !!pendingBurnId}
+          isError={burnIsError}
+          error={burnError}
+        />
+      )}
 
       {/* ── Stats Row ── */}
       <motion.div
@@ -448,7 +529,7 @@ export default function NftManagePage() {
             >
               {/* Delete Button */}
               <button
-                onClick={() => removeTeaCake(cake.id)}
+                onClick={() => handleBurn(cake)}
                 className="absolute top-2 left-2 z-10 w-6 h-6 flex items-center justify-center bg-surface-container border-[0.5px] border-outline-variant text-outline hover:text-error hover:border-error/40 transition-colors font-label text-xs"
                 title="Remove"
               >
@@ -460,6 +541,12 @@ export default function NftManagePage() {
                 <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
                   {cake.weight}
                 </span>
+                {/* On-chain Badge */}
+                {cake.txHash && (
+                  <span className="absolute top-3 left-9 font-label text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border-[0.5px] text-secondary border-secondary/40 bg-secondary/10">
+                    On-chain
+                  </span>
+                )}
                 {/* Grade Badge */}
                 <span
                   className={`absolute top-3 right-3 font-label text-[10px] uppercase tracking-[0.15em] px-2 py-0.5 border-[0.5px] ${gradeBadge(cake.grade)}`}
@@ -536,7 +623,7 @@ export default function NftManagePage() {
                   </p>
                 </div>
                 <button
-                  onClick={() => removeTeaCake(cake.id)}
+                  onClick={() => handleBurn(cake)}
                   className="w-6 h-6 flex items-center justify-center border-[0.5px] border-outline-variant text-outline hover:text-error hover:border-error/40 transition-colors font-label text-xs"
                   title="Remove"
                 >
