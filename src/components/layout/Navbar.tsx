@@ -5,17 +5,19 @@ import { usePathname } from "next/navigation";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useStore } from "@/stores/useStore";
 import { useWalletSync } from "@/hooks/useWallet";
+import { useT } from "@/lib/i18n/useT";
 import { Menu, X } from "lucide-react";
 
 const NAV_LINKS = [
-  { label: "Market", href: "/nft" },
-  { label: "Exchange", href: "/dex" },
-  { label: "Vault", href: "/rwa" },
-  { label: "History", href: "/dashboard" },
+  { labelKey: "nav.market", href: "/nft" },
+  { labelKey: "nav.exchange", href: "/dex" },
+  { labelKey: "nav.vault", href: "/rwa" },
+  { labelKey: "nav.history", href: "/dashboard" },
 ] as const;
 
 export function Navbar() {
   useWalletSync();
+  const t = useT();
 
   const pathname = usePathname();
   const lang = useStore((s) => s.lang);
@@ -42,7 +44,7 @@ export function Navbar() {
                     : "text-white/60 hover:text-white"
                 }`}
               >
-                {link.label}
+                {t(link.labelKey)}
               </Link>
             );
           })}
@@ -87,7 +89,7 @@ export function Navbar() {
                         onClick={openConnectModal}
                         className="bg-primary text-on-primary px-6 py-2 font-label font-bold uppercase text-[10px] active:scale-95 hover:opacity-90 transition-all"
                       >
-                        Connect Wallet
+                        {t("common.connectWallet")}
                       </button>
                     );
                   }
@@ -98,7 +100,7 @@ export function Navbar() {
                         onClick={openChainModal}
                         className="border border-error text-error font-label text-[10px] tracking-widest px-5 py-2 uppercase"
                       >
-                        Wrong Network
+                        {t("common.network")}
                       </button>
                     );
                   }

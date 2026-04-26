@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStore, type TeaCake } from "@/stores/useStore";
 import { ArrowRight, X } from "lucide-react";
+import { useT } from "@/lib/i18n/useT";
 
 /* ---------- Provenance Sidebar Panel ---------- */
 function ProvenanceSidebar({
@@ -13,6 +14,7 @@ function ProvenanceSidebar({
   cake: TeaCake;
   onClose: () => void;
 }) {
+  const t = useT();
   return (
     <>
       <motion.div
@@ -37,7 +39,7 @@ function ProvenanceSidebar({
         </button>
 
         <h4 className="text-[10px] font-label uppercase tracking-[0.4em] text-primary mb-8">
-          Selected Provenance
+          {t("nft.selectedProvenance")}
         </h4>
 
         <div className="mb-12">
@@ -77,7 +79,7 @@ function ProvenanceSidebar({
 
         <div className="mt-12">
           <button className="w-full bg-primary text-on-primary py-4 font-label font-bold uppercase text-xs tracking-widest hover:bg-primary/90 transition-all">
-            Inquire for Private Sale
+            {t("nft.inquireSale")}
           </button>
         </div>
       </motion.div>
@@ -95,6 +97,7 @@ function TeaCard({
   onSelect: (cake: TeaCake) => void;
   isLarge?: boolean;
 }) {
+  const t = useT();
   if (isLarge) {
     return (
       <div
@@ -108,7 +111,7 @@ function TeaCard({
           <div className="absolute inset-0 bg-gradient-to-b from-surface-container-low/20 via-transparent to-surface-container-low" />
           <div className="absolute top-8 left-8">
             <div className="text-[10px] font-label uppercase text-primary mb-2 tracking-[0.3em]">
-              Masterpiece Collection
+              {t("nft.masterpiece")}
             </div>
             <h3 className="text-4xl font-headline text-white max-w-xs leading-tight">
               {cake.name}
@@ -120,7 +123,7 @@ function TeaCard({
             <div className="flex items-center gap-3">
               <div className="w-2 h-2 rounded-full bg-secondary" />
               <span className="text-[10px] font-label uppercase tracking-widest text-secondary">
-                Appraised by Master ({cake.vintage})
+                {t("nft.appraisedBy")} ({cake.vintage})
               </span>
             </div>
             <p className="text-sm font-body text-on-surface-variant opacity-80 leading-relaxed">
@@ -130,14 +133,14 @@ function TeaCard({
           <div className="flex justify-between items-end">
             <div>
               <div className="text-[10px] font-label uppercase text-white/40 mb-1">
-                Current Appraisal
+                {t("nft.currentAppraisal")}
               </div>
               <div className="text-2xl font-label text-primary font-bold">
                 {cake.price} BNB
               </div>
             </div>
             <button className="bg-primary text-on-primary px-8 py-3 font-label font-bold uppercase text-xs hover:bg-primary/90 transition-all">
-              Acquire Now
+              {t("nft.acquireNow")}
             </button>
           </div>
         </div>
@@ -186,24 +189,24 @@ function TeaCard({
         <div className="grid grid-cols-2 gap-4 mb-8">
           <div className="border-l border-outline-variant/30 pl-4">
             <div className="text-[10px] font-label uppercase text-white/40">
-              Vintage
+              {t("nft.vintage")}
             </div>
             <div className="text-sm font-label">{cake.vintage}</div>
           </div>
           <div className="border-l border-outline-variant/30 pl-4">
             <div className="text-[10px] font-label uppercase text-white/40">
-              Weight
+              {t("nft.weight")}
             </div>
             <div className="text-sm font-label">{cake.weight}</div>
           </div>
         </div>
         <div className="flex items-center justify-between border-t border-outline-variant/15 pt-6">
           <button className="text-[10px] font-label uppercase tracking-widest text-primary flex items-center gap-2 group/btn">
-            View Provenance
+            {t("nft.viewProvenance")}
             <ArrowRight className="w-3 h-3 transition-transform group-hover/btn:translate-x-1" />
           </button>
           <button className="bg-primary-container text-primary border border-primary/20 px-4 py-2 text-[10px] font-label uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-all">
-            Place Bid
+            {t("nft.placeBid")}
           </button>
         </div>
       </div>
@@ -215,6 +218,7 @@ function TeaCard({
 export default function NftMarketplacePage() {
   const teaCakes = useStore((s) => s.teaCakes);
   const [selectedCake, setSelectedCake] = useState<TeaCake | null>(null);
+  const t = useT();
 
   const listedCakes = teaCakes.filter((c) => c.isListed);
 
@@ -223,34 +227,32 @@ export default function NftMarketplacePage() {
       <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div className="max-w-2xl">
           <h1 className="text-5xl font-headline text-on-surface mb-4 tracking-tight leading-tight">
-            The Marketplace of{" "}
-            <span className="text-primary italic">Provenance</span>
+            {t("nft.titlePrefix")}{" "}
+            <span className="text-primary italic">{t("nft.titleAccent")}</span>
           </h1>
           <p className="text-on-surface-variant font-body leading-relaxed opacity-80">
-            Explore the world&apos;s most rare and authenticated vintage
-            Pu&apos;er tea cakes. Every token represents a physical cake held
-            in our climate-controlled Kura, verified by the blockchain.
+            {t("nft.subtitle")}
           </p>
         </div>
 
         <div className="flex gap-4 border-b border-outline-variant/15 pb-2">
           <div className="flex flex-col">
             <label className="text-[10px] font-label uppercase text-white/40 mb-1 tracking-tighter">
-              Sort by Vintage
+              {t("nft.sortVintage")}
             </label>
             <select className="bg-transparent border-none text-primary font-label text-xs focus:ring-0 p-0 pr-8 cursor-pointer uppercase tracking-widest outline-none">
-              <option>Oldest First</option>
-              <option>Newest First</option>
+              <option>{t("nft.oldestFirst")}</option>
+              <option>{t("nft.newestFirst")}</option>
             </select>
           </div>
           <div className="w-px h-8 bg-outline-variant/15 self-end mb-1" />
           <div className="flex flex-col">
             <label className="text-[10px] font-label uppercase text-white/40 mb-1 tracking-tighter">
-              Sort by Price
+              {t("nft.sortPrice")}
             </label>
             <select className="bg-transparent border-none text-primary font-label text-xs focus:ring-0 p-0 pr-8 cursor-pointer uppercase tracking-widest outline-none">
-              <option>Highest to Lowest</option>
-              <option>Lowest to Highest</option>
+              <option>{t("nft.highToLow")}</option>
+              <option>{t("nft.lowToHigh")}</option>
             </select>
           </div>
         </div>

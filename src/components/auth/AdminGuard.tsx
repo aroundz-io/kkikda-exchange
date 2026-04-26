@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Lock, ShieldOff, Loader2 } from "lucide-react";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useT } from "@/lib/i18n/useT";
 
 interface Props {
   children: React.ReactNode;
@@ -16,6 +17,7 @@ interface Props {
  * a friendly access-control screen.
  */
 export function AdminGuard({ children }: Props) {
+  const t = useT();
   const { isAdmin, isLoading, isConnected, address } = useIsAdmin();
 
   // 1. Not connected
@@ -30,14 +32,13 @@ export function AdminGuard({ children }: Props) {
           <Lock className="w-12 h-12 text-primary mx-auto" strokeWidth={1.5} />
           <div className="space-y-2">
             <p className="font-label text-[10px] uppercase tracking-[0.3em] text-primary">
-              Restricted Area
+              {t("guard.restricted")}
             </p>
             <h1 className="font-headline text-3xl text-on-surface">
-              Admin Access Only
+              {t("guard.adminOnly")}
             </h1>
             <p className="font-body text-sm text-on-surface-variant max-w-sm mx-auto">
-              This section manages tokenized assets and protocol parameters.
-              Connect a wallet that holds the admin role to continue.
+              {t("guard.adminPitch")}
             </p>
           </div>
           <div className="flex justify-center">
@@ -47,7 +48,7 @@ export function AdminGuard({ children }: Props) {
                   onClick={openConnectModal}
                   className="btn-gradient"
                 >
-                  Connect Wallet
+                  {t("common.connectWallet")}
                 </button>
               )}
             </ConnectButton.Custom>
@@ -56,7 +57,7 @@ export function AdminGuard({ children }: Props) {
             href="/"
             className="inline-block font-label text-[10px] uppercase tracking-[0.2em] text-outline hover:text-primary transition-colors"
           >
-            ← Back to Portfolio
+            ← {t("common.back")}
           </Link>
         </motion.div>
       </div>
@@ -70,7 +71,7 @@ export function AdminGuard({ children }: Props) {
         <div className="max-w-xl mx-auto bg-surface-container-low border-[0.5px] border-outline-variant p-10 flex flex-col items-center gap-4">
           <Loader2 className="w-8 h-8 text-primary animate-spin" />
           <p className="font-label text-[10px] uppercase tracking-[0.2em] text-outline">
-            Verifying admin role on-chain…
+            {t("guard.verifying")}
           </p>
         </div>
       </div>
@@ -89,21 +90,19 @@ export function AdminGuard({ children }: Props) {
           <ShieldOff className="w-12 h-12 text-error mx-auto" strokeWidth={1.5} />
           <div className="space-y-2">
             <p className="font-label text-[10px] uppercase tracking-[0.3em] text-error">
-              Access Denied
+              {t("guard.denied")}
             </p>
             <h1 className="font-headline text-3xl text-on-surface">
-              Insufficient Privileges
+              {t("guard.insufficient")}
             </h1>
             <p className="font-body text-sm text-on-surface-variant max-w-md mx-auto">
-              The connected wallet does not hold the admin role on this
-              protocol. Token issuance, NFT minting, and configuration tools
-              are restricted to authorized curators.
+              {t("guard.notAdminMsg")}
             </p>
           </div>
 
           <div className="bg-surface-container-high border-[0.5px] border-outline-variant px-4 py-3 mx-auto max-w-md text-left space-y-1">
             <p className="font-label text-[9px] uppercase tracking-[0.15em] text-outline">
-              Connected Wallet
+              {t("guard.connected")}
             </p>
             <p className="font-label text-xs text-on-surface break-all">
               {address}
@@ -114,7 +113,7 @@ export function AdminGuard({ children }: Props) {
             href="/"
             className="inline-block font-label text-[10px] uppercase tracking-[0.2em] text-primary hover:opacity-80 transition-opacity border-[0.5px] border-primary px-6 py-2.5"
           >
-            ← Back to Portfolio
+            ← {t("common.back")}
           </Link>
         </motion.div>
       </div>

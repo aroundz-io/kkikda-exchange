@@ -2,32 +2,12 @@
 
 import { motion } from "framer-motion";
 import { useStore } from "@/stores/useStore";
+import { useT } from "@/lib/i18n/useT";
 
 const fade = {
   initial: { opacity: 0, y: 16 },
   animate: { opacity: 1, y: 0 },
 };
-
-const HOW_IT_WORKS = [
-  {
-    step: "01",
-    title: "Select a Pool",
-    description:
-      "Browse available staking pools. Each pool has different APY, lock periods, and reward tokens.",
-  },
-  {
-    step: "02",
-    title: "Stake Your Tokens",
-    description:
-      "Deposit tokens into the pool. Your funds are locked for the specified period to earn rewards.",
-  },
-  {
-    step: "03",
-    title: "Earn Rewards",
-    description:
-      "Rewards accrue in real-time and can be claimed after the lock period expires.",
-  },
-];
 
 function formatUsd(n: number) {
   if (n >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(1)}B`;
@@ -37,8 +17,27 @@ function formatUsd(n: number) {
 }
 
 export default function StakingPage() {
+  const t = useT();
   const stakingPools = useStore((s) => s.stakingPools);
   const user = useStore((s) => s.user);
+
+  const HOW_IT_WORKS = [
+    {
+      step: "01",
+      title: t("staking.step1Title"),
+      description: t("staking.step1Desc"),
+    },
+    {
+      step: "02",
+      title: t("staking.step2Title"),
+      description: t("staking.step2Desc"),
+    },
+    {
+      step: "03",
+      title: t("staking.step3Title"),
+      description: t("staking.step3Desc"),
+    },
+  ];
 
   const totalStaked = stakingPools.reduce((s, p) => s + p.totalStakedUsd, 0);
   const avgApy =
@@ -47,19 +46,19 @@ export default function StakingPage() {
       : 0;
 
   const summaryCards = [
-    { label: "Total Staked", value: formatUsd(totalStaked) },
-    { label: "Average APY", value: `${avgApy.toFixed(1)}%` },
-    { label: "Your Staked", value: formatUsd(user.stakedValue) },
-    { label: "Rewards Earned", value: "$1,248" },
+    { label: t("staking.totalStaked"), value: formatUsd(totalStaked) },
+    { label: t("staking.avgApy"), value: `${avgApy.toFixed(1)}%` },
+    { label: t("staking.yourStaked"), value: formatUsd(user.stakedValue) },
+    { label: t("staking.rewardsEarned"), value: "$1,248" },
   ];
 
   return (
     <div className="page-padding space-y-10">
       {/* ── Header ── */}
       <motion.header {...fade} transition={{ duration: 0.5 }}>
-        <p className="label mb-3">YIELD PROTOCOL</p>
+        <p className="label mb-3">{t("staking.kicker")}</p>
         <h1 className="font-headline text-4xl text-on-surface">
-          Staking &amp; Liquidity
+          {t("staking.title")}
         </h1>
       </motion.header>
 
@@ -112,25 +111,25 @@ export default function StakingPage() {
                   </div>
                   <div className="flex flex-wrap gap-6 text-xs text-on-surface-variant font-body">
                     <span>
-                      TVL:{" "}
+                      {t("staking.tvl")}:{" "}
                       <span className="text-on-surface">
                         {formatUsd(pool.totalStakedUsd)}
                       </span>
                     </span>
                     <span>
-                      Min Stake:{" "}
+                      {t("staking.minStake")}:{" "}
                       <span className="text-on-surface">
                         {pool.minStake.toLocaleString()}
                       </span>
                     </span>
                     <span>
-                      Lock:{" "}
+                      {t("staking.lock")}:{" "}
                       <span className="text-on-surface">
-                        {pool.lockDays} days
+                        {pool.lockDays} {t("staking.lockDays")}
                       </span>
                     </span>
                     <span>
-                      Reward:{" "}
+                      {t("staking.reward")}:{" "}
                       <span className="text-on-surface">
                         {pool.rewardToken}
                       </span>
@@ -141,7 +140,7 @@ export default function StakingPage() {
                 {/* APY */}
                 <div className="text-center lg:text-right shrink-0">
                   <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline mb-1">
-                    APY
+                    {t("dex.apy")}
                   </p>
                   <p className="font-headline text-3xl text-primary">
                     {pool.apy}%
@@ -151,7 +150,7 @@ export default function StakingPage() {
                 {/* Action */}
                 <div className="shrink-0">
                   <button className="btn-gradient w-full lg:w-auto">
-                    Stake Now
+                    {t("staking.stakeNow")}
                   </button>
                 </div>
               </div>
@@ -160,7 +159,7 @@ export default function StakingPage() {
               <div className="mt-4">
                 <div className="flex justify-between mb-1">
                   <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                    Pool Utilization
+                    {t("staking.poolUtilization")}
                   </span>
                   <span className="font-label text-[10px] uppercase tracking-[0.15em] text-on-surface-variant">
                     {utilization.toFixed(0)}%
@@ -187,7 +186,7 @@ export default function StakingPage() {
         transition={{ duration: 0.5, delay: 0.4 }}
       >
         <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-          How Staking Works
+          {t("staking.howItWorks")}
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {HOW_IT_WORKS.map((item) => (

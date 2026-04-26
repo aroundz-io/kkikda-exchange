@@ -9,6 +9,7 @@ import { useTokenMint } from "@/hooks/useTokenContract";
 import { useMinterRole } from "@/hooks/useMinterRole";
 import { ADDRESSES, KKD_TOKEN_ABI } from "@/lib/web3/contracts";
 import { TxStatus } from "@/components/ui/TxStatus";
+import { useT } from "@/lib/i18n/useT";
 
 const fade = {
   initial: { opacity: 0, y: 16 },
@@ -25,6 +26,7 @@ function onChainAddressFor(tokenId: string): Address | undefined {
 }
 
 export default function AdminTokensPage() {
+  const t = useT();
   const tokens = useStore((s) => s.tokens);
   const addToken = useStore((s) => s.addToken);
   const updateToken = useStore((s) => s.updateToken);
@@ -145,13 +147,13 @@ export default function AdminTokensPage() {
         transition={{ duration: 0.5 }}
       >
         <h1 className="font-headline text-4xl text-on-surface">
-          Token Management
+          {t("adminTok.title")}
         </h1>
         <button
           onClick={() => setShowCreate(!showCreate)}
           className="btn-gradient"
         >
-          {showCreate ? "Cancel" : "Create New Token"}
+          {showCreate ? t("adminTok.cancel") : t("adminTok.createNew")}
         </button>
       </motion.header>
 
@@ -166,12 +168,12 @@ export default function AdminTokensPage() {
             transition={{ duration: 0.3 }}
           >
             <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-              New Token
+              {t("adminTok.newToken")}
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1">
                 <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  Name
+                  {t("adminTok.name")}
                 </label>
                 <input
                   value={newName}
@@ -182,7 +184,7 @@ export default function AdminTokensPage() {
               </div>
               <div className="space-y-1">
                 <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  Symbol
+                  {t("adminTok.symbol")}
                 </label>
                 <input
                   value={newSymbol}
@@ -193,7 +195,7 @@ export default function AdminTokensPage() {
               </div>
               <div className="space-y-1">
                 <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  Max Supply
+                  {t("adminTok.maxSupply")}
                 </label>
                 <input
                   value={newMaxSupply}
@@ -207,7 +209,7 @@ export default function AdminTokensPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1">
                 <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  Initial Supply
+                  {t("adminTok.initialSupply")}
                 </label>
                 <input
                   value={newSupply}
@@ -219,7 +221,7 @@ export default function AdminTokensPage() {
               </div>
               <div className="space-y-1">
                 <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  Price
+                  {t("adminTok.price")}
                 </label>
                 <input
                   value={newPrice}
@@ -231,16 +233,16 @@ export default function AdminTokensPage() {
               </div>
               <div className="space-y-1">
                 <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  Category
+                  {t("adminTok.category")}
                 </label>
                 <select
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value as "rwa" | "utility" | "governance")}
                   className="w-full bg-surface-container-high border-[0.5px] border-outline-variant px-3 py-2 font-body text-sm text-on-surface outline-none focus:border-primary transition-colors"
                 >
-                  <option value="rwa">RWA</option>
-                  <option value="utility">Utility</option>
-                  <option value="governance">Governance</option>
+                  <option value="rwa">{t("adminTok.catRwa")}</option>
+                  <option value="utility">{t("adminTok.catUtility")}</option>
+                  <option value="governance">{t("adminTok.catGov")}</option>
                 </select>
               </div>
             </div>
@@ -249,7 +251,7 @@ export default function AdminTokensPage() {
               disabled={!newName || !newSymbol || !newMaxSupply}
               className="btn-gradient disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              Create Token
+              {t("adminTok.createBtn")}
             </button>
           </motion.div>
         )}
@@ -301,18 +303,18 @@ export default function AdminTokensPage() {
                           : "text-secondary border-secondary/40"
                       }`}
                     >
-                      {token.isPaused ? "Paused" : "Active"}
+                      {token.isPaused ? t("adminTok.paused") : t("adminTok.active")}
                     </span>
                   </div>
                 </div>
               </div>
               <div className="flex gap-6 mt-3 font-body text-xs text-on-surface-variant">
                 <span>
-                  Supply: {token.supply.toLocaleString()} /{" "}
+                  {t("adminTok.supply")}: {token.supply.toLocaleString()} /{" "}
                   {token.maxSupply.toLocaleString()}
                 </span>
                 <span>
-                  Vol 24h: ${token.volume24h.toLocaleString()}
+                  {t("adminTok.vol24h")}: ${token.volume24h.toLocaleString()}
                 </span>
               </div>
             </motion.button>
@@ -332,7 +334,7 @@ export default function AdminTokensPage() {
                 transition={{ duration: 0.3 }}
               >
                 <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  Token Detail
+                  {t("adminTok.detail")}
                 </p>
 
                 <div className="space-y-3">
@@ -347,10 +349,10 @@ export default function AdminTokensPage() {
 
                   <div className="grid grid-cols-2 gap-3">
                     {[
-                      { label: "Price", value: `$${selectedToken.price.toLocaleString()}` },
-                      { label: "24h Change", value: `${selectedToken.change24h > 0 ? "+" : ""}${selectedToken.change24h}%` },
-                      { label: "Market Cap", value: `$${selectedToken.marketCap.toLocaleString()}` },
-                      { label: "Category", value: selectedToken.category },
+                      { label: t("adminTok.col.price"), value: `$${selectedToken.price.toLocaleString()}` },
+                      { label: t("adminTok.col.change"), value: `${selectedToken.change24h > 0 ? "+" : ""}${selectedToken.change24h}%` },
+                      { label: t("adminTok.col.cap"), value: `$${selectedToken.marketCap.toLocaleString()}` },
+                      { label: t("adminTok.col.cat"), value: selectedToken.category },
                     ].map((item) => (
                       <div key={item.label} className="space-y-1">
                         <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
@@ -366,7 +368,7 @@ export default function AdminTokensPage() {
                   {/* Supply */}
                   <div className="space-y-1">
                     <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                      Supply
+                      {t("adminTok.supply")}
                     </p>
                     <div className="h-1.5 bg-surface-container-high overflow-hidden">
                       <motion.div
@@ -387,10 +389,10 @@ export default function AdminTokensPage() {
                   {/* Mint Supply */}
                   <div className="space-y-2">
                     <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                      Mint Additional Supply
+                      {t("adminTok.mintAdditional")}
                       {onChainAddress && (
                         <span className="ml-2 text-secondary normal-case tracking-normal">
-                          · on-chain
+                          · {t("adminTok.onChain")}
                         </span>
                       )}
                     </p>
@@ -398,7 +400,7 @@ export default function AdminTokensPage() {
                       <input
                         value={mintAmount}
                         onChange={(e) => setMintAmount(e.target.value)}
-                        placeholder="Amount"
+                        placeholder={t("adminTok.mintAmount")}
                         type="number"
                         disabled={isPending || isConfirming}
                         className="flex-1 bg-surface-container-high border-[0.5px] border-outline-variant px-3 py-2 font-body text-sm text-on-surface placeholder:text-outline outline-none focus:border-primary transition-colors disabled:opacity-50"
@@ -414,18 +416,18 @@ export default function AdminTokensPage() {
                         className="px-4 py-2 bg-secondary/10 text-secondary border-[0.5px] border-secondary/40 font-label text-[10px] uppercase tracking-[0.15em] hover:bg-secondary/20 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                       >
                         {isPending
-                          ? "Sign…"
+                          ? t("adminTok.signBtn")
                           : isConfirming
-                            ? "Confirm…"
-                            : "Mint"}
+                            ? t("adminTok.confirmBtn")
+                            : t("adminTok.mintBtn")}
                       </button>
                     </div>
                     <p className="font-body text-[10px] text-on-surface-variant">
-                      Remaining: {(selectedToken.maxSupply - selectedToken.supply).toLocaleString()} tokens available
+                      {t("adminTok.remaining")}: {(selectedToken.maxSupply - selectedToken.supply).toLocaleString()} {t("adminTok.tokensAvailable")}
                     </p>
                     {onChainAddress && isConnected && !roleLoading && !hasMinterRole && (
                       <p className="font-label text-[10px] uppercase tracking-[0.15em] text-error">
-                        ⚠ Your wallet lacks MINTER_ROLE on this token contract — tx will revert.
+                        {t("adminTok.minterWarn")}
                       </p>
                     )}
                     <TxStatus
@@ -441,7 +443,7 @@ export default function AdminTokensPage() {
                   {/* Contract */}
                   <div className="space-y-1">
                     <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                      Contract
+                      {t("adminTok.contract")}
                     </p>
                     <p className="font-label text-[10px] text-on-surface-variant">
                       {selectedToken.contractAddress}
@@ -461,7 +463,7 @@ export default function AdminTokensPage() {
                         : "bg-error/10 text-error border-error/40 hover:bg-error/20"
                     }`}
                   >
-                    {selectedToken.isPaused ? "Resume Token" : "Pause Token"}
+                    {selectedToken.isPaused ? t("adminTok.resume") : t("adminTok.pause")}
                   </button>
                   <button
                     onClick={() => {
@@ -470,7 +472,7 @@ export default function AdminTokensPage() {
                     }}
                     className="flex-1 py-2.5 font-label text-[10px] uppercase tracking-[0.15em] border-[0.5px] bg-error/10 text-error border-error/40 hover:bg-error/20 transition-colors"
                   >
-                    Delete Token
+                    {t("adminTok.delete")}
                   </button>
                 </div>
               </motion.div>
@@ -480,7 +482,7 @@ export default function AdminTokensPage() {
                 {...fade}
               >
                 <p className="font-body text-xs text-outline">
-                  Select a token to view details
+                  {t("adminTok.selectMsg")}
                 </p>
               </motion.div>
             )}

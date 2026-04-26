@@ -9,6 +9,7 @@ import { useMinterRole } from "@/hooks/useMinterRole";
 import { buildTeaCakeURI } from "@/lib/web3/metadata";
 import { ADDRESSES, KKIKDA_NFT_ABI } from "@/lib/web3/contracts";
 import { TxStatus } from "@/components/ui/TxStatus";
+import { useT } from "@/lib/i18n/useT";
 
 const fade = {
   initial: { opacity: 0, y: 16 },
@@ -43,6 +44,7 @@ const INITIAL_FORM = {
 };
 
 export default function NftManagePage() {
+  const t = useT();
   const teaCakes = useStore((s) => s.teaCakes);
   const addTeaCake = useStore((s) => s.addTeaCake);
   const removeTeaCake = useStore((s) => s.removeTeaCake);
@@ -118,7 +120,7 @@ export default function NftManagePage() {
       return;
     }
 
-    if (!confirm(`Burn "${cake.name}" (token #${cake.tokenId})? This action is permanent.`)) {
+    if (!confirm(`${t("adminNft.confirmBurn")} "${cake.name}" (token #${cake.tokenId})? ${t("adminNft.confirmBurnSuffix")}`)) {
       return;
     }
 
@@ -136,9 +138,9 @@ export default function NftManagePage() {
       : 0;
 
   const stats = [
-    { label: "Total Assets", value: totalAssets.toString() },
-    { label: "Total Value", value: formatUsd(totalValue) },
-    { label: "Avg Vintage", value: avgVintage.toString() },
+    { label: t("adminNft.totalAssets"), value: totalAssets.toString() },
+    { label: t("adminNft.totalValue"), value: formatUsd(totalValue) },
+    { label: t("adminNft.avgVintage"), value: avgVintage.toString() },
   ];
 
   function handleChange(
@@ -226,13 +228,13 @@ export default function NftManagePage() {
         transition={{ duration: 0.5 }}
       >
         <h1 className="font-headline text-4xl text-on-surface">
-          Tokenized Inventory
+          {t("adminNft.title")}
         </h1>
         <button
           onClick={() => setShowMintForm((v) => !v)}
           className="btn-gradient inline-block text-center"
         >
-          {showMintForm ? "Cancel" : "Mint New Asset"}
+          {showMintForm ? t("adminNft.cancel") : t("adminNft.mintNew")}
         </button>
       </motion.header>
 
@@ -249,14 +251,14 @@ export default function NftManagePage() {
             transition={{ duration: 0.35 }}
           >
             <h2 className="font-headline text-xl text-on-surface">
-              Mint New NFT
+              {t("adminNft.formTitle")}
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {/* Name */}
               <div className="space-y-1.5">
                 <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  Name
+                  {t("adminNft.name")}
                 </label>
                 <input
                   name="name"
@@ -271,13 +273,13 @@ export default function NftManagePage() {
               {/* Subtitle / Description */}
               <div className="space-y-1.5">
                 <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  Subtitle / Description
+                  {t("adminNft.subtitle")}
                 </label>
                 <input
                   name="subtitle"
                   value={form.subtitle}
                   onChange={handleChange}
-                  placeholder="Short description"
+                  placeholder={t("adminNft.subtitlePh")}
                   className={inputClass}
                 />
               </div>
@@ -285,7 +287,7 @@ export default function NftManagePage() {
               {/* Vintage Year */}
               <div className="space-y-1.5">
                 <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  Vintage Year
+                  {t("adminNft.vintageYear")}
                 </label>
                 <input
                   name="vintage"
@@ -300,7 +302,7 @@ export default function NftManagePage() {
               {/* Weight */}
               <div className="space-y-1.5">
                 <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  Weight
+                  {t("adminNft.weight")}
                 </label>
                 <input
                   name="weight"
@@ -314,7 +316,7 @@ export default function NftManagePage() {
               {/* Factory */}
               <div className="space-y-1.5">
                 <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  Factory
+                  {t("adminNft.factory")}
                 </label>
                 <input
                   name="factory"
@@ -328,7 +330,7 @@ export default function NftManagePage() {
               {/* Grade */}
               <div className="space-y-1.5">
                 <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  Grade
+                  {t("adminNft.grade")}
                 </label>
                 <select
                   name="grade"
@@ -346,7 +348,7 @@ export default function NftManagePage() {
               {/* Category */}
               <div className="space-y-1.5">
                 <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  Category
+                  {t("adminNft.category")}
                 </label>
                 <select
                   name="category"
@@ -364,7 +366,7 @@ export default function NftManagePage() {
               {/* Price in BNB */}
               <div className="space-y-1.5">
                 <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  Price in BNB
+                  {t("adminNft.priceBnb")}
                 </label>
                 <input
                   name="priceBnb"
@@ -380,7 +382,7 @@ export default function NftManagePage() {
               {/* Price in USD */}
               <div className="space-y-1.5">
                 <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  Price in USD
+                  {t("adminNft.priceUsd")}
                 </label>
                 <input
                   name="priceUsd"
@@ -396,13 +398,13 @@ export default function NftManagePage() {
               {/* Tags */}
               <div className="space-y-1.5">
                 <label className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  Tags
+                  {t("adminNft.tags")}
                 </label>
                 <input
                   name="tags"
                   value={form.tags}
                   onChange={handleChange}
-                  placeholder="Audited, Rare, Certified"
+                  placeholder={t("adminNft.tagsPh")}
                   className={inputClass}
                 />
               </div>
@@ -419,19 +421,17 @@ export default function NftManagePage() {
 
             {!isConnected && (
               <p className="font-label text-[10px] uppercase tracking-[0.15em] text-error">
-                Connect your wallet to mint on BSC.
+                {t("adminNft.connectWalletWarn")}
               </p>
             )}
 
             {isConnected && !roleLoading && !hasMinterRole && (
               <div className="border-[0.5px] border-error/40 bg-error/5 px-4 py-3 space-y-1">
                 <p className="font-label text-[10px] uppercase tracking-[0.15em] text-error">
-                  No MINTER_ROLE
+                  {t("adminNft.noMinterRole")}
                 </p>
                 <p className="font-body text-xs text-on-surface-variant">
-                  Your wallet ({address?.slice(0, 6)}…{address?.slice(-4)}) does
-                  not hold the MINTER_ROLE on the NFT contract. The transaction
-                  will revert. Ask the contract admin to grant this role.
+                  {address?.slice(0, 6)}…{address?.slice(-4)} — {t("adminNft.noMinterRoleMsg")}
                 </p>
               </div>
             )}
@@ -447,10 +447,10 @@ export default function NftManagePage() {
               className="btn-gradient disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {isPending
-                ? "Awaiting signature…"
+                ? t("dex.awaitingSig")
                 : isConfirming
-                  ? "Confirming on-chain…"
-                  : "Mint NFT on BSC"}
+                  ? t("dex.confirming")
+                  : t("adminNft.mintBtn")}
             </button>
           </motion.form>
         )}
@@ -503,7 +503,7 @@ export default function NftManagePage() {
               : "border-outline-variant text-outline hover:text-on-surface"
           }`}
         >
-          Grid
+          {t("adminNft.grid")}
         </button>
         <button
           onClick={() => setViewMode("list")}
@@ -513,7 +513,7 @@ export default function NftManagePage() {
               : "border-outline-variant text-outline hover:text-on-surface"
           }`}
         >
-          List
+          {t("adminNft.list")}
         </button>
       </motion.div>
 
@@ -544,7 +544,7 @@ export default function NftManagePage() {
                 {/* On-chain Badge */}
                 {cake.txHash && (
                   <span className="absolute top-3 left-9 font-label text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border-[0.5px] text-secondary border-secondary/40 bg-secondary/10">
-                    On-chain
+                    {t("adminNft.onChain")}
                   </span>
                 )}
                 {/* Grade Badge */}

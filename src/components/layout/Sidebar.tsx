@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useAccount } from "wagmi";
 import { useStore } from "@/stores/useStore";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useT } from "@/lib/i18n/useT";
 import {
   FolderOpen,
   Package,
@@ -19,18 +20,19 @@ import {
 } from "lucide-react";
 
 const NAV_ITEMS = [
-  { label: "Collections", href: "/nft", icon: FolderOpen },
-  { label: "My Kura", href: "/dashboard", icon: Package, requiresWallet: true },
-  { label: "Governance", href: "/staking", icon: Gavel },
+  { labelKey: "sidebar.collections", href: "/nft", icon: FolderOpen },
+  { labelKey: "sidebar.myKura", href: "/dashboard", icon: Package, requiresWallet: true },
+  { labelKey: "sidebar.governance", href: "/staking", icon: Gavel },
 ] as const;
 
 const ADMIN_NAV_ITEMS = [
-  { label: "Dashboard", href: "/admin", icon: Settings },
-  { label: "Tokens", href: "/admin/tokens", icon: Coins },
-  { label: "NFT Inventory", href: "/admin/nft-manage", icon: Boxes },
+  { labelKey: "sidebar.dashboard", href: "/admin", icon: Settings },
+  { labelKey: "sidebar.tokens", href: "/admin/tokens", icon: Coins },
+  { labelKey: "sidebar.nftInventory", href: "/admin/nft-manage", icon: Boxes },
 ] as const;
 
 export function Sidebar() {
+  const t = useT();
   const pathname = usePathname();
   const sidebarOpen = useStore((s) => s.sidebarOpen);
   const setSidebarOpen = useStore((s) => s.setSidebarOpen);
@@ -51,16 +53,16 @@ export function Sidebar() {
           </div>
           <div>
             <p className="text-primary font-headline font-bold text-sm tracking-tight">
-              {isAdmin ? "Kura Master" : "Collector"}
+              {isAdmin ? t("sidebar.kuraMaster") : t("sidebar.collector")}
             </p>
             <p className="text-outline font-label text-[10px] uppercase tracking-widest flex items-center gap-1.5">
               {isAdmin ? (
                 <>
                   <ShieldCheck className="w-3 h-3 text-secondary" />
-                  Admin
+                  {t("sidebar.admin")}
                 </>
               ) : (
-                "Vintage Curator"
+                t("sidebar.vintageCurator")
               )}
             </p>
           </div>
@@ -70,7 +72,7 @@ export function Sidebar() {
           onClick={() => setSidebarOpen(false)}
           className="block w-full text-center bg-gradient-to-br from-primary to-on-primary-container text-on-primary py-3 px-4 font-label font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity"
         >
-          {isAdmin ? "New Mint" : "Quick Trade"}
+          {isAdmin ? t("sidebar.newMint") : t("sidebar.quickTrade")}
         </Link>
       </div>
 
@@ -91,7 +93,7 @@ export function Sidebar() {
               }`}
             >
               <Icon className="w-5 h-5" />
-              {item.label}
+              {t(item.labelKey)}
             </Link>
           );
         })}
@@ -101,7 +103,7 @@ export function Sidebar() {
           <div className="pt-6 mt-6 border-t-[0.5px] border-outline-variant/30">
             <p className="px-8 mb-2 font-label text-[9px] uppercase tracking-[0.2em] text-secondary flex items-center gap-1.5">
               <ShieldCheck className="w-3 h-3" />
-              Admin Panel
+              {t("sidebar.adminPanel")}
             </p>
             {ADMIN_NAV_ITEMS.map((item) => {
               const active =
@@ -120,7 +122,7 @@ export function Sidebar() {
                   }`}
                 >
                   <Icon className="w-4 h-4" />
-                  {item.label}
+                  {t(item.labelKey)}
                 </Link>
               );
             })}
@@ -132,7 +134,7 @@ export function Sidebar() {
       <div className="px-8 mt-auto">
         <div className="p-4 bg-surface-container-low border-b-[0.5px] border-outline-variant/30">
           <p className="text-[10px] font-label text-outline uppercase mb-2">
-            {isAdmin ? "Admin Status" : "KYC Status"}
+            {isAdmin ? t("sidebar.adminStatus") : t("sidebar.kycStatus")}
           </p>
           <div className="flex items-center justify-between">
             <span
@@ -140,7 +142,7 @@ export function Sidebar() {
                 isAdmin ? "text-primary" : "text-secondary"
               }`}
             >
-              {isAdmin ? "Authorized" : "Tier 2 Verified"}
+              {isAdmin ? t("sidebar.authorized") : t("sidebar.tier2")}
             </span>
             {isAdmin ? (
               <ShieldCheck className="w-4 h-4 text-primary" />

@@ -16,6 +16,7 @@ import { PANCAKE_ROUTER, WBNB } from "@/lib/web3/contracts";
 import { TxStatus } from "@/components/ui/TxStatus";
 import { useReadContract } from "wagmi";
 import { KKD_TOKEN_ABI } from "@/lib/web3/contracts";
+import { useT } from "@/lib/i18n/useT";
 import {
   ArrowUpDown,
   ChevronDown,
@@ -46,6 +47,7 @@ function useBarHeights(count: number) {
 function ExchangeWidget() {
   const { address, isConnected } = useAccount();
   const addToast = useStore((s) => s.addToast);
+  const t = useT();
 
   // Swap direction: true = BNB → KKDA, false = KKDA → BNB
   const [bnbToToken, setBnbToToken] = useState(true);
@@ -149,8 +151,8 @@ function ExchangeWidget() {
       setPayAmount("");
       addToast({
         type: "success",
-        title: "Swap Confirmed",
-        message: "Your trade was executed on PancakeSwap.",
+        title: t("dex.swapConfirmed"),
+        message: t("dex.swapConfirmedMsg"),
       });
       active.reset();
     }
@@ -161,16 +163,16 @@ function ExchangeWidget() {
     if (!isConnected || !address) {
       addToast({
         type: "error",
-        title: "Wallet Not Connected",
-        message: "Connect your wallet to swap.",
+        title: t("dex.walletNotConnected"),
+        message: t("dex.walletNotConnectedMsg"),
       });
       return;
     }
     if (!amountIn || !amountOut) {
       addToast({
         type: "error",
-        title: "Invalid Amount",
-        message: "Enter a valid amount and wait for the quote.",
+        title: t("dex.invalidAmount"),
+        message: t("dex.invalidAmountMsg"),
       });
       return;
     }
@@ -201,14 +203,14 @@ function ExchangeWidget() {
   return (
     <div className="bg-surface-container p-8 shadow-2xl relative border border-outline-variant/10">
       <div className="flex justify-between items-center mb-8">
-        <h3 className="font-headline text-lg text-primary">Instant Exchange</h3>
+        <h3 className="font-headline text-lg text-primary">{t("dex.instantExchange")}</h3>
         <Settings className="text-white/40 cursor-pointer hover:text-primary" size={18} />
       </div>
 
       {/* Pay Input */}
       <div className="mb-4">
         <label className="font-label text-[10px] text-secondary uppercase tracking-widest mb-2 block">
-          You Pay
+          {t("dex.youPay")}
         </label>
         <div className="flex justify-between items-end border-b border-outline-variant/30 pb-4 focus-within:border-primary transition-colors">
           <input
@@ -225,7 +227,7 @@ function ExchangeWidget() {
           </div>
         </div>
         <p className="font-label text-[10px] text-white/20 mt-2">
-          Balance: {payBalance} {inputSymbol}
+          {t("dex.balance")}: {payBalance} {inputSymbol}
         </p>
       </div>
 
@@ -245,7 +247,7 @@ function ExchangeWidget() {
       {/* Receive Input */}
       <div className="mb-6">
         <label className="font-label text-[10px] text-secondary uppercase tracking-widest mb-2 block">
-          You Receive
+          {t("dex.youReceive")}
         </label>
         <div className="flex justify-between items-end border-b border-outline-variant/30 pb-4 focus-within:border-primary transition-colors">
           <input
@@ -262,7 +264,7 @@ function ExchangeWidget() {
         </div>
         {quoteFailed && payAmount && (
           <p className="font-label text-[10px] text-error mt-2 uppercase tracking-tighter">
-            No liquidity for this pair on PancakeSwap.
+            {t("dex.noLiquidity")}
           </p>
         )}
       </div>
@@ -270,7 +272,7 @@ function ExchangeWidget() {
       {/* Summary */}
       <div className="space-y-2 mb-6">
         <div className="flex justify-between text-[11px] font-label uppercase tracking-tighter text-white/40">
-          <span>Minimum Received</span>
+          <span>{t("dex.minReceived")}</span>
           <span>
             {minOut
               ? bnbToToken
@@ -281,11 +283,11 @@ function ExchangeWidget() {
           </span>
         </div>
         <div className="flex justify-between text-[11px] font-label uppercase tracking-tighter text-white/40">
-          <span>Slippage Tolerance</span>
+          <span>{t("dex.slippage")}</span>
           <span>{(slippage * 100).toFixed(1)}%</span>
         </div>
         <div className="flex justify-between text-[11px] font-label uppercase tracking-tighter text-white/40">
-          <span>Router</span>
+          <span>{t("dex.router")}</span>
           <span>PancakeSwap V2</span>
         </div>
       </div>
@@ -306,10 +308,10 @@ function ExchangeWidget() {
           className="w-full bg-gradient-to-br from-secondary to-secondary/60 text-on-secondary py-4 font-label font-bold uppercase tracking-[0.2em] shadow-lg active:scale-[0.98] transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed mt-4"
         >
           {approvePending
-            ? "Approving…"
+            ? t("dex.approving")
             : approveConfirming
-              ? "Confirming approval…"
-              : `Approve ${inputSymbol}`}
+              ? t("dex.confirmingApproval")
+              : `${t("dex.approveBtn")} ${inputSymbol}`}
         </button>
       ) : (
         <button
@@ -325,12 +327,12 @@ function ExchangeWidget() {
           className="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary py-4 font-label font-bold uppercase tracking-[0.2em] shadow-lg active:scale-[0.98] transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed mt-4"
         >
           {!isConnected
-            ? "Connect Wallet"
+            ? t("common.connectWallet")
             : active.isPending
-              ? "Awaiting signature…"
+              ? t("dex.awaitingSig")
               : active.isConfirming
-                ? "Confirming on-chain…"
-                : "Execute Trade"}
+                ? t("dex.confirming")
+                : t("dex.executeTrade")}
         </button>
       )}
     </div>
@@ -347,6 +349,7 @@ function LiquidityPoolCard({
   apy: string;
   icon: React.ReactNode;
 }) {
+  const t = useT();
   return (
     <div className="bg-surface-container-highest p-6 flex justify-between items-center group cursor-pointer hover:bg-outline-variant/20 transition-all">
       <div className="flex items-center gap-4">
@@ -356,7 +359,7 @@ function LiquidityPoolCard({
         <div>
           <h4 className="font-body font-bold text-white">{title}</h4>
           <p className="font-label text-[10px] text-white/40 uppercase tracking-widest">
-            APY: {apy}
+            {t("dex.apy")}: {apy}
           </p>
         </div>
       </div>
@@ -373,6 +376,7 @@ export default function DexPage() {
   const tokens = useStore((s) => s.tokens);
   const [period, setPeriod] = useState<Period>("1D");
   const barHeights = useBarHeights(10);
+  const t = useT();
 
   const kkda = tokens.find((t) => t.symbol === "KKDA");
   const price = kkda?.price ?? 4281.9;
@@ -391,11 +395,11 @@ export default function DexPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="font-headline text-4xl text-primary mb-2"
               >
-                Vintage $KKDA / BNB
+                {t("dex.pair")}
               </motion.h1>
               <p className="font-label text-secondary text-sm flex items-center gap-2">
                 <span className="w-2 h-2 bg-secondary rounded-full" />
-                PROVENANCE VERIFIED &bull; 0x4f2...3a92
+                {t("dex.provenanceVerified")} &bull; 0x4f2...3a92
               </p>
             </div>
             <div className="text-left md:text-right">
@@ -413,7 +417,7 @@ export default function DexPage() {
             <div className="absolute inset-0 chart-gradient" />
             <div className="relative h-full w-full flex flex-col">
               <div className="flex justify-between text-[10px] font-label text-white/20 uppercase tracking-widest mb-4">
-                <span>Performance Index</span>
+                <span>{t("dex.performanceIndex")}</span>
                 <div className="flex gap-4">
                   {TIME_PERIODS.map((p) => (
                     <button
@@ -451,7 +455,7 @@ export default function DexPage() {
           {/* Liquidity Pools */}
           <section>
             <h2 className="font-headline text-xl text-primary mb-6">
-              Liquidity Reservoirs
+              {t("dex.liquidityReservoirs")}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <LiquidityPoolCard
@@ -480,10 +484,10 @@ export default function DexPage() {
               </div>
               <div>
                 <h4 className="font-body font-bold text-sm text-white">
-                  Buy with Fiat
+                  {t("dex.fiatBuy")}
                 </h4>
                 <p className="font-body text-xs text-white/40">
-                  Direct bank transfer or Credit Card via MoonPay.
+                  {t("dex.fiatBuyDesc")}
                 </p>
               </div>
             </div>
@@ -491,25 +495,22 @@ export default function DexPage() {
               className="text-primary font-label text-[10px] uppercase tracking-widest gold-underline self-start"
               href="#"
             >
-              Launch Fiat Ramp
+              {t("dex.launchFiat")}
             </a>
           </div>
 
           {/* Provenance Info */}
           <div className="bg-surface-container-low p-8 opacity-60">
             <h5 className="font-headline text-sm text-primary mb-4 italic">
-              The Master&apos;s Note
+              {t("dex.mastersNote")}
             </h5>
             <p className="font-body text-xs leading-relaxed text-white/60">
-              &ldquo;Like a fine 1990s Menghai cake, $KKDA liquidity matures
-              through patient holding. Each transaction is recorded on the
-              perpetual scroll of the blockchain, ensuring your vintage remains
-              untarnished.&rdquo;
+              {t("dex.mastersNoteText")}
             </p>
             <div className="mt-4 flex items-center gap-2">
               <div className="w-4 h-[1px] bg-primary" />
               <span className="font-label text-[10px] uppercase tracking-widest text-primary">
-                Chief Curator
+                {t("dex.chiefCurator")}
               </span>
             </div>
           </div>

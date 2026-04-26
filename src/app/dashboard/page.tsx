@@ -10,9 +10,11 @@ import {
   Target,
   TrendingUp,
 } from "lucide-react";
+import { useT } from "@/lib/i18n/useT";
 
 export default function DashboardPage() {
   const { orders } = useStore();
+  const t = useT();
 
   const sorted = [...orders].sort((a, b) => b.timestamp - a.timestamp);
 
@@ -33,18 +35,18 @@ export default function DashboardPage() {
       : 0;
 
   const summaryCards = [
-    { label: "Total Trades", value: totalTrades.toString(), icon: BarChart3 },
+    { label: t("dashboard.totalTrades"), value: totalTrades.toString(), icon: BarChart3 },
     {
-      label: "Total Volume",
+      label: t("dashboard.totalVolume"),
       value: `$${totalVolume.toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
       icon: Activity,
     },
     {
-      label: "Avg Trade Size",
+      label: t("dashboard.avgTradeSize"),
       value: `$${avgTradeSize.toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
       icon: Target,
     },
-    { label: "Win Rate", value: `${winRate}%`, icon: TrendingUp },
+    { label: t("dashboard.winRate"), value: `${winRate}%`, icon: TrendingUp },
   ];
 
   const formatTime = (ts: number) => {
@@ -70,11 +72,10 @@ export default function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             className="font-headline text-4xl text-on-surface mb-2"
           >
-            Transaction History
+            {t("dashboard.title")}
           </motion.h1>
           <p className="font-body text-outline max-w-lg">
-            A complete ledger of your trading activity across the Heritage
-            Exchange.
+            {t("dashboard.subtitle")}
           </p>
         </div>
       </header>
@@ -109,7 +110,7 @@ export default function DashboardPage() {
           <div className="flex items-center gap-3 mb-5">
             <div className="w-1 h-6 bg-primary" />
             <h2 className="font-headline text-xl text-on-surface">
-              Order History
+              {t("dashboard.orderHistory")}
             </h2>
           </div>
 
@@ -118,24 +119,22 @@ export default function DashboardPage() {
               <thead>
                 <tr className="border-b border-outline-variant/30">
                   {[
-                    "Time",
-                    "Type",
-                    "Asset",
-                    "Amount",
-                    "Price",
-                    "Total",
-                    "Status",
-                    "Tx Hash",
+                    { key: "time", label: t("dashboard.col.time"), align: "left" },
+                    { key: "type", label: t("dashboard.col.type"), align: "left" },
+                    { key: "asset", label: t("dashboard.col.asset"), align: "left" },
+                    { key: "amount", label: t("dashboard.col.amount"), align: "right" },
+                    { key: "price", label: t("dashboard.col.price"), align: "right" },
+                    { key: "total", label: t("dashboard.col.total"), align: "right" },
+                    { key: "status", label: t("dashboard.col.status"), align: "left" },
+                    { key: "txHash", label: t("dashboard.col.txHash"), align: "left" },
                   ].map((col) => (
                     <th
-                      key={col}
+                      key={col.key}
                       className={`font-label text-[10px] uppercase tracking-[0.15em] text-outline p-4 ${
-                        col === "Total" || col === "Price" || col === "Amount"
-                          ? "text-right"
-                          : "text-left"
+                        col.align === "right" ? "text-right" : "text-left"
                       }`}
                     >
-                      {col}
+                      {col.label}
                     </th>
                   ))}
                 </tr>
@@ -147,7 +146,7 @@ export default function DashboardPage() {
                       colSpan={8}
                       className="p-12 text-center text-outline text-sm"
                     >
-                      No transactions yet. Start trading to see your history.
+                      {t("dashboard.empty")}
                     </td>
                   </tr>
                 ) : (
@@ -220,13 +219,13 @@ export default function DashboardPage() {
             <div className="flex items-center gap-3 mb-5">
               <div className="w-1 h-6 bg-primary" />
               <h3 className="font-headline text-lg text-on-surface">
-                Recent Activity
+                {t("dashboard.recentActivity")}
               </h3>
             </div>
 
             {sorted.length === 0 ? (
               <p className="text-sm text-outline">
-                No activity to display yet.
+                {t("dashboard.noActivity")}
               </p>
             ) : (
               <div className="relative pl-5">
@@ -256,7 +255,7 @@ export default function DashboardPage() {
                               : "text-error"
                           }
                         >
-                          {order.type === "buy" ? "Bought" : "Sold"}
+                          {order.type === "buy" ? t("dashboard.bought") : t("dashboard.sold")}
                         </span>{" "}
                         {order.amount} {order.tokenSymbol}
                       </p>

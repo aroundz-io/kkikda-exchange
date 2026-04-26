@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { useStore } from "@/stores/useStore";
+import { useT } from "@/lib/i18n/useT";
 import {
   Flame,
   ShieldCheck,
@@ -107,6 +108,7 @@ function TimelineItem({
 }
 
 export default function RwaPage() {
+  const t = useT();
   const teaCakes = useStore((s) => s.teaCakes);
   const selectedCake = teaCakes[0];
 
@@ -119,22 +121,22 @@ export default function RwaPage() {
         className="space-y-3"
       >
         <span className="font-label text-primary text-xs uppercase tracking-[0.3em]">
-          Redemption Protocol
+          {t("rwa.kicker")}
         </span>
         <h1 className="font-headline text-4xl lg:text-5xl text-white leading-tight">
-          The Physical Release.
+          {t("rwa.title")}
         </h1>
       </motion.div>
 
       {/* Step Progress */}
       <div className="flex items-center gap-4 overflow-x-auto no-scrollbar">
-        <Step number="01" label="Select" active />
+        <Step number="01" label={t("rwa.step.select")} active />
         <div className="w-12 h-[0.5px] bg-outline-variant/30 shrink-0" />
-        <Step number="02" label="Confirm" />
+        <Step number="02" label={t("rwa.step.confirm")} />
         <div className="w-12 h-[0.5px] bg-outline-variant/30 shrink-0" />
-        <Step number="03" label="Release" />
+        <Step number="03" label={t("rwa.step.release")} />
         <div className="w-12 h-[0.5px] bg-outline-variant/30 shrink-0" />
-        <Step number="04" label="Done" />
+        <Step number="04" label={t("rwa.step.done")} />
       </div>
 
       {/* Bento Grid */}
@@ -176,27 +178,26 @@ export default function RwaPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="p-8 bg-surface-container-high border border-outline-variant/10">
               <h3 className="font-headline text-lg text-white mb-6">
-                Vault Specifications
+                {t("rwa.vaultSpecs")}
               </h3>
               <div className="space-y-4">
-                <SpecRow label="Weight" value="357g ± 5g" />
-                <SpecRow label="Storage Conditions" value="65% RH / 24°C" />
-                <SpecRow label="Last Inspection" value="Oct 14, 2023" />
-                <SpecRow label="Blockchain Hash" value="0x4a12...93f2" isHash />
+                <SpecRow label={t("rwa.specWeight")} value="357g ± 5g" />
+                <SpecRow label={t("rwa.specStorage")} value="65% RH / 24°C" />
+                <SpecRow label={t("rwa.specInspection")} value="Oct 14, 2023" />
+                <SpecRow label={t("rwa.specHash")} value="0x4a12...93f2" isHash />
               </div>
             </div>
 
             <div className="p-8 bg-surface-container-highest border border-outline-variant/15 flex flex-col justify-center items-center text-center">
               <Flame className="text-primary mb-4" size={40} fill="currentColor" />
               <h3 className="font-headline text-xl text-white mb-2">
-                Burn to Redeem
+                {t("rwa.burnTitle")}
               </h3>
               <p className="font-body text-sm text-white/60 mb-6">
-                Burning this NFT permanently destroys the digital token and
-                triggers the physical release from our vault.
+                {t("rwa.burnDesc")}
               </p>
               <button className="w-full py-4 bg-primary text-on-primary font-label font-bold text-sm uppercase tracking-[0.2em] hover:bg-on-primary-container transition-all">
-                Initiate Redemption
+                {t("rwa.initiateRedemption")}
               </button>
             </div>
           </div>
@@ -209,17 +210,17 @@ export default function RwaPage() {
               <ShieldCheck className="text-secondary/30" size={40} />
             </div>
             <h3 className="font-headline text-lg text-white mb-2">
-              Vault Status
+              {t("rwa.vaultStatus")}
             </h3>
             <p className="font-label text-[10px] text-secondary uppercase tracking-[0.2em] mb-6">
-              Verified in Vault
+              {t("rwa.verifiedInVault")}
             </p>
 
             <div className="space-y-6">
               <div>
                 <div className="flex justify-between items-end mb-2">
                   <span className="font-label text-[10px] text-white/40 uppercase tracking-widest">
-                    Collateralization
+                    {t("rwa.collateralization")}
                   </span>
                   <span className="font-label text-sm text-white">100%</span>
                 </div>
@@ -235,13 +236,13 @@ export default function RwaPage() {
 
               <StatusItem
                 icon={<CheckCircle2 size={16} />}
-                text="Third-party audited reserves"
-                subtext="Report #VLT-29402-23"
+                text={t("rwa.thirdPartyAudited")}
+                subtext={`${t("rwa.auditReport")} #VLT-29402-23`}
               />
               <StatusItem
                 icon={<CheckCircle2 size={16} />}
-                text="Climate-controlled preservation"
-                subtext="Status: Optimal Aging"
+                text={t("rwa.climateControl")}
+                subtext={t("rwa.optimalAging")}
               />
             </div>
           </div>
@@ -250,7 +251,7 @@ export default function RwaPage() {
           <div className="bg-surface-container-low border border-outline-variant/10 overflow-hidden">
             <div className="p-6 border-b border-outline-variant/10">
               <h3 className="font-headline text-sm text-white">
-                Active Deliveries
+                {t("rwa.activeDeliveries")}
               </h3>
             </div>
             <div className="p-6 space-y-8">
@@ -261,11 +262,11 @@ export default function RwaPage() {
                       2003 &ldquo;Purple Dayi&rdquo;
                     </p>
                     <p className="font-label text-[10px] text-white/40 uppercase tracking-widest">
-                      Carrier: FedEx Priority
+                      {t("rwa.carrier")}: FedEx Priority
                     </p>
                   </div>
                   <span className="font-label text-[10px] text-secondary uppercase tracking-widest bg-secondary/10 px-2 py-1 shrink-0">
-                    In Transit
+                    {t("rwa.inTransit")}
                   </span>
                 </div>
 
@@ -273,23 +274,23 @@ export default function RwaPage() {
                   <div className="absolute left-[7px] top-2 bottom-2 w-[1px] border-l border-dashed border-outline-variant" />
                   <TimelineItem
                     active
-                    text="Out for delivery"
+                    text={t("rwa.outForDelivery")}
                     time="Today, 09:42 AM • Seoul, KR"
                   />
                   <TimelineItem
-                    text="Customs clearance completed"
+                    text={t("rwa.customsCleared")}
                     time="Oct 24 • Incheon Int'l"
                     opacity="opacity-50"
                   />
                   <TimelineItem
-                    text="Vault exit & dispatch"
+                    text={t("rwa.dispatch")}
                     time="Oct 22 • Hong Kong Hub"
                     opacity="opacity-30"
                   />
                 </div>
 
                 <button className="w-full py-3 mt-4 border border-outline-variant/30 text-white font-label text-[10px] uppercase tracking-[0.2em] hover:bg-white/5 transition-all">
-                  View Full Tracking
+                  {t("rwa.viewTracking")}
                 </button>
               </div>
             </div>
@@ -297,14 +298,13 @@ export default function RwaPage() {
 
           <div className="p-8 border border-outline-variant/10">
             <p className="font-body text-xs text-white/40 mb-4 italic">
-              &ldquo;True tea is only realized when it transitions from the
-              vault of memory to the vessel of presence.&rdquo;
+              &ldquo;{t("rwa.quote")}&rdquo;
             </p>
             <a
               href="#"
               className="inline-flex items-center gap-2 text-primary font-label text-[10px] uppercase tracking-widest group"
             >
-              Redemption Guide
+              {t("rwa.guide")}
               <ArrowRight
                 size={14}
                 className="group-hover:translate-x-1 transition-transform"

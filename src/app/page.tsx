@@ -4,12 +4,14 @@ import { useStore } from "@/stores/useStore";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { TrendingUp, MoreVertical, Waves } from "lucide-react";
+import { useT } from "@/lib/i18n/useT";
 
 type FilterTab = "all" | "tea" | "liquidity";
 
 export default function HomePage() {
   const { user, teaCakes } = useStore();
   const [filter, setFilter] = useState<FilterTab>("all");
+  const t = useT();
 
   return (
     <div className="page-padding">
@@ -17,16 +19,15 @@ export default function HomePage() {
       <header className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div>
           <h1 className="font-headline text-4xl text-on-surface mb-2">
-            Portfolio Overview
+            {t("home.title")}
           </h1>
           <p className="font-body text-outline max-w-lg">
-            Managing your curated collection of vintage Pu&apos;er tea cakes and
-            digital liquidity positions.
+            {t("home.subtitle")}
           </p>
         </div>
         <div className="text-left md:text-right">
           <p className="font-label text-[10px] text-outline uppercase tracking-[0.2em] mb-1">
-            Global Wallet Balance
+            {t("home.globalBalance")}
           </p>
           {user.address ? (
             <p className="font-label text-4xl text-primary font-bold">
@@ -55,7 +56,7 @@ export default function HomePage() {
           </div>
           <div>
             <p className="font-label text-[10px] text-outline uppercase tracking-widest mb-4">
-              Total Profit &amp; Loss
+              {t("home.totalPnl")}
             </p>
             <div className="flex items-baseline gap-2">
               <h2 className="text-3xl font-label text-secondary font-bold">
@@ -76,7 +77,7 @@ export default function HomePage() {
               />
             </div>
             <p className="text-[10px] font-label text-outline mt-2 uppercase tracking-widest">
-              Monthly Growth Target
+              {t("home.monthlyTarget")}
             </p>
           </div>
         </div>
@@ -84,22 +85,22 @@ export default function HomePage() {
         {/* Staking Accrual */}
         <div className="col-span-12 lg:col-span-4 bg-surface-container-highest p-8">
           <p className="font-label text-[10px] text-outline uppercase tracking-widest mb-4">
-            Staking Accrual
+            {t("home.stakingAccrual")}
           </p>
           <div className="flex flex-col gap-1">
             <h2 className="text-3xl font-label text-primary font-bold">
               4.20 <span className="text-lg font-light">$KKDA</span>
             </h2>
             <p className="text-outline text-xs font-body">
-              Est. Annual Yield: 8.42%
+              {t("home.annualYield")}: 8.42%
             </p>
           </div>
           <div className="mt-8 flex gap-4">
             <button className="text-[10px] font-label uppercase tracking-widest text-primary border-b-[0.5px] border-primary pb-1 hover:opacity-70 transition-opacity">
-              Claim Rewards
+              {t("home.claimRewards")}
             </button>
             <button className="text-[10px] font-label uppercase tracking-widest text-on-surface border-b-[0.5px] border-outline-variant pb-1 hover:opacity-70 transition-opacity">
-              Compound
+              {t("home.compound")}
             </button>
           </div>
         </div>
@@ -108,18 +109,17 @@ export default function HomePage() {
         <div className="col-span-12 lg:col-span-4 relative overflow-hidden bg-surface-container-low p-8 flex flex-col justify-between">
           <div className="relative z-10">
             <p className="font-label text-[10px] text-outline uppercase tracking-widest mb-4">
-              Security Status
+              {t("home.securityStatus")}
             </p>
             <h2 className="text-xl font-headline text-on-surface mb-2">
-              Tier 2 Verification
+              {t("home.tier2Verification")}
             </h2>
             <p className="text-xs text-outline font-body mb-6">
-              Upgrade to Tier 3 for institutional limits and priority auction
-              access.
+              {t("home.tier3Pitch")}
             </p>
           </div>
           <button className="relative z-10 w-fit font-label text-[10px] font-bold uppercase tracking-widest px-6 py-2 border-[0.5px] border-outline-variant text-on-surface hover:bg-primary hover:text-on-primary hover:border-primary transition-all">
-            Start Upgrade
+            {t("home.startUpgrade")}
           </button>
         </div>
       </div>
@@ -128,7 +128,7 @@ export default function HomePage() {
       <section className="mb-12">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
           <h3 className="font-headline text-2xl text-on-surface">
-            Digital Assets Portfolio
+            {t("home.digitalAssets")}
           </h3>
           <div className="flex gap-4">
             {(["all", "tea", "liquidity"] as FilterTab[]).map((tab) => (
@@ -142,10 +142,10 @@ export default function HomePage() {
                 }`}
               >
                 {tab === "all"
-                  ? "All Assets"
+                  ? t("home.allAssets")
                   : tab === "tea"
-                    ? "Tea Cakes"
-                    : "Liquidity"}
+                    ? t("home.teaCakes")
+                    : t("home.liquidity")}
               </button>
             ))}
           </div>
@@ -157,19 +157,19 @@ export default function HomePage() {
             <thead>
               <tr className="border-b-[0.5px] border-outline-variant">
                 <th className="pb-4 font-label text-[10px] uppercase tracking-widest text-outline">
-                  Asset Class
+                  {t("home.assetClass")}
                 </th>
                 <th className="pb-4 font-label text-[10px] uppercase tracking-widest text-outline">
-                  Allocation
+                  {t("home.allocation")}
                 </th>
                 <th className="pb-4 font-label text-[10px] uppercase tracking-widest text-outline">
-                  Market Value
+                  {t("home.marketValue")}
                 </th>
                 <th className="pb-4 font-label text-[10px] uppercase tracking-widest text-outline">
-                  P&amp;L (24h)
+                  {t("home.pnl24h")}
                 </th>
                 <th className="pb-4 font-label text-[10px] uppercase tracking-widest text-outline text-right">
-                  Action
+                  {t("home.action")}
                 </th>
               </tr>
             </thead>
@@ -185,10 +185,10 @@ export default function HomePage() {
                     </div>
                     <div>
                       <p className="font-headline text-sm font-bold">
-                        $KKDA Heritage Token
+                        {t("home.heritageToken")}
                       </p>
                       <p className="text-[10px] font-label text-outline">
-                        Native Utility Token
+                        {t("home.utilityToken")}
                       </p>
                     </div>
                   </div>
@@ -225,7 +225,7 @@ export default function HomePage() {
                           {cake.name}
                         </p>
                         <p className="text-[10px] font-label text-outline">
-                          Vintage NFT Cake #{cake.tokenId}
+                          {t("home.vintageNftCake")} #{cake.tokenId}
                         </p>
                       </div>
                     </div>
@@ -257,7 +257,7 @@ export default function HomePage() {
                         LP-KKDA/USDT
                       </p>
                       <p className="text-[10px] font-label text-outline">
-                        Liquidity Provision
+                        {t("home.lpProvision")}
                       </p>
                     </div>
                   </div>
@@ -281,26 +281,26 @@ export default function HomePage() {
         {/* Provenance Timeline */}
         <div className="col-span-12 lg:col-span-8">
           <h3 className="font-headline text-2xl text-on-surface mb-8">
-            Provenance Timeline
+            {t("home.provenanceTimeline")}
           </h3>
           <div className="space-y-0 border-l-[0.5px] border-outline-variant border-dashed ml-2 pl-8">
             {[
               {
                 date: "Dec 14, 2023",
-                title: "Acquisition: 1980s Menghai Raw",
-                desc: "Verified blockchain transfer from Master Curator #004. Storage moved to HK-Vault 02.",
+                title: t("home.timeline.acquisitionTitle"),
+                desc: t("home.timeline.acquisitionDesc"),
                 active: true,
               },
               {
                 date: "Nov 22, 2023",
-                title: "KYC Tier 2 Verification Completed",
-                desc: "Identity verified for global transactions up to $250,000 USD equivalent.",
+                title: t("home.timeline.kycTitle"),
+                desc: t("home.timeline.kycDesc"),
                 active: false,
               },
               {
                 date: "Oct 05, 2023",
-                title: "Ledger Account Initialized",
-                desc: "Welcome to Heritage Ledger. Genesis wallet binding successful.",
+                title: t("home.timeline.ledgerTitle"),
+                desc: t("home.timeline.ledgerDesc"),
                 active: false,
               },
             ].map((item, i) => (
@@ -338,18 +338,15 @@ export default function HomePage() {
           <div className="bg-primary-container p-8 relative overflow-hidden">
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/10 blur-3xl rounded-full" />
             <h4 className="font-headline text-xl text-primary mb-4">
-              Curator&apos;s Insight
+              {t("home.curatorInsight")}
             </h4>
             <p className="text-sm text-on-primary-container font-body leading-relaxed mb-6">
-              &ldquo;Your portfolio&apos;s concentration in 80s vintage cakes
-              shows strong preservation of value. Market trends suggest a 12%
-              uptick in liquidity for aged Menghai varieties next
-              quarter.&rdquo;
+              {t("home.curatorQuote")}
             </p>
             <div className="flex items-center gap-3">
               <div className="w-8 h-[0.5px] bg-primary" />
               <span className="font-label text-[10px] text-primary uppercase tracking-widest">
-                Heritage Advisory
+                {t("home.heritageAdvisory")}
               </span>
             </div>
           </div>

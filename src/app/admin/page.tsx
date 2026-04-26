@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useStore } from "@/stores/useStore";
+import { useT } from "@/lib/i18n/useT";
 import { Sparkles, Flame, Box, Grid, List } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -24,6 +25,7 @@ function MetricCard({
   progress: number;
   colorClass?: string;
 }) {
+  const t = useT();
   const textColor = colorClass.replace("bg-", "text-");
   return (
     <motion.div
@@ -48,11 +50,11 @@ function MetricCard({
         </h3>
         {trend ? (
           <p className="text-secondary text-xs mt-4 font-label">
-            {trend} <span className="text-outline ml-1">THIS MONTH</span>
+            {trend} <span className="text-outline ml-1">{t("admin.thisMonth")}</span>
           </p>
         ) : (
           <p className="text-outline text-xs mt-4 font-label uppercase tracking-tighter">
-            System Status: Optimal
+            {t("admin.systemOptimal")}
           </p>
         )}
       </div>
@@ -70,16 +72,17 @@ function MetricCard({
 
 /* ---------- Fee Config ---------- */
 function FeeConfig() {
+  const t = useT();
   const fees = [
-    { label: "NFT Minting Fee", value: "2.50", unit: "%" },
-    { label: "Liquidity Swap Fee", value: "0.05", unit: "%" },
-    { label: "Redemption (Burn) Fee", value: "150.00", unit: "USD" },
+    { label: t("admin.feeNftMinting"), value: "2.50", unit: "%" },
+    { label: t("admin.feeLiquidity"), value: "0.05", unit: "%" },
+    { label: t("admin.feeRedemption"), value: "150.00", unit: "USD" },
   ];
 
   return (
     <section className="space-y-6">
       <h2 className="text-xl font-headline font-bold border-l-4 border-primary pl-4 uppercase tracking-widest">
-        Protocol Fees
+        {t("admin.protocolFees")}
       </h2>
       <div className="bg-surface-container-high p-8 space-y-8 border border-outline-variant/5">
         {fees.map((fee) => (
@@ -100,7 +103,7 @@ function FeeConfig() {
           </div>
         ))}
         <button className="w-full py-4 border-[0.5px] border-primary text-primary font-label text-xs uppercase tracking-[0.2em] hover:bg-primary/10 transition-colors">
-          Update Configuration
+          {t("admin.updateConfig")}
         </button>
       </div>
     </section>
@@ -109,6 +112,7 @@ function FeeConfig() {
 
 /* ---------- Mint History ---------- */
 function MintHistory() {
+  const t = useT();
   const mintRecords = useStore((s) => s.mintRecords);
 
   const history = [
@@ -142,10 +146,10 @@ function MintHistory() {
     <section className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-headline font-bold border-l-4 border-secondary pl-4 uppercase tracking-widest">
-          Recent Mint History
+          {t("admin.recentMintHistory")}
         </h2>
         <button className="font-label text-[10px] text-outline uppercase hover:text-primary transition-colors">
-          View Full Ledger &rarr;
+          {t("admin.viewLedger")} &rarr;
         </button>
       </div>
 
@@ -153,12 +157,12 @@ function MintHistory() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-surface-container-low font-label text-[10px] text-outline uppercase tracking-widest">
-              <th className="px-6 py-4 font-medium">Tx Hash</th>
-              <th className="px-6 py-4 font-medium">Asset Name</th>
-              <th className="px-6 py-4 font-medium">Token ID</th>
-              <th className="px-6 py-4 font-medium">Value</th>
-              <th className="px-6 py-4 font-medium">Timestamp</th>
-              <th className="px-6 py-4 font-medium">Status</th>
+              <th className="px-6 py-4 font-medium">{t("admin.col.txHash")}</th>
+              <th className="px-6 py-4 font-medium">{t("admin.col.assetName")}</th>
+              <th className="px-6 py-4 font-medium">{t("admin.col.tokenId")}</th>
+              <th className="px-6 py-4 font-medium">{t("admin.col.value")}</th>
+              <th className="px-6 py-4 font-medium">{t("admin.col.timestamp")}</th>
+              <th className="px-6 py-4 font-medium">{t("admin.col.status")}</th>
             </tr>
           </thead>
           <tbody className="text-sm font-body divide-y divide-outline-variant/10">
@@ -206,7 +210,11 @@ function MintHistory() {
                           : "bg-error/10 text-error"
                     }`}
                   >
-                    {item.status}
+                    {item.status === "Confirmed"
+                      ? t("admin.confirmed")
+                      : item.status === "Processing"
+                        ? t("admin.processing")
+                        : t("admin.failed")}
                   </span>
                 </td>
               </motion.tr>
@@ -220,13 +228,14 @@ function MintHistory() {
 
 /* ---------- Inventory Grid ---------- */
 function InventoryGrid() {
+  const t = useT();
   const teaCakes = useStore((s) => s.teaCakes);
 
   return (
     <section className="space-y-8 pt-10">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-headline font-bold text-on-surface">
-          Tokenized Inventory
+          {t("admin.tokenizedInventory")}
         </h2>
         <div className="flex space-x-2">
           <button className="p-2 border-[0.5px] border-outline-variant text-outline hover:text-primary transition-colors">
@@ -255,10 +264,10 @@ function InventoryGrid() {
             <div className="p-6 space-y-4">
               <div className="flex justify-between items-start">
                 <span className="font-label text-[10px] text-primary uppercase tracking-[0.2em]">
-                  Batch #HL-{item.vintage}-{String(item.tokenId).padStart(2, "0")}
+                  {t("admin.batch")} #HL-{item.vintage}-{String(item.tokenId).padStart(2, "0")}
                 </span>
                 <span className="font-label text-[10px] text-outline">
-                  ID: {item.tokenId}
+                  {t("admin.id")}: {item.tokenId}
                 </span>
               </div>
               <h4 className="text-lg font-headline font-bold leading-tight group-hover:text-primary transition-colors">
@@ -267,7 +276,7 @@ function InventoryGrid() {
               <div className="flex items-center justify-between pt-4 border-t border-outline-variant/20">
                 <div className="space-y-1">
                   <p className="font-label text-[10px] text-outline uppercase">
-                    Appraisal
+                    {t("admin.appraisal")}
                   </p>
                   <p className="font-headline font-bold text-secondary">
                     ${item.priceUsd.toLocaleString()}
@@ -275,7 +284,7 @@ function InventoryGrid() {
                 </div>
                 <div className="space-y-1 text-right">
                   <p className="font-label text-[10px] text-outline uppercase">
-                    Quality
+                    {t("admin.quality")}
                   </p>
                   <p className="font-headline font-bold text-on-surface">
                     {item.grade}
@@ -292,6 +301,7 @@ function InventoryGrid() {
 
 /* ---------- Main Admin Page ---------- */
 export default function AdminPage() {
+  const t = useT();
   const teaCakes = useStore((s) => s.teaCakes);
   const tokens = useStore((s) => s.tokens);
   const mintRecords = useStore((s) => s.mintRecords);
@@ -308,10 +318,10 @@ export default function AdminPage() {
           animate={{ opacity: 1, x: 0 }}
         >
           <h1 className="text-4xl font-headline font-bold text-on-surface tracking-tight">
-            Executive Dashboard
+            {t("admin.executiveDashboard")}
           </h1>
           <p className="text-outline font-body mt-2">
-            Overseeing the provenance and minting of vintage Pu&apos;er assets.
+            {t("admin.executiveSubtitle")}
           </p>
         </motion.div>
 
@@ -320,10 +330,10 @@ export default function AdminPage() {
           animate={{ opacity: 1, x: 0 }}
           className="flex items-center space-x-4 font-label text-xs"
         >
-          <span className="text-outline">NETWORK STATUS:</span>
+          <span className="text-outline">{t("admin.networkStatus")}:</span>
           <span className="flex items-center text-secondary">
             <span className="w-2 h-2 bg-secondary rounded-full mr-2 animate-pulse" />
-            SYNCHRONIZED
+            {t("admin.synchronized")}
           </span>
         </motion.div>
       </header>
@@ -331,7 +341,7 @@ export default function AdminPage() {
       {/* Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <MetricCard
-          label="Total Minted Value"
+          label={t("admin.totalMintedValue")}
           value={`$${totalMintedValue.toLocaleString()}`}
           trend="+12.4%"
           icon={Sparkles}
@@ -339,15 +349,15 @@ export default function AdminPage() {
           colorClass="bg-primary"
         />
         <MetricCard
-          label="Assets Burned (Redeemed)"
+          label={t("admin.assetsBurned")}
           value={mintRecords.length > 0 ? mintRecords.length.toLocaleString() : "1,240"}
-          subValue="Units"
+          subValue={t("admin.units")}
           icon={Flame}
           progress={mintRecords.length > 0 ? Math.min(100, Math.round((mintRecords.length / 100) * 100)) : 22}
           colorClass="bg-error"
         />
         <MetricCard
-          label="Active Ledger Tokens"
+          label={t("admin.activeLedgerTokens")}
           value={totalTokens > 0 ? totalTokens.toLocaleString() : "3,581"}
           trend="STABLE"
           icon={Box}
@@ -377,10 +387,10 @@ export default function AdminPage() {
         >
           <div>
             <p className="font-headline text-lg text-on-surface group-hover:text-primary transition-colors">
-              Token Management
+              {t("admin.tokenManagement")}
             </p>
             <p className="font-body text-xs text-on-surface-variant mt-1">
-              Create, pause, and manage token supply
+              {t("admin.tokenMgmtDesc")}
             </p>
           </div>
           <span className="text-outline group-hover:text-primary transition-colors">
@@ -393,10 +403,10 @@ export default function AdminPage() {
         >
           <div>
             <p className="font-headline text-lg text-on-surface group-hover:text-primary transition-colors">
-              NFT / Asset Management
+              {t("admin.nftAssetManagement")}
             </p>
             <p className="font-body text-xs text-on-surface-variant mt-1">
-              Manage tokenized tea cake inventory
+              {t("admin.nftAssetDesc")}
             </p>
           </div>
           <span className="text-outline group-hover:text-primary transition-colors">

@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useChainId } from "wagmi";
 import { bscScanTxUrl } from "@/lib/web3/metadata";
+import { useT } from "@/lib/i18n/useT";
 
 interface Props {
   hash?: `0x${string}`;
@@ -21,6 +22,7 @@ export function TxStatus({
   isError,
   error,
 }: Props) {
+  const t = useT();
   const chainId = useChainId();
 
   const visible = isPending || isConfirming || isSuccess || isError;
@@ -29,16 +31,16 @@ export function TxStatus({
   let label = "";
   let tone = "text-outline border-outline-variant";
   if (isPending) {
-    label = "Awaiting wallet signature…";
+    label = t("tx.awaiting");
     tone = "text-primary border-primary/40 bg-primary/5";
   } else if (isConfirming) {
-    label = "Confirming on-chain…";
+    label = t("tx.confirming");
     tone = "text-secondary border-secondary/40 bg-secondary/5";
   } else if (isSuccess) {
-    label = "Transaction confirmed";
+    label = t("tx.confirmed");
     tone = "text-secondary border-secondary/40 bg-secondary/10";
   } else if (isError) {
-    label = error?.message?.split("\n")[0] ?? "Transaction failed";
+    label = error?.message?.split("\n")[0] ?? t("tx.failed");
     tone = "text-error border-error/40 bg-error/5";
   }
 
@@ -52,7 +54,7 @@ export function TxStatus({
       >
         <div className="space-y-1 min-w-0 flex-1">
           <p className="font-label text-[10px] uppercase tracking-[0.15em]">
-            Transaction Status
+            {t("tx.status")}
           </p>
           <p className="font-body text-sm break-words">{label}</p>
         </div>
@@ -63,7 +65,7 @@ export function TxStatus({
             rel="noopener noreferrer"
             className="font-label text-[10px] uppercase tracking-[0.15em] underline shrink-0 self-center"
           >
-            View on BSCScan
+            {t("tx.viewBscscan")}
           </a>
         )}
       </motion.div>
