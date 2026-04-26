@@ -47,7 +47,14 @@ export function useIsAdmin() {
     abi: KKIKDA_NFT_ABI,
     functionName: "hasRole",
     args: address ? [DEFAULT_ADMIN_ROLE, address] : undefined,
-    query: { enabled: isConnected && !!address },
+    query: {
+      enabled: isConnected && !!address,
+      // Don't trust stale React Query / wagmi cache after a contract redeploy
+      staleTime: 0,
+      gcTime: 0,
+      refetchOnMount: "always",
+      refetchOnWindowFocus: true,
+    },
   });
 
   const ownerQuery = useReadContract({
@@ -55,7 +62,13 @@ export function useIsAdmin() {
     address: ADDRESSES.KKIKDA_NFT as Address,
     abi: OWNABLE_ABI,
     functionName: "owner",
-    query: { enabled: isConnected && !!address },
+    query: {
+      enabled: isConnected && !!address,
+      staleTime: 0,
+      gcTime: 0,
+      refetchOnMount: "always",
+      refetchOnWindowFocus: true,
+    },
   });
 
   const hasRole = (roleQuery.data as boolean | undefined) ?? false;
@@ -65,6 +78,31 @@ export function useIsAdmin() {
     owner &&
     address.toLowerCase() === owner.toLowerCase()
   );
+
+  // Debug: surface the actual on-chain check result so the user can verify
+  // the wallet/contract pair from the browser console without an explorer.
+  if (typeof window !== "undefined" && isConnected && address) {
+    // eslint-disable-next-line no-console
+    console.log(
+      "[useIsAdmin]",
+      JSON.stringify(
+        {
+          contract: ADDRESSES.KKIKDA_NFT,
+          chainId: BSC_CHAIN_ID,
+          wallet: address,
+          owner,
+          hasDefaultAdminRole: hasRole,
+          isOwner,
+          finalIsAdmin: hasRole || isOwner,
+          loading: roleQuery.isLoading || ownerQuery.isLoading,
+          roleErr: roleQuery.error?.message,
+          ownerErr: ownerQuery.error?.message,
+        },
+        null,
+        2,
+      ),
+    );
+  }
 
   return {
     isAdmin: hasRole || isOwner,
