@@ -305,7 +305,7 @@ export default function RwaPage() {
           </div>
 
           <div className="p-8 border border-outline-variant/10">
-            <p className="font-body text-xs text-white/40 mb-4 italic">
+            <p className="font-body text-xs text-white/40 mb-4">
               &ldquo;{t("rwa.quote")}&rdquo;
             </p>
             <a

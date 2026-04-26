@@ -473,7 +473,7 @@ export default function DexPage() {
 
           {/* Provenance Info */}
           <div className="bg-surface-container-low p-8 opacity-60">
-            <h5 className="font-headline text-sm text-primary mb-4 italic">
+            <h5 className="font-headline text-sm text-primary mb-4">
               {t("dex.mastersNote")}
             </h5>
             <p className="font-body text-xs leading-relaxed text-white/60">

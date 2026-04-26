@@ -78,7 +78,7 @@ function ProvenanceSidebar({
               >
                 {entry.date} | {entry.event}
               </div>
-              <p className="text-xs font-body opacity-60 italic leading-relaxed">
+              <p className="text-xs font-body opacity-60 leading-relaxed">
                 {entry.detail}
               </p>
             </div>
@@ -200,7 +200,7 @@ export default function NftMarketplacePage() {
         <div className="max-w-2xl">
           <h1 className="text-5xl font-headline text-on-surface mb-4 tracking-tight leading-tight">
             {t("nft.titlePrefix")}{" "}
-            <span className="text-primary italic">{t("nft.titleAccent")}</span>
+            <span className="text-primary">{t("nft.titleAccent")}</span>
           </h1>
           <p className="text-on-surface-variant font-body leading-relaxed opacity-80">
             {t("nft.subtitle")}
