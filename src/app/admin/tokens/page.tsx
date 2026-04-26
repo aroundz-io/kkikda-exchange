@@ -1,8 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAccount } from "wagmi";
+import { parseUnits, type Address } from "viem";
 import { useStore, type Token } from "@/stores/useStore";
+import { useTokenMint } from "@/hooks/useTokenContract";
+import { ADDRESSES } from "@/lib/web3/contracts";
+import { TxStatus } from "@/components/ui/TxStatus";
 
 const fade = {
   initial: { opacity: 0, y: 16 },
@@ -11,12 +16,22 @@ const fade = {
 
 const genId = () => Math.random().toString(36).slice(2, 10);
 
+/** Map a store token id to its on-chain BSC contract address (if deployed). */
+function onChainAddressFor(tokenId: string): Address | undefined {
+  if (tokenId === "kkd") return ADDRESSES.KKD_TOKEN as Address;
+  if (tokenId === "puer") return ADDRESSES.RWA_PUER_TOKEN as Address;
+  return undefined;
+}
+
 export default function AdminTokensPage() {
   const tokens = useStore((s) => s.tokens);
   const addToken = useStore((s) => s.addToken);
   const updateToken = useStore((s) => s.updateToken);
   const mintTokenSupply = useStore((s) => s.mintTokenSupply);
   const deleteToken = useStore((s) => s.deleteToken);
+  const addToast = useStore((s) => s.addToast);
+
+  const { address, isConnected } = useAccount();
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
@@ -31,8 +46,56 @@ export default function AdminTokensPage() {
 
   // Mint supply state
   const [mintAmount, setMintAmount] = useState("");
+  const [pendingMint, setPendingMint] = useState<{ id: string; amount: number } | null>(null);
 
   const selectedToken = tokens.find((t) => t.id === selectedId) ?? null;
+  const onChainAddress = selectedToken ? onChainAddressFor(selectedToken.id) : undefined;
+
+  const {
+    mint,
+    hash,
+    isPending,
+    isConfirming,
+    isSuccess,
+    isError,
+    error,
+    reset,
+  } = useTokenMint(onChainAddress);
+
+  // After tx confirms, sync the local store's supply.
+  useEffect(() => {
+    if (isSuccess && pendingMint) {
+      mintTokenSupply(pendingMint.id, pendingMint.amount);
+      setPendingMint(null);
+      setMintAmount("");
+      reset();
+    }
+  }, [isSuccess, pendingMint, mintTokenSupply, reset]);
+
+  function handleMintSupply() {
+    if (!selectedToken) return;
+    const amount = Number(mintAmount);
+    if (!amount || amount <= 0) return;
+
+    // If this token has a deployed contract counterpart, mint on-chain.
+    if (onChainAddress) {
+      if (!isConnected || !address) {
+        addToast({
+          type: "error",
+          title: "Wallet Not Connected",
+          message: "Connect your wallet to mint on BSC.",
+        });
+        return;
+      }
+      setPendingMint({ id: selectedToken.id, amount });
+      // ERC-20 mint takes raw units (assume 18 decimals like KKD).
+      mint(address, parseUnits(String(amount), 18));
+    } else {
+      // Locally-created token (no contract) — store-only update.
+      mintTokenSupply(selectedToken.id, amount);
+      setMintAmount("");
+    }
+  }
 
   function handleCreate() {
     if (!newName || !newSymbol || !newMaxSupply) return;
@@ -318,6 +381,11 @@ export default function AdminTokensPage() {
                   <div className="space-y-2">
                     <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
                       Mint Additional Supply
+                      {onChainAddress && (
+                        <span className="ml-2 text-secondary normal-case tracking-normal">
+                          · on-chain
+                        </span>
+                      )}
                     </p>
                     <div className="flex gap-2">
                       <input
@@ -325,24 +393,37 @@ export default function AdminTokensPage() {
                         onChange={(e) => setMintAmount(e.target.value)}
                         placeholder="Amount"
                         type="number"
-                        className="flex-1 bg-surface-container-high border-[0.5px] border-outline-variant px-3 py-2 font-body text-sm text-on-surface placeholder:text-outline outline-none focus:border-primary transition-colors"
+                        disabled={isPending || isConfirming}
+                        className="flex-1 bg-surface-container-high border-[0.5px] border-outline-variant px-3 py-2 font-body text-sm text-on-surface placeholder:text-outline outline-none focus:border-primary transition-colors disabled:opacity-50"
                       />
                       <button
-                        onClick={() => {
-                          if (mintAmount && Number(mintAmount) > 0) {
-                            mintTokenSupply(selectedToken.id, Number(mintAmount));
-                            setMintAmount("");
-                          }
-                        }}
-                        disabled={!mintAmount || Number(mintAmount) <= 0}
+                        onClick={handleMintSupply}
+                        disabled={
+                          !mintAmount ||
+                          Number(mintAmount) <= 0 ||
+                          isPending ||
+                          isConfirming
+                        }
                         className="px-4 py-2 bg-secondary/10 text-secondary border-[0.5px] border-secondary/40 font-label text-[10px] uppercase tracking-[0.15em] hover:bg-secondary/20 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                       >
-                        Mint
+                        {isPending
+                          ? "Sign…"
+                          : isConfirming
+                            ? "Confirm…"
+                            : "Mint"}
                       </button>
                     </div>
                     <p className="font-body text-[10px] text-on-surface-variant">
                       Remaining: {(selectedToken.maxSupply - selectedToken.supply).toLocaleString()} tokens available
                     </p>
+                    <TxStatus
+                      hash={hash}
+                      isPending={isPending}
+                      isConfirming={isConfirming}
+                      isSuccess={isSuccess && !!pendingMint}
+                      isError={isError}
+                      error={error}
+                    />
                   </div>
 
                   {/* Contract */}

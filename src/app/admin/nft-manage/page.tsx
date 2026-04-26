@@ -1,8 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAccount } from "wagmi";
 import { useStore, type TeaCake } from "@/stores/useStore";
+import { useNFTMint } from "@/hooks/useNFTContract";
+import { buildTeaCakeURI } from "@/lib/web3/metadata";
+import { ADDRESSES } from "@/lib/web3/contracts";
+import { TxStatus } from "@/components/ui/TxStatus";
 
 const fade = {
   initial: { opacity: 0, y: 16 },
@@ -40,10 +45,35 @@ export default function NftManagePage() {
   const teaCakes = useStore((s) => s.teaCakes);
   const addTeaCake = useStore((s) => s.addTeaCake);
   const removeTeaCake = useStore((s) => s.removeTeaCake);
+  const addToast = useStore((s) => s.addToast);
+
+  const { address, isConnected } = useAccount();
+  const {
+    mint,
+    hash,
+    isPending,
+    isConfirming,
+    isSuccess,
+    isError,
+    error,
+    reset,
+  } = useNFTMint();
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showMintForm, setShowMintForm] = useState(false);
   const [form, setForm] = useState(INITIAL_FORM);
+  const [pendingCake, setPendingCake] = useState<TeaCake | null>(null);
+
+  // After tx confirms, persist the new cake to the local store with the real tx hash.
+  useEffect(() => {
+    if (isSuccess && pendingCake && hash) {
+      addTeaCake({ ...pendingCake, contractAddress: hash });
+      setPendingCake(null);
+      setForm(INITIAL_FORM);
+      setShowMintForm(false);
+      reset();
+    }
+  }, [isSuccess, pendingCake, hash, addTeaCake, reset]);
 
   const totalAssets = teaCakes.length;
   const totalValue = teaCakes.reduce((s, t) => s + t.priceUsd, 0);
@@ -69,14 +99,27 @@ export default function NftManagePage() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
+    if (!isConnected || !address) {
+      addToast({
+        type: "error",
+        title: "Wallet Not Connected",
+        message: "Connect your wallet to mint NFTs on BSC.",
+      });
+      return;
+    }
+
     const maxTokenId =
       teaCakes.length > 0
         ? Math.max(...teaCakes.map((t) => t.tokenId))
         : 0;
 
     const today = new Date().toISOString().slice(0, 10);
+    const tags = form.tags
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
 
-    const newCake: TeaCake = {
+    const cake: TeaCake = {
       id: `tc-${Date.now()}`,
       name: form.name,
       subtitle: form.subtitle,
@@ -88,23 +131,33 @@ export default function NftManagePage() {
       price: Number(form.priceBnb) || 0,
       priceUsd: Number(form.priceUsd) || 0,
       appraisal: Number(form.priceUsd) || 0,
-      tags: form.tags
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean),
+      tags,
       category: form.category,
       tokenId: maxTokenId + 1,
-      contractAddress: "0x1111...2222",
-      owner: "0xMINTER",
+      contractAddress: ADDRESSES.KKIKDA_NFT,
+      owner: address,
       isListed: true,
       provenance: [
         { date: today, event: "Minted", detail: "Minted via Admin Panel" },
       ],
     };
 
-    addTeaCake(newCake);
-    setForm(INITIAL_FORM);
-    setShowMintForm(false);
+    const uri = buildTeaCakeURI({
+      name: cake.name,
+      description: cake.subtitle,
+      vintage: cake.vintage,
+      weight: cake.weight,
+      factory: cake.factory,
+      grade: cake.grade,
+      category: cake.category,
+      priceBnb: cake.price,
+      priceUsd: cake.priceUsd,
+      tags: cake.tags,
+      mintedAt: today,
+    });
+
+    setPendingCake(cake);
+    mint(address, uri);
   }
 
   const inputClass =
@@ -304,8 +357,31 @@ export default function NftManagePage() {
               </div>
             </div>
 
-            <button type="submit" className="btn-gradient">
-              Mint NFT
+            <TxStatus
+              hash={hash}
+              isPending={isPending}
+              isConfirming={isConfirming}
+              isSuccess={isSuccess && !!pendingCake}
+              isError={isError}
+              error={error}
+            />
+
+            {!isConnected && (
+              <p className="font-label text-[10px] uppercase tracking-[0.15em] text-error">
+                Connect your wallet to mint on BSC.
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={!isConnected || isPending || isConfirming}
+              className="btn-gradient disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {isPending
+                ? "Awaiting signature…"
+                : isConfirming
+                  ? "Confirming on-chain…"
+                  : "Mint NFT on BSC"}
             </button>
           </motion.form>
         )}
