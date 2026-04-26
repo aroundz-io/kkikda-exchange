@@ -306,7 +306,11 @@ export default function AdminPage() {
   const tokens = useStore((s) => s.tokens);
   const mintRecords = useStore((s) => s.mintRecords);
 
-  const totalMintedValue = teaCakes.reduce((s, t) => s + t.priceUsd, 0);
+  // Total RWA-backed value = unit price × minted units (1:1)
+  const totalMintedValue = teaCakes.reduce(
+    (s, t) => s + t.priceUsd * (t.mintedUnits ?? 1),
+    0,
+  );
   const totalTokens = tokens.reduce((s, t) => s + t.supply, 0);
 
   return (

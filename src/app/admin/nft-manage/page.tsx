@@ -130,8 +130,13 @@ export default function NftManagePage() {
     burn(BigInt(cake.tokenId));
   }
 
-  const totalAssets = teaCakes.length;
-  const totalValue = teaCakes.reduce((s, t) => s + t.priceUsd, 0);
+  // Total NFT units across all product types (sum of mintedUnits)
+  const totalAssets = teaCakes.reduce((s, t) => s + (t.mintedUnits ?? 1), 0);
+  // Total vault value = price × mintedUnits
+  const totalValue = teaCakes.reduce(
+    (s, t) => s + t.priceUsd * (t.mintedUnits ?? 1),
+    0,
+  );
   const avgVintage =
     teaCakes.length > 0
       ? Math.round(
@@ -192,6 +197,8 @@ export default function NftManagePage() {
       contractAddress: ADDRESSES.KKIKDA_NFT,
       owner: address,
       isListed: true,
+      totalUnits: 1,
+      mintedUnits: 1,
       provenance: [
         { date: today, event: "Minted", detail: "Minted via Admin Panel" },
       ],
@@ -550,8 +557,15 @@ export default function NftManagePage() {
                     {cake.vintage}
                   </p>
                   <p className="font-headline text-sm text-primary">
-                    ${cake.priceUsd.toLocaleString()}
+                    {cake.priceUsd.toLocaleString()} USDT
                   </p>
+                </div>
+                <div className="flex items-center justify-between font-label text-[9px] uppercase tracking-[0.15em] text-outline border-t-[0.5px] border-outline-variant/20 pt-2">
+                  <span>
+                    {(cake.mintedUnits ?? 1).toLocaleString()} /{" "}
+                    {(cake.totalUnits ?? 1).toLocaleString()} minted
+                  </span>
+                  <span className="text-primary">#{cake.tokenId}</span>
                 </div>
                 <div className="flex flex-wrap gap-1">
                   {cake.tags.slice(0, 2).map((tag) => (
@@ -595,16 +609,20 @@ export default function NftManagePage() {
                 </div>
                 <p className="font-body text-xs text-on-surface-variant mt-0.5">
                   {cake.factory} &middot; {cake.vintage} &middot;{" "}
-                  {cake.category}
+                  {cake.category} &middot;{" "}
+                  <span className="text-secondary">
+                    {(cake.mintedUnits ?? 1).toLocaleString()} /{" "}
+                    {(cake.totalUnits ?? 1).toLocaleString()} units
+                  </span>
                 </p>
               </div>
               <div className="text-right shrink-0 flex items-center gap-3">
                 <div>
                   <p className="font-headline text-sm text-primary">
-                    ${cake.priceUsd.toLocaleString()}
+                    {cake.priceUsd.toLocaleString()} USDT
                   </p>
                   <p className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                    {cake.priceUsd.toLocaleString()} USDT
+                    per unit
                   </p>
                 </div>
                 <button
