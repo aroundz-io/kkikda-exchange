@@ -40,6 +40,12 @@ export const translations = {
   "sidebar.collector": { en: "Collector", ko: "수집가" },
   "sidebar.admin": { en: "Admin", ko: "관리자" },
   "sidebar.vintageCurator": { en: "Vintage Curator", ko: "빈티지 큐레이터" },
+  "sidebar.guest": { en: "Guest", ko: "방문자" },
+  "sidebar.guestPrompt": {
+    en: "Connect a BSC wallet to begin",
+    ko: "BSC 지갑을 연결해 시작하세요",
+  },
+  "sidebar.connectCta": { en: "Connect Wallet", ko: "지갑 연결" },
   "sidebar.newMint": { en: "New Mint", ko: "신규 발행" },
   "sidebar.quickTrade": { en: "Quick Trade", ko: "빠른 거래" },
   "sidebar.kycStatus": { en: "KYC Status", ko: "KYC 상태" },

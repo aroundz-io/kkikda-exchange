@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAccount } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useStore } from "@/stores/useStore";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useT } from "@/lib/i18n/useT";
@@ -41,7 +42,10 @@ export function Sidebar() {
   const sidebarOpen = useStore((s) => s.sidebarOpen);
   const setSidebarOpen = useStore((s) => s.setSidebarOpen);
   const { isAdmin } = useIsAdmin();
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
+  const shortAddr = address
+    ? `${address.slice(0, 6)}…${address.slice(-4)}`
+    : "";
 
   const visibleNavItems = NAV_ITEMS.filter(
     (item) => !("requiresWallet" in item && item.requiresWallet) || isConnected,
@@ -49,35 +53,76 @@ export function Sidebar() {
 
   const sidebarContent = (
     <div className="flex flex-col h-full py-8">
-      {/* User Profile */}
+      {/* User Profile — disconnected / collector / admin */}
       <div className="px-8 mb-10">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-10 h-10 bg-surface-container-highest border-[0.5px] border-outline-variant flex items-center justify-center">
-            <User className="w-5 h-5 text-primary" />
+          <div
+            className={`w-10 h-10 border-[0.5px] flex items-center justify-center ${
+              isConnected
+                ? "bg-surface-container-highest border-outline-variant"
+                : "bg-surface-container border-outline-variant/40"
+            }`}
+          >
+            <User
+              className={`w-5 h-5 ${
+                isConnected ? "text-primary" : "text-outline"
+              }`}
+            />
           </div>
-          <div>
-            <p className="text-primary font-headline font-bold text-sm tracking-tight">
-              {isAdmin ? t("sidebar.kuraMaster") : t("sidebar.collector")}
+          <div className="min-w-0">
+            <p
+              className={`font-headline font-bold text-sm tracking-tight ${
+                isConnected ? "text-primary" : "text-outline"
+              }`}
+            >
+              {!isConnected
+                ? t("sidebar.guest")
+                : isAdmin
+                  ? t("sidebar.kuraMaster")
+                  : t("sidebar.collector")}
             </p>
-            <p className="text-outline font-label text-[10px] uppercase tracking-widest flex items-center gap-1.5">
-              {isAdmin ? (
+            <p className="text-outline font-label text-[10px] uppercase tracking-widest flex items-center gap-1.5 truncate">
+              {!isConnected ? (
+                t("sidebar.guestPrompt")
+              ) : isAdmin ? (
                 <>
                   <ShieldCheck className="w-3 h-3 text-secondary" />
-                  {t("sidebar.admin")}
+                  <span className="truncate normal-case tracking-normal text-on-surface-variant">
+                    {t("sidebar.admin")} · {shortAddr}
+                  </span>
                 </>
               ) : (
-                t("sidebar.vintageCurator")
+                <span className="truncate normal-case tracking-normal text-on-surface-variant">
+                  {shortAddr}
+                </span>
               )}
             </p>
           </div>
         </div>
-        <Link
-          href={isAdmin ? "/admin/nft-manage" : "/dex"}
-          onClick={() => setSidebarOpen(false)}
-          className="block w-full text-center bg-gradient-to-br from-primary to-on-primary-container text-on-primary py-3 px-4 font-label font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity"
-        >
-          {isAdmin ? t("sidebar.newMint") : t("sidebar.quickTrade")}
-        </Link>
+
+        {!isConnected ? (
+          <ConnectButton.Custom>
+            {({ openConnectModal }) => (
+              <button
+                onClick={() => {
+                  openConnectModal();
+                  setSidebarOpen(false);
+                }}
+                className="block w-full text-center bg-gradient-to-br from-primary to-on-primary-container text-on-primary py-3 px-4 font-label font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity"
+              >
+                {t("sidebar.connectCta")}
+              </button>
+            )}
+          </ConnectButton.Custom>
+        ) : (
+          <Link
+            href={isAdmin ? "/admin/nft-manage" : "/dex"}
+            onClick={() => setSidebarOpen(false)}
+            className="block w-full text-center bg-gradient-to-br from-primary to-on-primary-container text-on-primary py-3 px-4 font-label font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity"
+          >
+            {isAdmin ? t("sidebar.newMint") : t("sidebar.quickTrade")}
+          </Link>
+        )}
       </div>
 
       {/* Navigation */}
@@ -134,28 +179,31 @@ export function Sidebar() {
         )}
       </nav>
 
-      {/* KYC Status */}
-      <div className="px-8 mt-auto">
-        <div className="p-4 bg-surface-container-low border-b-[0.5px] border-outline-variant/30">
-          <p className="text-[10px] font-label text-outline uppercase mb-2">
-            {isAdmin ? t("sidebar.adminStatus") : t("sidebar.kycStatus")}
-          </p>
-          <div className="flex items-center justify-between">
-            <span
-              className={`text-xs font-bold uppercase tracking-widest ${
-                isAdmin ? "text-primary" : "text-secondary"
-              }`}
-            >
-              {isAdmin ? t("sidebar.authorized") : t("sidebar.tier2")}
-            </span>
-            {isAdmin ? (
-              <ShieldCheck className="w-4 h-4 text-primary" />
-            ) : (
-              <BadgeCheck className="w-4 h-4 text-secondary fill-secondary" />
-            )}
+      {/* KYC / Status — only when connected (otherwise the badge would
+          imply an identity that doesn't exist yet) */}
+      {isConnected && (
+        <div className="px-8 mt-auto">
+          <div className="p-4 bg-surface-container-low border-b-[0.5px] border-outline-variant/30">
+            <p className="text-[10px] font-label text-outline uppercase mb-2">
+              {isAdmin ? t("sidebar.adminStatus") : t("sidebar.kycStatus")}
+            </p>
+            <div className="flex items-center justify-between">
+              <span
+                className={`text-xs font-bold uppercase tracking-widest ${
+                  isAdmin ? "text-primary" : "text-secondary"
+                }`}
+              >
+                {isAdmin ? t("sidebar.authorized") : t("sidebar.tier2")}
+              </span>
+              {isAdmin ? (
+                <ShieldCheck className="w-4 h-4 text-primary" />
+              ) : (
+                <BadgeCheck className="w-4 h-4 text-secondary fill-secondary" />
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 
