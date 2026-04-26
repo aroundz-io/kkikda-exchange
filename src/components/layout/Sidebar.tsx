@@ -95,7 +95,7 @@ export function Sidebar() {
                     }`}
                   />
                 </div>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p
                     className={`font-headline font-bold text-sm tracking-tight ${
                       isConnected ? "text-primary" : "text-outline"
@@ -107,22 +107,22 @@ export function Sidebar() {
                         ? t("sidebar.kuraMaster")
                         : t("sidebar.collector")}
                   </p>
-                  <p className="text-outline font-label text-[10px] uppercase tracking-widest flex items-center gap-1.5 truncate">
-                    {!isConnected ? (
-                      t("sidebar.guestPrompt")
-                    ) : isAdmin ? (
-                      <>
+                  {!isConnected ? (
+                    /* Multi-line wrap — sentence-style prompt, no truncate.
+                       break-keep keeps Korean word boundaries intact. */
+                    <p className="text-outline font-body text-[11px] leading-snug mt-0.5 break-keep">
+                      {t("sidebar.guestPrompt")}
+                    </p>
+                  ) : (
+                    <p className="font-label text-[10px] flex items-center gap-1.5 truncate text-on-surface-variant">
+                      {isAdmin && (
                         <ShieldCheck className="w-3 h-3 text-secondary shrink-0" />
-                        <span className="truncate normal-case tracking-normal text-on-surface-variant">
-                          {t("sidebar.admin")} · {shortAddr}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="truncate normal-case tracking-normal text-on-surface-variant">
-                        {shortAddr}
+                      )}
+                      <span className="truncate">
+                        {isAdmin ? `${t("sidebar.admin")} · ${shortAddr}` : shortAddr}
                       </span>
-                    )}
-                  </p>
+                    </p>
+                  )}
                 </div>
               </button>
 

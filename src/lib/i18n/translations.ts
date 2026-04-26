@@ -21,7 +21,7 @@ export const translations = {
   // ──────────────────────────────────────────────
   "nav.market": { en: "Market", ko: "마켓" },
   "nav.exchange": { en: "Exchange", ko: "거래소" },
-  "nav.governance": { en: "Governance", ko: "거버넌스" },
+  "nav.governance": { en: "Staking", ko: "스테이킹" },
   "nav.vault": { en: "Vault", ko: "보관소" },
   "nav.history": { en: "Ledger", ko: "전체 내역" },
 
