@@ -181,6 +181,21 @@ export const translations = {
     en: "BSC · BEP-20",
     ko: "BSC · BEP-20",
   },
+  "dex.routing": { en: "Routing", ko: "라우팅 경로" },
+  "dex.routeKkdaUsdt": {
+    en: "KKDA ↔ WBNB ↔ USDT (PancakeSwap multi-hop)",
+    ko: "KKDA ↔ WBNB ↔ USDT (PancakeSwap 다중 경유)",
+  },
+  "dex.poolKkdaUsdt": { en: "KKDA · USDT Pool", ko: "KKDA · USDT 풀" },
+  "dex.poolStatusPending": {
+    en: "Liquidity pending — awaiting admin seed",
+    ko: "유동성 대기 중 — 관리자 풀 시딩 필요",
+  },
+  "dex.poolStatusLive": { en: "Live · trading enabled", ko: "활성 · 거래 가능" },
+  "dex.poolNote": {
+    en: "Once the admin seeds liquidity, swaps execute against the on-chain LP via PancakeSwap V2. WBNB is BSC's native wrapped-BNB used by the router for multi-hop routing — it is not a token issued by KKIKDAGEO.",
+    ko: "관리자가 유동성을 추가하면 PancakeSwap V2의 온체인 LP를 통해 스왑이 실행됩니다. WBNB는 BSC의 기본 래핑 BNB로 라우터의 다중 경유에만 사용되며, 끽다거가 발행한 토큰이 아닙니다.",
+  },
   "dex.executeTrade": { en: "Execute Trade", ko: "거래 실행" },
   "dex.awaitingSig": { en: "Awaiting signature…", ko: "서명 대기 중…" },
   "dex.confirming": { en: "Confirming on-chain…", ko: "온체인 확인 중…" },

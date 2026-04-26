@@ -23,8 +23,6 @@ import {
   ChevronDown,
   Settings,
   Droplets,
-  Waves,
-  ArrowRight,
 } from "lucide-react";
 import type { Address } from "viem";
 
@@ -334,38 +332,6 @@ function ExchangeWidget() {
   );
 }
 
-/* ---------- Liquidity Pool Card ---------- */
-function LiquidityPoolCard({
-  title,
-  apy,
-  icon,
-}: {
-  title: string;
-  apy: string;
-  icon: React.ReactNode;
-}) {
-  const t = useT();
-  return (
-    <div className="bg-surface-container-highest p-6 flex justify-between items-center group cursor-pointer hover:bg-outline-variant/20 transition-all">
-      <div className="flex items-center gap-4">
-        <div className="w-12 h-12 bg-tertiary-container flex items-center justify-center">
-          {icon}
-        </div>
-        <div>
-          <h4 className="font-body font-bold text-white">{title}</h4>
-          <p className="font-label text-[10px] text-white/40 uppercase tracking-widest">
-            {t("dex.apy")}: {apy}
-          </p>
-        </div>
-      </div>
-      <ArrowRight
-        className="text-primary group-hover:translate-x-1 transition-transform"
-        size={20}
-      />
-    </div>
-  );
-}
-
 /* ---------- Main Page ---------- */
 export default function DexPage() {
   const tokens = useStore((s) => s.tokens);
@@ -447,22 +413,41 @@ export default function DexPage() {
             </div>
           </div>
 
-          {/* Liquidity Pools */}
+          {/* Liquidity Pool — single honest status card */}
           <section>
             <h2 className="font-headline text-xl text-primary mb-6">
               {t("dex.liquidityReservoirs")}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <LiquidityPoolCard
-                title="KKDA-USDT"
-                apy="12.1%"
-                icon={<Droplets className="text-primary" />}
-              />
-              <LiquidityPoolCard
-                title="USDT-WBNB"
-                apy="6.8%"
-                icon={<Waves className="text-primary" />}
-              />
+            <div className="bg-surface-container-low border-[0.5px] border-outline-variant p-6 space-y-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-4 min-w-0">
+                  <div className="w-12 h-12 bg-tertiary-container flex items-center justify-center shrink-0">
+                    <Droplets className="text-primary" size={20} />
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="font-headline text-base text-on-surface">
+                      {t("dex.poolKkdaUsdt")}
+                    </h4>
+                    <p className="font-label text-[10px] uppercase tracking-[0.15em] text-error mt-1">
+                      ● {t("dex.poolStatusPending")}
+                    </p>
+                  </div>
+                </div>
+                <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline shrink-0">
+                  PancakeSwap V2
+                </span>
+              </div>
+              <div className="border-t border-outline-variant/15 pt-4 space-y-2">
+                <div className="flex justify-between text-[11px] font-label uppercase tracking-tighter text-white/40">
+                  <span>{t("dex.routing")}</span>
+                  <span className="text-on-surface-variant">
+                    {t("dex.routeKkdaUsdt")}
+                  </span>
+                </div>
+                <p className="font-body text-xs text-on-surface-variant leading-relaxed">
+                  {t("dex.poolNote")}
+                </p>
+              </div>
             </div>
           </section>
         </div>
