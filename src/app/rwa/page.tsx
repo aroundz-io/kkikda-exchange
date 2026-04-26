@@ -149,10 +149,19 @@ export default function RwaPage() {
             animate={{ opacity: 1, scale: 1 }}
             className="relative bg-surface-container-low border border-outline-variant/10"
           >
-            <div className="aspect-[16/10] bg-surface-container flex items-center justify-center">
-              <span className="text-outline/20 font-headline text-[120px]">
-                {selectedCake?.vintage}
-              </span>
+            <div className="aspect-[16/10] bg-surface-container flex items-center justify-center overflow-hidden">
+              {selectedCake?.image ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={selectedCake.image}
+                  alt={selectedCake.name}
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <span className="text-outline/20 font-headline text-[120px]">
+                  {selectedCake?.vintage}
+                </span>
+              )}
             </div>
             <div className="p-6 lg:p-8 bg-surface-container-low space-y-4">
               <h2 className="font-headline text-2xl lg:text-3xl text-white">

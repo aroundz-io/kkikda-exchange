@@ -256,10 +256,20 @@ function InventoryGrid() {
             transition={{ delay: i * 0.1 }}
             className="bg-surface-container-lowest group relative border-b border-transparent hover:border-primary transition-all duration-500 cursor-pointer"
           >
-            <div className="aspect-[4/5] bg-surface-container overflow-hidden flex items-center justify-center">
-              <span className="text-outline/20 font-headline text-5xl">
-                {item.vintage}
-              </span>
+            <div className="aspect-square bg-surface-container overflow-hidden flex items-center justify-center">
+              {item.image ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-full h-full object-contain"
+                  loading="lazy"
+                />
+              ) : (
+                <span className="text-outline/20 font-headline text-5xl">
+                  {item.vintage}
+                </span>
+              )}
             </div>
             <div className="p-6 space-y-4">
               <div className="flex justify-between items-start">

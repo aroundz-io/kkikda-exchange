@@ -528,11 +528,20 @@ export default function NftManagePage() {
                 X
               </button>
 
-              {/* Image Placeholder */}
-              <div className="aspect-[4/5] bg-surface-container flex items-center justify-center relative">
-                <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
-                  {cake.weight}
-                </span>
+              {/* Product Image — uniform square aspect */}
+              <div className="aspect-square bg-surface-container flex items-center justify-center relative overflow-hidden">
+                {cake.image ? (
+                  <img
+                    src={cake.image}
+                    alt={cake.name}
+                    className="w-full h-full object-contain"
+                    loading="lazy"
+                  />
+                ) : (
+                  <span className="font-label text-[10px] uppercase tracking-[0.15em] text-outline">
+                    {cake.weight}
+                  </span>
+                )}
                 {/* On-chain Badge */}
                 {cake.txHash && (
                   <span className="absolute top-3 left-9 font-label text-[9px] uppercase tracking-[0.15em] px-2 py-0.5 border-[0.5px] text-secondary border-secondary/40 bg-secondary/10">
@@ -591,10 +600,19 @@ export default function NftManagePage() {
               {...fade}
               transition={{ duration: 0.3, delay: 0.1 + i * 0.04 }}
             >
-              <div className="w-14 h-14 bg-surface-container shrink-0 flex items-center justify-center">
-                <span className="font-label text-[9px] uppercase tracking-[0.15em] text-outline">
-                  {cake.weight}
-                </span>
+              <div className="w-14 h-14 bg-surface-container shrink-0 flex items-center justify-center overflow-hidden">
+                {cake.image ? (
+                  <img
+                    src={cake.image}
+                    alt={cake.name}
+                    className="w-full h-full object-contain"
+                    loading="lazy"
+                  />
+                ) : (
+                  <span className="font-label text-[9px] uppercase tracking-[0.15em] text-outline">
+                    {cake.weight}
+                  </span>
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">

@@ -43,10 +43,18 @@ function ProvenanceSidebar({
         </h4>
 
         <div className="mb-12">
-          <div className="h-48 w-full bg-surface-container mb-6 border border-outline-variant/10 overflow-hidden flex items-center justify-center">
-            <span className="text-outline text-xs font-label uppercase">
-              {cake.name}
-            </span>
+          <div className="aspect-square w-full bg-surface-container mb-6 border border-outline-variant/10 overflow-hidden flex items-center justify-center">
+            {cake.image ? (
+              <img
+                src={cake.image}
+                alt={cake.name}
+                className="w-full h-full object-contain"
+              />
+            ) : (
+              <span className="text-outline text-xs font-label uppercase">
+                {cake.name}
+              </span>
+            )}
           </div>
           <h2 className="text-2xl font-headline mb-2">{cake.name}</h2>
           <p className="text-xs font-body text-on-surface-variant leading-relaxed opacity-70">
@@ -87,120 +95,84 @@ function ProvenanceSidebar({
   );
 }
 
-/* ---------- Tea Card ---------- */
+/* ---------- Tea Card (uniform size for all products) ---------- */
 function TeaCard({
   cake,
   onSelect,
-  isLarge = false,
 }: {
   cake: TeaCake;
   onSelect: (cake: TeaCake) => void;
-  isLarge?: boolean;
 }) {
   const t = useT();
-  if (isLarge) {
-    return (
-      <div
-        className="group relative xl:row-span-2 bg-surface-container-low border border-outline-variant/5 hover:border-primary/20 transition-all duration-500 overflow-hidden flex flex-col cursor-pointer"
-        onClick={() => onSelect(cake)}
-      >
-        <div className="relative flex-1 overflow-hidden min-h-[300px] bg-surface-container flex items-center justify-center">
-          <span className="text-outline/30 font-headline text-4xl">
-            {cake.vintage}
-          </span>
-          <div className="absolute inset-0 bg-gradient-to-b from-surface-container-low/20 via-transparent to-surface-container-low" />
-          <div className="absolute top-8 left-8">
-            <div className="text-[10px] font-label uppercase text-primary mb-2 tracking-[0.3em]">
-              {t("nft.masterpiece")}
-            </div>
-            <h3 className="text-4xl font-headline text-white max-w-xs leading-tight">
-              {cake.name}
-            </h3>
-          </div>
-        </div>
-        <div className="p-8 bg-surface-container-low relative z-10">
-          <div className="mb-8 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-secondary" />
-              <span className="text-[10px] font-label uppercase tracking-widest text-secondary">
-                {t("nft.appraisedBy")} ({cake.vintage})
-              </span>
-            </div>
-            <p className="text-sm font-body text-on-surface-variant opacity-80 leading-relaxed">
-              {cake.subtitle}
-            </p>
-          </div>
-          <div className="flex justify-between items-end">
-            <div>
-              <div className="text-[10px] font-label uppercase text-white/40 mb-1">
-                {t("nft.currentAppraisal")}
-              </div>
-              <div className="text-2xl font-label text-primary font-bold">
-                {cake.priceUsd.toLocaleString()} USDT
-              </div>
-            </div>
-            <button className="bg-primary text-on-primary px-8 py-3 font-label font-bold uppercase text-xs hover:bg-primary/90 transition-all">
-              {t("nft.acquireNow")}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div
-      className="group relative bg-surface-container-low border border-outline-variant/5 hover:border-primary/20 transition-all duration-500 overflow-hidden cursor-pointer"
+      className="group relative bg-surface-container-low border border-outline-variant/5 hover:border-primary/20 transition-all duration-500 overflow-hidden cursor-pointer flex flex-col"
       onClick={() => onSelect(cake)}
     >
-      <div className="relative h-80 overflow-hidden bg-surface-container flex items-center justify-center">
-        <span className="text-outline/20 font-headline text-6xl">
-          {cake.vintage}
-        </span>
-        <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent opacity-60" />
-        <div className="absolute top-4 left-4 flex gap-2">
-          {cake.tags.map((tag) => (
+      {/* Square product image — uniform aspect ratio */}
+      <div className="relative aspect-square overflow-hidden bg-surface-container">
+        {cake.image ? (
+          <img
+            src={cake.image}
+            alt={cake.name}
+            className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="text-outline/20 font-headline text-6xl">
+              {cake.vintage}
+            </span>
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low/40 to-transparent pointer-events-none" />
+        <div className="absolute top-4 left-4 flex flex-wrap gap-1.5 max-w-[80%]">
+          {cake.tags.slice(0, 2).map((tag) => (
             <span
               key={tag}
-              className="bg-surface-container-highest/80 text-on-surface px-3 py-1 text-[10px] font-label uppercase tracking-widest backdrop-blur-md border border-outline-variant/20"
+              className="bg-surface-container-highest/80 text-on-surface px-2.5 py-1 text-[9px] font-label uppercase tracking-widest backdrop-blur-md border border-outline-variant/20"
             >
               {tag}
             </span>
           ))}
         </div>
       </div>
-      <div className="p-8">
-        <div className="flex justify-between items-start mb-6">
-          <div>
-            <h3 className="text-2xl font-headline mb-1">{cake.name}</h3>
-            <p className="text-[10px] font-label uppercase tracking-widest text-white/40">
+
+      <div className="p-6 flex-1 flex flex-col">
+        <div className="flex justify-between items-start mb-4 gap-3">
+          <div className="min-w-0">
+            <h3 className="text-xl font-headline truncate">{cake.name}</h3>
+            <p className="text-[10px] font-label uppercase tracking-widest text-white/40 line-clamp-2 mt-1">
               {cake.subtitle}
             </p>
           </div>
-          <div className="text-right">
-            <div className="text-lg font-label text-primary font-bold">
+          <div className="text-right shrink-0">
+            <div className="text-base font-label text-primary font-bold whitespace-nowrap">
               {cake.priceUsd.toLocaleString()} USDT
             </div>
-            <div className="text-[10px] font-label text-white/20">
-              ${cake.priceUsd.toLocaleString()} USD
+            <div className="text-[10px] font-label text-white/20 whitespace-nowrap">
+              {cake.totalUnits.toLocaleString()} units
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          <div className="border-l border-outline-variant/30 pl-4">
+
+        <div className="grid grid-cols-2 gap-3 mb-5">
+          <div className="border-l border-outline-variant/30 pl-3">
             <div className="text-[10px] font-label uppercase text-white/40">
               {t("nft.vintage")}
             </div>
             <div className="text-sm font-label">{cake.vintage}</div>
           </div>
-          <div className="border-l border-outline-variant/30 pl-4">
+          <div className="border-l border-outline-variant/30 pl-3">
             <div className="text-[10px] font-label uppercase text-white/40">
               {t("nft.weight")}
             </div>
             <div className="text-sm font-label">{cake.weight}</div>
           </div>
         </div>
-        <div className="flex items-center justify-between border-t border-outline-variant/15 pt-6">
+
+        <div className="flex items-center justify-between border-t border-outline-variant/15 pt-5 mt-auto">
           <button className="text-[10px] font-label uppercase tracking-widest text-primary flex items-center gap-2 group/btn">
             {t("nft.viewProvenance")}
             <ArrowRight className="w-3 h-3 transition-transform group-hover/btn:translate-x-1" />
@@ -258,13 +230,12 @@ export default function NftMarketplacePage() {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-8">
-        {listedCakes.map((cake, idx) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {listedCakes.map((cake) => (
           <TeaCard
             key={cake.id}
             cake={cake}
             onSelect={setSelectedCake}
-            isLarge={idx === 1}
           />
         ))}
       </div>
