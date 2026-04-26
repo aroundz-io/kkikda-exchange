@@ -281,6 +281,10 @@ function ExchangeWidget() {
           <span>{t("dex.router")}</span>
           <span>PancakeSwap V2</span>
         </div>
+        <div className="flex justify-between text-[11px] font-label uppercase tracking-tighter text-white/40">
+          <span>{t("dex.network")}</span>
+          <span className="text-secondary">{t("dex.networkValue")}</span>
+        </div>
       </div>
 
       <TxStatus

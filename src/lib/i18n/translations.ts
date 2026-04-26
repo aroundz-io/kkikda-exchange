@@ -162,6 +162,11 @@ export const translations = {
   "dex.minReceived": { en: "Minimum Received", ko: "최소 수령량" },
   "dex.slippage": { en: "Slippage Tolerance", ko: "슬리피지 허용치" },
   "dex.router": { en: "Router", ko: "라우터" },
+  "dex.network": { en: "Network", ko: "네트워크" },
+  "dex.networkValue": {
+    en: "BSC · BEP-20",
+    ko: "BSC · BEP-20",
+  },
   "dex.executeTrade": { en: "Execute Trade", ko: "거래 실행" },
   "dex.awaitingSig": { en: "Awaiting signature…", ko: "서명 대기 중…" },
   "dex.confirming": { en: "Confirming on-chain…", ko: "온체인 확인 중…" },
