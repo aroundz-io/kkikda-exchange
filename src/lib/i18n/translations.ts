@@ -50,7 +50,7 @@ export const translations = {
   // ──────────────────────────────────────────────
   "footer.tagline": {
     en: "© 2024 KKIKDAGEO. The Digital Kura for Vintage Pu'er.",
-    ko: "© 2024 끽다거. 빈티지 보이차의 디지털 보관소.",
+    ko: "© 2024 끽다거. 골동보이차의 디지털 보관소.",
   },
   "footer.provenance": { en: "Provenance Protocol", ko: "프로비넌스 프로토콜" },
   "footer.whitepaper": { en: "Whitepaper", ko: "백서" },
@@ -62,8 +62,8 @@ export const translations = {
   // ──────────────────────────────────────────────
   "home.title": { en: "Portfolio Overview", ko: "포트폴리오 개요" },
   "home.subtitle": {
-    en: "Managing your curated collection of vintage Pu'er tea cakes and digital liquidity positions.",
-    ko: "엄선된 빈티지 보이차와 디지털 유동성 포지션을 한곳에서 관리하세요.",
+    en: "Managing your curated collection of Vintage Pu'er and digital liquidity positions.",
+    ko: "엄선된 골동보이차와 디지털 유동성 포지션을 한곳에서 관리하세요.",
   },
   "home.globalBalance": { en: "Global Wallet Balance", ko: "통합 지갑 잔액" },
   "home.totalPnl": { en: "Total Profit & Loss", ko: "총 손익" },
@@ -81,7 +81,7 @@ export const translations = {
   "home.startUpgrade": { en: "Start Upgrade", ko: "업그레이드 시작" },
   "home.digitalAssets": { en: "Digital Assets Portfolio", ko: "디지털 자산 포트폴리오" },
   "home.allAssets": { en: "All Assets", ko: "전체" },
-  "home.teaCakes": { en: "Tea Cakes", ko: "보이차" },
+  "home.teaCakes": { en: "Vintage Pu'er", ko: "골동보이차" },
   "home.liquidity": { en: "Liquidity", ko: "유동성" },
   "home.assetClass": { en: "Asset Class", ko: "자산 종류" },
   "home.allocation": { en: "Allocation", ko: "보유 수량" },
@@ -91,12 +91,12 @@ export const translations = {
   "home.heritageToken": { en: "$KKDA Heritage Token", ko: "$KKDA 헤리티지 토큰" },
   "home.utilityToken": { en: "Native Utility Token", ko: "기본 유틸리티 토큰" },
   "home.lpProvision": { en: "Liquidity Provision", ko: "유동성 공급" },
-  "home.vintageNftCake": { en: "Vintage NFT Cake", ko: "빈티지 NFT 보이차" },
+  "home.vintageNftCake": { en: "Vintage Pu'er NFT", ko: "골동보이차 NFT" },
   "home.provenanceTimeline": { en: "Provenance Timeline", ko: "이력 타임라인" },
   "home.curatorInsight": { en: "Curator's Insight", ko: "큐레이터의 인사이트" },
   "home.curatorQuote": {
-    en: "Your portfolio's concentration in 80s vintage cakes shows strong preservation of value. Market trends suggest a 12% uptick in liquidity for aged Menghai varieties next quarter.",
-    ko: "1980년대 빈티지 보이차에 집중된 포트폴리오가 가치를 잘 보존하고 있습니다. 시장 흐름을 보면 다음 분기에 숙성 멍하이 계열의 유동성이 약 12% 상승할 것으로 예상됩니다.",
+    en: "Your portfolio's concentration in 80s Vintage Pu'er shows strong preservation of value. Market trends suggest a 12% uptick in liquidity for aged Menghai varieties next quarter.",
+    ko: "1980년대 골동보이차에 집중된 포트폴리오가 가치를 잘 보존하고 있습니다. 시장 흐름을 보면 다음 분기에 숙성 멍하이 계열의 유동성이 약 12% 상승할 것으로 예상됩니다.",
   },
   "home.heritageAdvisory": { en: "Heritage Advisory", ko: "헤리티지 자문단" },
   "home.timeline.acquisitionTitle": {
@@ -130,8 +130,8 @@ export const translations = {
   "nft.titlePrefix": { en: "The Marketplace of", ko: "프로비넌스의" },
   "nft.titleAccent": { en: "Provenance", ko: "마켓플레이스" },
   "nft.subtitle": {
-    en: "Explore the world's most rare and authenticated vintage Pu'er tea cakes. Every token represents a physical cake held in our climate-controlled Kura, verified by the blockchain.",
-    ko: "세계에서 가장 희귀하고 인증된 빈티지 보이차를 만나보세요. 모든 토큰은 항온 보관소에 실재하는 보이차를 나타내며 블록체인으로 검증됩니다.",
+    en: "Explore the world's most rare and authenticated Vintage Pu'er. Every token represents a physical cake held in our climate-controlled Kura, verified by the blockchain.",
+    ko: "세계에서 가장 희귀하고 인증된 골동보이차를 만나보세요. 모든 토큰은 항온 보관소에 실재하는 골동보이차를 나타내며 블록체인으로 검증됩니다.",
   },
   "nft.sortVintage": { en: "Sort by Vintage", ko: "빈티지 기준 정렬" },
   "nft.sortPrice": { en: "Sort by Price", ko: "가격 기준 정렬" },
@@ -320,8 +320,8 @@ export const translations = {
   "redeem.kicker": { en: "PHYSICAL REDEMPTION", ko: "실물 인수" },
   "redeem.title": { en: "Redeem Your Asset", ko: "자산 인수하기" },
   "redeem.body": {
-    en: "To redeem a tokenized tea cake for its physical counterpart, visit the",
-    ko: "토큰화된 보이차를 실물로 받으시려면 다음 페이지를 방문하세요:",
+    en: "To redeem a tokenized Vintage Pu'er for its physical counterpart, visit the",
+    ko: "토큰화된 골동보이차를 실물로 받으시려면 다음 페이지를 방문하세요:",
   },
   "redeem.vaultPage": { en: "Vault page", ko: "보관소 페이지" },
 
@@ -330,8 +330,8 @@ export const translations = {
   // ──────────────────────────────────────────────
   "admin.executiveDashboard": { en: "Executive Dashboard", ko: "관리자 대시보드" },
   "admin.executiveSubtitle": {
-    en: "Overseeing the provenance and minting of vintage Pu'er assets.",
-    ko: "빈티지 보이차 자산의 이력과 발행을 관리합니다.",
+    en: "Overseeing the provenance and minting of Vintage Pu'er assets.",
+    ko: "골동보이차 자산의 이력과 발행을 관리합니다.",
   },
   "admin.networkStatus": { en: "NETWORK STATUS", ko: "네트워크 상태" },
   "admin.synchronized": { en: "SYNCHRONIZED", ko: "동기화됨" },
@@ -365,8 +365,8 @@ export const translations = {
   },
   "admin.nftAssetManagement": { en: "NFT / Asset Management", ko: "NFT / 자산 관리" },
   "admin.nftAssetDesc": {
-    en: "Manage tokenized tea cake inventory",
-    ko: "토큰화된 보이차 인벤토리 관리",
+    en: "Manage tokenized Vintage Pu'er inventory",
+    ko: "토큰화된 골동보이차 인벤토리 관리",
   },
   "admin.batch": { en: "Batch", ko: "배치" },
   "admin.id": { en: "ID", ko: "ID" },

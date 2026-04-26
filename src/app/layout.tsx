@@ -10,7 +10,7 @@ import { Toasts } from "@/components/ui/Toasts";
 export const metadata: Metadata = {
   title: "KKIKDAGEO | Digital Kura Exchange",
   description:
-    "A vintage Pu'er tea RWA crypto exchange. Trade authenticated, tokenized tea cakes on-chain with full provenance tracking.",
+    "A vintage Pu'er RWA crypto exchange on BSC. Trade authenticated, tokenized Vintage Pu'er on-chain with full provenance tracking.",
 };
 
 export default function RootLayout({
